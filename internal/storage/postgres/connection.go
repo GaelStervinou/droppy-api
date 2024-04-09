@@ -5,11 +5,15 @@ import (
 	"go-api/internal/storage/postgres/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 )
 
 func Connect() (*gorm.DB, error) {
-	//TODO à mettre dans des variables d'env
-	dsn := "user=postgres host=localhost port=5432 dbname=postgres password=postgres sslmode=disable"
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv("DB_HOST")
+	dsn := "user=" + dbUser + " host=" + dbHost + " dbname=" + dbName + " password=" + dbPassword + " sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
