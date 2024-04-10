@@ -53,9 +53,9 @@ func main() {
 
 	p.Use(CurrentUserMiddleware)
 	p.Get("/users/{id}", func(res http.ResponseWriter, req *http.Request) {
-		username := context.Get(req, "username").(string)
+		currentUserID := context.Get(req, "userId")
 
-		user, err := repo.UserRepository.GetByEmail(req.Context(), username)
+		user, err := repo.UserRepository.GetById(req.Context(), currentUserID.(uint))
 		if err != nil {
 			http.Error(res, err.Error(), http.StatusInternalServerError)
 			return
@@ -129,10 +129,10 @@ func CurrentUserMiddleware(next http.Handler) http.Handler {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			username := claims["username"].(string)
+			userId := uint(claims["userId"].(float64))
 
 			//TODO peut-être faire une requête pour récupérer le user et passer le user direct dans le context
-			context.Set(r, "username", username)
+			context.Set(r, "userId", userId)
 		}
 		next.ServeHTTP(w, r)
 	})
