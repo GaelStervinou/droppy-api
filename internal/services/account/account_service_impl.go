@@ -62,7 +62,7 @@ func (a *AccountService) Login(ctx context.Context, email string, password strin
 	}
 
 	//login successful, now generate a random token
-	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetEmail())
+	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
@@ -88,7 +88,7 @@ func (a *AccountService) LoginWithGoogle(ctx context.Context, email string) (*ac
 	}
 
 	//TODO refacto avec function login juste au dessus
-	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetEmail())
+	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
