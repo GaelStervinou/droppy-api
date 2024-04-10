@@ -49,5 +49,9 @@ func GoogleAuthHandler(res http.ResponseWriter, req *http.Request, acc account.A
 	}
 	res.WriteHeader(http.StatusOK)
 	res.Header().Set("Content-Type", "application/json")
-	res.Write(payload)
+	_, err = res.Write(payload)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

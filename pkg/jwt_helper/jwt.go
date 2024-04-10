@@ -3,10 +3,11 @@ package jwt_helper
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"os"
 	"time"
 )
 
-var secretKey = []byte("secret-key")
+var secretKey = []byte(os.Getenv("JWT_SECRET"))
 
 func GenerateToken(username string) (string, int, error) {
 	expiry := time.Now().Add(time.Hour * 24).Unix()
@@ -24,18 +25,18 @@ func GenerateToken(username string) (string, int, error) {
 	return tokenString, int(expiry), nil
 }
 
-func VerifyToken(tokenString string) error {
+func VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
-	return nil
+	return token, nil
 }
