@@ -2,7 +2,6 @@ package account
 
 import (
 	"errors"
-	"fmt"
 	"go-api/internal/repositories"
 	errors2 "go-api/pkg/errors"
 	"go-api/pkg/model"
@@ -41,11 +40,7 @@ func TestAccountService_Create(t *testing.T) {
 		UserRepository:  &MockUserRepository{},
 		TokenRepository: nil,
 	}
-	a := AccountService{
-		Repo: &repo,
-	}
 
-	fmt.Println(a)
 	type fields struct {
 		Repo *repositories.Repositories
 	}

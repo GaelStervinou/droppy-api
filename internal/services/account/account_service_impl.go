@@ -11,6 +11,7 @@ import (
 	"go-api/pkg/services/account"
 	"go-api/pkg/validation"
 	"golang.org/x/crypto/argon2"
+	"time"
 )
 
 type AccountService struct {
@@ -84,6 +85,44 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 	return &account.TokenInfo{JWTToken: newToken, RefreshToken: refreshToken, Expiry: newTokenExpiry}, nil
 }
 
+func (a *AccountService) LoginFromRefreshToken(refreshToken string) (*account.TokenInfo, error) {
+	t, err := a.Repo.TokenRepository.FindByRefreshToken(refreshToken)
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+	if t == nil {
+		return &account.TokenInfo{}, errors.New("refresh token not found")
+	}
+
+	if t.GetExpiry() < int(time.Now().Unix()) {
+		return &account.TokenInfo{}, errors.New("refresh token expired")
+	}
+
+	user, err := a.Repo.UserRepository.GetById(t.GetUserID())
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	newToken, newRefreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	_, err = a.Repo.TokenRepository.Create(context.TODO(), model.TokenCreationParam{
+		Token:  newRefreshToken,
+		UserID: user.GetID(),
+		Expiry: newTokenExpiry,
+	})
+
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	err = a.Repo.TokenRepository.Delete(t.GetID())
+
+	return &account.TokenInfo{JWTToken: newToken, RefreshToken: newRefreshToken, Expiry: newTokenExpiry}, nil
+}
+
 func (a *AccountService) LoginWithGoogle(email string) (*account.TokenInfo, error) {
 	user, err := a.Repo.UserRepository.GetByEmail(email)
 	if err != nil {
@@ -110,7 +149,7 @@ func (a *AccountService) LoginWithGoogle(email string) (*account.TokenInfo, erro
 }
 
 func (a *AccountService) Logout(userId uint) error {
-	return a.Repo.TokenRepository.Delete(context.TODO(), userId)
+	return nil
 }
 
 func (a *AccountService) EmailExists(email string) (bool, error) {

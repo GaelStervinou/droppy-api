@@ -7,6 +7,7 @@ type AccountServiceIface interface {
 	Login(string, string) (*TokenInfo, error)
 	LoginWithGoogle(string) (*TokenInfo, error)
 	Logout(uint) error
+	LoginFromRefreshToken(string) (*TokenInfo, error)
 	EmailExists(string) (bool, error)
 }
 
