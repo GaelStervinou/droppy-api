@@ -10,7 +10,6 @@ type AuthToken struct {
 	gorm.Model
 	Token  string `json:"token,omitempty"`
 	UserID uint   `json:"userId,omitempty"`
-	Email  string `json:"email,omitempty"`
 	Expiry int    `json:"expiry,omitempty"`
 }
 
@@ -22,10 +21,6 @@ func (s *AuthToken) GetToken() string {
 
 func (s *AuthToken) GetUserID() uint {
 	return s.UserID
-}
-
-func (s *AuthToken) GetEmail() string {
-	return s.Email
 }
 
 func (s *AuthToken) GetExpiry() int {
@@ -52,10 +47,19 @@ func (repo *repoPrivate) Create(ctx context.Context, args model.TokenCreationPar
 	tokenObject := AuthToken{
 		Token:  args.Token,
 		UserID: args.UserID,
-		Email:  args.Email,
 		Expiry: args.Expiry,
 	}
-	result := repo.db.Create(&tokenObject)
+	existingRow, err := repo.Find(ctx, args.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	var result *gorm.DB
+	if existingRow != nil {
+		result = repo.db.Create(&tokenObject)
+	} else {
+		result = repo.db.Save(&tokenObject)
+	}
 
 	return &tokenObject, result.Error
 }
@@ -67,6 +71,6 @@ func (repo *repoPrivate) Find(ctx context.Context, token string) (model.AuthToke
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) Delete(ctx context.Context, token string) error {
-	return repo.db.Delete(&AuthToken{}, token).Error
+func (repo *repoPrivate) Delete(ctx context.Context, userId uint) error {
+	return repo.db.Delete(&AuthToken{}, userId).Error
 }
