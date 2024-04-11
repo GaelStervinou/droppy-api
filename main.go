@@ -55,7 +55,7 @@ func main() {
 	p.Get("/users/{id}", func(res http.ResponseWriter, req *http.Request) {
 		currentUserID := context.Get(req, "userId")
 
-		user, err := repo.UserRepository.GetById(req.Context(), currentUserID.(uint))
+		user, err := repo.UserRepository.GetById(currentUserID.(uint))
 		if err != nil {
 			http.Error(res, err.Error(), http.StatusInternalServerError)
 			return
@@ -68,7 +68,7 @@ func main() {
 			return
 		}
 
-		requestedUser, err := repo.UserRepository.GetById(req.Context(), uint(userID))
+		requestedUser, err := repo.UserRepository.GetById(uint(userID))
 
 		if err != nil {
 			http.Error(res, err.Error(), http.StatusInternalServerError)
@@ -129,7 +129,7 @@ func CurrentUserMiddleware(next http.Handler) http.Handler {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			userId := uint(claims["userId"].(float64))
+			userId := uint(claims["sub"].(float64))
 
 			//TODO peut-être faire une requête pour récupérer le user et passer le user direct dans le context
 			context.Set(r, "userId", userId)

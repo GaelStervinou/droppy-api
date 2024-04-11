@@ -19,22 +19,21 @@ func GoogleAuthHandler(res http.ResponseWriter, req *http.Request, acc account.A
 		return
 	}
 
-	isKnown, err := acc.EmailExists(req.Context(), user.Email)
-
+	isKnown, err := acc.EmailExists(user.Email)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if false == isKnown {
-		err := acc.CreateWithGoogle(req.Context(), user.FirstName, user.LastName, user.Email, user.UserID)
+		err := acc.CreateWithGoogle(user.FirstName, user.LastName, user.Email, user.UserID)
 		if err != nil {
 			http.Error(res, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	tokenInfo, err := acc.LoginWithGoogle(req.Context(), user.Email)
+	tokenInfo, err := acc.LoginWithGoogle(user.Email)
 
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)

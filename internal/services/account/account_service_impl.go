@@ -7,7 +7,9 @@ import (
 	"go-api/internal/repositories"
 	"go-api/pkg/jwt_helper"
 	"go-api/pkg/model"
+	"go-api/pkg/random"
 	"go-api/pkg/services/account"
+	"go-api/pkg/validation"
 	"golang.org/x/crypto/argon2"
 )
 
@@ -15,62 +17,63 @@ type AccountService struct {
 	Repo *repositories.Repositories
 }
 
-func (a *AccountService) Create(ctx context.Context, firstname string, lastname string, email string, password string) error {
+func (a *AccountService) Create(firstname string, lastname string, email string, password string, username string) error {
+	user := model.UserCreationParam{
+		Firstname: firstname,
+		Lastname:  lastname,
+		Email:     email,
+		Password:  password,
+		Username:  username,
+		//TODO peut-être passé par une struct pour le role ou au moins un enum ?
+		Roles: []string{"user", "admin"},
+	}
+	validationError := validation.ValidateUserCreation(user)
+	if len(validationError.Fields) > 0 {
+		return validationError
+	}
 	hashedPassword := argonFromPassword(password)
 
-	_, err := a.Repo.UserRepository.Create(
-		context.TODO(),
-		model.UserCreationParam{
-			Firstname: firstname,
-			Lastname:  lastname,
-			Email:     email,
-			Password:  hashedPassword,
-			//TODO peut-être passé par une struct pour le role ou au moins un enum ?
-			Role: "user",
-		},
-	)
+	user.Password = hashedPassword
+
+	_, err := a.Repo.UserRepository.Create(user)
 
 	return err
 }
 
-func (a *AccountService) CreateWithGoogle(ctx context.Context, firstname string, lastname string, email string, googleId string) error {
+func (a *AccountService) CreateWithGoogle(firstname string, lastname string, email string, googleId string) error {
 	_, err := a.Repo.UserRepository.CreateWithGoogle(
-		context.TODO(),
 		model.UserCreationWithGoogleParam{
 			Firstname: firstname,
 			Lastname:  lastname,
 			Email:     email,
 			GoogleId:  googleId,
+			Username:  random.RandStringRunes(10),
 			//TODO peut-être passé par une struct pour le role ou au moins un enum ?
-			Role: "user",
+			Roles: []string{"user"},
 		},
 	)
 
 	return err
 }
 
-func (a *AccountService) Login(ctx context.Context, email string, password string) (*account.TokenInfo, error) {
-	//first read the user data
-	user, err := a.Repo.UserRepository.GetByEmail(context.TODO(), email)
+func (a *AccountService) Login(email string, password string) (*account.TokenInfo, error) {
+	user, err := a.Repo.UserRepository.GetByEmail(email)
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
 
-	//then, compare password
 	if user.GetPassword() != argonFromPassword(password) {
 		return &account.TokenInfo{}, errors.New("email or password does not match our record")
 	}
 
-	//login successful, now generate a random token
-	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID())
+	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
 
 	_, err = a.Repo.TokenRepository.Create(context.TODO(), model.TokenCreationParam{
-		Token:  newToken,
+		Token:  refreshToken,
 		UserID: user.GetID(),
-		Email:  email,
 		Expiry: newTokenExpiry,
 	})
 
@@ -78,25 +81,24 @@ func (a *AccountService) Login(ctx context.Context, email string, password strin
 		return &account.TokenInfo{}, err
 	}
 
-	return &account.TokenInfo{Token: newToken, Expiry: newTokenExpiry}, nil
+	return &account.TokenInfo{JWTToken: newToken, RefreshToken: refreshToken, Expiry: newTokenExpiry}, nil
 }
 
-func (a *AccountService) LoginWithGoogle(ctx context.Context, email string) (*account.TokenInfo, error) {
-	user, err := a.Repo.UserRepository.GetByEmail(context.TODO(), email)
+func (a *AccountService) LoginWithGoogle(email string) (*account.TokenInfo, error) {
+	user, err := a.Repo.UserRepository.GetByEmail(email)
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
 
 	//TODO refacto avec function login juste au dessus
-	newToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID())
+	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
 
 	_, err = a.Repo.TokenRepository.Create(context.TODO(), model.TokenCreationParam{
-		Token:  newToken,
+		Token:  refreshToken,
 		UserID: user.GetID(),
-		Email:  email,
 		Expiry: newTokenExpiry,
 	})
 
@@ -104,16 +106,15 @@ func (a *AccountService) LoginWithGoogle(ctx context.Context, email string) (*ac
 		return &account.TokenInfo{}, err
 	}
 
-	return &account.TokenInfo{Token: newToken, Expiry: newTokenExpiry}, nil
+	return &account.TokenInfo{JWTToken: newToken, RefreshToken: refreshToken, Expiry: newTokenExpiry}, nil
 }
 
-func (a *AccountService) Logout(ctx context.Context, s string) error {
-	//TODO implement me
-	panic("implement me")
+func (a *AccountService) Logout(userId uint) error {
+	return a.Repo.TokenRepository.Delete(context.TODO(), userId)
 }
 
-func (a *AccountService) EmailExists(ctx context.Context, email string) (bool, error) {
-	_, err := a.Repo.UserRepository.GetByEmail(context.TODO(), email)
+func (a *AccountService) EmailExists(email string) (bool, error) {
+	_, err := a.Repo.UserRepository.GetByEmail(email)
 	if err != nil {
 		return false, nil
 	}
@@ -140,7 +141,7 @@ func argonFromPassword(password string) string {
 		saltLength:  8,
 		keyLength:   16,
 	}
-	//TODO utiliser var d'env pour le salt ?
+	//TODO un salt par user ? ou un salt global ?
 	salt := []byte("salt1234")
 
 	// Pass the plaintext password, salt and parameters to the argon2.IDKey
