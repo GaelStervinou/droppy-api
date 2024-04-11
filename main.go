@@ -10,6 +10,7 @@ import (
 	"github.com/markbates/goth/gothic"
 	"go-api/authentication"
 	"go-api/authentication/provider"
+	"go-api/internal/http/routes"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
@@ -40,14 +41,18 @@ func main() {
 
 	p := pat.New()
 
+	p.Get("/auth/refresh", func(res http.ResponseWriter, req *http.Request) {
+		routes.RefreshTokenHandler(res, req, &account.AccountService{
+			Repo: repo,
+		})
+	})
+
 	p.Get("/auth/{provider}/callback", func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("callback")
 		authentication.GoogleAuthHandler(res, req, &account.AccountService{
 			Repo: repo,
 		})
 	})
 	p.Get("/auth/{provider}", func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("auth")
 		gothic.BeginAuthHandler(res, req)
 	})
 

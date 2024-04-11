@@ -17,6 +17,7 @@ type AuthTokenModel interface {
 
 type AuthTokenRepository interface {
 	Create(ctx context.Context, args TokenCreationParam) (AuthTokenModel, error)
-	Find(ctx context.Context, token string) (AuthTokenModel, error)
-	Delete(ctx context.Context, userId uint) error
+	FindByRefreshToken(token string) (AuthTokenModel, error)
+	FindByUserId(uint) (AuthTokenModel, error)
+	Delete(uint) error
 }

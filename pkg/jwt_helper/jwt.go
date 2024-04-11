@@ -25,16 +25,17 @@ func GenerateToken(userId uint, roles []string) (string, string, int, error) {
 	}
 
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
+	refreshTokenExpiry := time.Now().AddDate(0, 0, 7).Unix()
 	rtClaims := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["sub"] = userId
-	rtClaims["exp"] = time.Now().AddDate(0, 0, 7).Unix()
+	rtClaims["exp"] = refreshTokenExpiry
 	rt, err := refreshToken.SignedString(secretKey)
 
 	if err != nil {
 		return "", "", 0, err
 	}
 
-	return tokenString, rt, int(expiry), nil
+	return tokenString, rt, int(refreshTokenExpiry), nil
 }
 
 func VerifyToken(tokenString string) (*jwt.Token, error) {

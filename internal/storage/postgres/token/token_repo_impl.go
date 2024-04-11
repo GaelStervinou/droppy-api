@@ -49,28 +49,30 @@ func (repo *repoPrivate) Create(ctx context.Context, args model.TokenCreationPar
 		UserID: args.UserID,
 		Expiry: args.Expiry,
 	}
-	existingRow, err := repo.Find(ctx, args.Token)
-	if err != nil {
-		return nil, err
-	}
 
-	var result *gorm.DB
-	if existingRow != nil {
-		result = repo.db.Create(&tokenObject)
-	} else {
-		result = repo.db.Save(&tokenObject)
-	}
+	result := repo.db.Create(&tokenObject)
 
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) Find(ctx context.Context, token string) (model.AuthTokenModel, error) {
-	tokenObject := AuthToken{Token: token}
-	result := repo.db.Find(&tokenObject)
-
+func (repo *repoPrivate) FindByRefreshToken(token string) (model.AuthTokenModel, error) {
+	tokenObject := AuthToken{}
+	result := repo.db.Where("token = ?", token).First(&tokenObject)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) Delete(ctx context.Context, userId uint) error {
-	return repo.db.Delete(&AuthToken{}, userId).Error
+func (repo *repoPrivate) FindByUserId(userId uint) (model.AuthTokenModel, error) {
+	tokenObject := AuthToken{}
+	result := repo.db.Where("user_id = ?", userId).First(&tokenObject)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &tokenObject, result.Error
+}
+
+func (repo *repoPrivate) Delete(recordId uint) error {
+	return repo.db.Delete(&AuthToken{}, recordId).Error
 }
