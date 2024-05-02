@@ -3,7 +3,7 @@ package account
 import (
 	"errors"
 	"go-api/internal/repositories"
-	errors2 "go-api/pkg/errors"
+	errors2 "go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"testing"
 )

@@ -2,15 +2,14 @@ package account
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"go-api/internal/repositories"
+	"go-api/pkg/hash"
 	"go-api/pkg/jwt_helper"
 	"go-api/pkg/model"
 	"go-api/pkg/random"
 	"go-api/pkg/services/account"
 	"go-api/pkg/validation"
-	"golang.org/x/crypto/argon2"
 	"time"
 )
 
@@ -26,17 +25,20 @@ func (a *AccountService) Create(firstname string, lastname string, email string,
 		Password:  password,
 		Username:  username,
 		//TODO peut-être passé par une struct pour le role ou au moins un enum ?
-		Roles: []string{"user", "admin"},
+		Roles: []string{"user"},
 	}
 	validationError := validation.ValidateUserCreation(user)
 	if len(validationError.Fields) > 0 {
 		return validationError
 	}
-	hashedPassword := argonFromPassword(password)
+	hashedPassword, err := hash.GenerateFromPassword(password)
+	if err != nil {
+		return err
+	}
 
 	user.Password = hashedPassword
 
-	_, err := a.Repo.UserRepository.Create(user)
+	_, err = a.Repo.UserRepository.Create(user)
 
 	return err
 }
@@ -62,8 +64,11 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
-
-	if user.GetPassword() != argonFromPassword(password) {
+	match, err := hash.ComparePasswordAndHash(password, user.GetPassword())
+	if err != nil {
+		return &account.TokenInfo{}, errors.New("Error while comparing password and hash")
+	}
+	if !match {
 		return &account.TokenInfo{}, errors.New("email or password does not match our record")
 	}
 
@@ -163,30 +168,3 @@ func (a *AccountService) EmailExists(email string) (bool, error) {
 
 // Safe checker to know if this file already implements the interface correctly or not
 var _ account.AccountServiceIface = (*AccountService)(nil)
-
-type params struct {
-	memory      uint32
-	iterations  uint32
-	parallelism uint8
-	saltLength  uint32
-	keyLength   uint32
-}
-
-func argonFromPassword(password string) string {
-	p := &params{
-		memory:      64 * 1024,
-		iterations:  3,
-		parallelism: 2,
-		saltLength:  8,
-		keyLength:   16,
-	}
-	//TODO un salt par user ? ou un salt global ?
-	salt := []byte("salt1234")
-
-	// Pass the plaintext password, salt and parameters to the argon2.IDKey
-	// function. This will generate a hash of the password using the Argon2id
-	// variant.
-	hash := argon2.IDKey([]byte(password), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
-
-	return base64.RawStdEncoding.EncodeToString(hash)
-}

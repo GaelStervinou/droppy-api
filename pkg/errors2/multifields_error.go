@@ -1,9 +1,9 @@
-package errors
+package errors2
 
 import "errors"
 
 type MultiFieldsError struct {
-	Fields map[string]string
+	Fields map[string]string `json:"fields"`
 }
 
 func (e MultiFieldsError) Error() string {

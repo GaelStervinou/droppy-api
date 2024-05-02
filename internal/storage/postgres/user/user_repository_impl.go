@@ -4,7 +4,10 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"go-api/pkg/errors2"
+	"go-api/pkg/hash"
 	"go-api/pkg/model"
+	"go-api/pkg/validation"
 	"gorm.io/gorm"
 	"strings"
 )
@@ -13,7 +16,7 @@ type User struct {
 	gorm.Model
 	GoogleID    *string `gorm:"unique"`
 	Email       string  `gorm:"unique"`
-	Password    string  `json:"-"`
+	Password    string  `gorm:"size:255" json:"password,omitempty"`
 	Username    string  `gorm:"unique;not null"`
 	Firstname   string
 	Lastname    string
@@ -83,15 +86,36 @@ func NewRepo(db *gorm.DB) model.UserRepository {
 }
 
 func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, error) {
+
+	validationError := validation.ValidateUserCreation(args)
+
+	if len(validationError.Fields) > 0 {
+		return nil, validationError
+	}
+
+	hashedPassword, err := hash.GenerateFromPassword(args.Password)
+
+	if err != nil {
+		return nil, err
+	}
+
 	userObject := User{
 		Firstname: args.Firstname,
 		Lastname:  args.Lastname,
 		Email:     args.Email,
-		Password:  args.Password,
+		Password:  hashedPassword,
+		Username:  args.Username,
 		Roles:     args.Roles,
 	}
 
 	result := repo.db.Create(&userObject)
+
+	if result.Error != nil {
+		if errors2.IsErrorCode(result.Error, errors2.UniqueViolationErr) {
+			return nil, errors.New("email or username already exists")
+		}
+		return nil, result.Error
+	}
 	return &userObject, result.Error
 }
 
@@ -128,9 +152,8 @@ func (repo *repoPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, er
 }
 
 func (repo *repoPrivate) GetByEmail(email string) (model.UserModel, error) {
-	userObject := User{Email: email}
-
-	result := repo.db.Find(&userObject)
+	userObject := User{}
+	result := repo.db.Where("email = ?", email).First(&userObject)
 	if userObject.CreatedAt.IsZero() {
 		return &userObject, errors.New(fmt.Sprintf("user with email %s not found", email))
 	}

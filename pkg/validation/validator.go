@@ -1,7 +1,7 @@
 package validation
 
 import (
-	errors2 "go-api/pkg/errors"
+	errors2 "go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/mail"
 )
@@ -27,6 +27,9 @@ func ValidateUserCreation(args model.UserCreationParam) errors2.MultiFieldsError
 	}
 	if len(args.Roles) == 0 {
 		finalErrors.Fields["role"] = "Role must not be empty"
+	}
+	if len(args.Username) < 4 {
+		finalErrors.Fields["username"] = "Username must be at least 4 characters long"
 	}
 
 	return finalErrors

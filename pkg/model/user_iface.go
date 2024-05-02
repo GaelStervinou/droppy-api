@@ -4,6 +4,7 @@ type UserModel interface {
 	GetID() uint
 	GetPassword() string
 	GetRoles() []string
+	GetEmail() string
 }
 
 type UserRepository interface {
