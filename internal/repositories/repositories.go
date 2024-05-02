@@ -7,16 +7,15 @@ import (
 	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"os"
-	"sync"
 )
 
 type Repositories struct {
-	wg              *sync.WaitGroup
+	//wg              *sync.WaitGroup
 	UserRepository  model.UserRepository
 	TokenRepository model.AuthTokenRepository
 }
 
-func Setup(wg *sync.WaitGroup) *Repositories {
+func Setup() *Repositories {
 	sqlDB, err := postgres.Connect()
 	if err != nil {
 		fmt.Println(err)
@@ -24,12 +23,12 @@ func Setup(wg *sync.WaitGroup) *Repositories {
 	}
 
 	return &Repositories{
-		wg:              wg,
+		//wg:              wg,
 		UserRepository:  user.NewRepo(sqlDB),
 		TokenRepository: token.NewRepo(sqlDB),
 	}
 }
 
 func (r *Repositories) Disconnect() {
-	r.wg.Done()
+	//r.wg.Done()
 }

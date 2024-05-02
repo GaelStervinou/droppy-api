@@ -1,26 +1,34 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gorilla/context"
-	"github.com/gorilla/pat"
 	"github.com/joho/godotenv"
-	"github.com/markbates/goth/gothic"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 	"go-api/authentication"
 	"go-api/authentication/provider"
-	"go-api/internal/http/routes"
-	"go-api/internal/repositories"
-	"go-api/internal/services/account"
+	_ "go-api/docs"
+	"go-api/internal/http/controllers"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/jwt_helper"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
-	"sync"
 )
+
+// @title Droppy API
+// @version 1.0
+// @description This is the API documentation for Droppy
+
+// @contact.name   Droppy API Support
+// @contact.email  stervinou.g36@gmail.com
+// @host localhost:3000
+// @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 	err := godotenv.Load()
@@ -33,112 +41,75 @@ func main() {
 
 	postgres.AutoMigrate()
 
-	var wg sync.WaitGroup
-	repo := repositories.Setup(&wg)
-	defer repo.Disconnect()
+	//var wg sync.WaitGroup
+	//repo := repositories.Setup(&wg)
+	//defer repo.Disconnect()
 
 	authentication.Init()
 
-	p := pat.New()
+	r := gin.Default()
+	r.Use(gin.Recovery())
 
-	p.Get("/auth/refresh", func(res http.ResponseWriter, req *http.Request) {
-		routes.RefreshTokenHandler(res, req, &account.AccountService{
-			Repo: repo,
-		})
-	})
-
-	p.Get("/auth/{provider}/callback", func(res http.ResponseWriter, req *http.Request) {
-		authentication.GoogleAuthHandler(res, req, &account.AccountService{
-			Repo: repo,
-		})
-	})
-	p.Get("/auth/{provider}", func(res http.ResponseWriter, req *http.Request) {
-		gothic.BeginAuthHandler(res, req)
-	})
-
-	p.Use(CurrentUserMiddleware)
-	p.Get("/users/{id}", func(res http.ResponseWriter, req *http.Request) {
-		currentUserID := context.Get(req, "userId")
-
-		user, err := repo.UserRepository.GetById(currentUserID.(uint))
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		id := strings.TrimSpace(req.URL.Query().Get(":id"))
-
-		userID, err := strconv.ParseUint(id, 10, 64)
-		if err != nil {
-			http.Error(res, "Invalid user ID", http.StatusBadRequest)
-			return
+	v1 := r.Group("/api/v1")
+	{
+		auth := v1.Group("/auth")
+		{
+			auth.GET("/refresh", controllers.RefreshToken)
+			auth.GET("/:provider", controllers.GoogleAuth)
+			auth.GET("/:provider/callback", controllers.GoogleAuthCallback)
+			auth.POST("/login", controllers.Login)
 		}
 
-		requestedUser, err := repo.UserRepository.GetById(uint(userID))
-
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
+		user := v1.Group("/users")
+		{
+			user.GET("/:id", CurrentUserMiddleware(), controllers.GetUserById)
+			user.POST("/", controllers.Create)
 		}
+	}
+	r.GET("/api/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	err = r.Run(":3000")
 
-		if requestedUser == nil {
-			http.Error(res, "User not found", http.StatusNotFound)
-			return
-		}
-
-		if user.GetID() != uint(userID) {
-			http.Error(res, "You are not authorized to access this resource", http.StatusForbidden)
-			return
-		}
-
-		payload, err := json.Marshal(requestedUser)
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		res.WriteHeader(http.StatusOK)
-		res.Header().Set("Content-Type", "application/json")
-		_, err = res.Write(payload)
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	})
-
-	fmt.Println("Server is running on port 3000")
-	log.Fatal(http.ListenAndServe(":3000", p))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func CurrentUserMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/auth/") {
-			next.ServeHTTP(w, r)
+func CurrentUserMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/auth/") {
+			c.Next()
 			return
 		}
-		authHeader := r.Header.Get("Authorization")
+		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			http.Error(w, "Authorization header is missing", http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
+			c.Abort()
 			return
 		}
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, "Invalid authorization header", http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header"})
+			c.Abort()
 			return
 		}
 		tokenString := parts[1]
+		fmt.Println(tokenString)
 
 		token, err := jwt_helper.VerifyToken(tokenString)
 
 		if err != nil {
-			http.Error(w, "Failed to parse JWT token: "+err.Error(), http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse JWT token: " + err.Error()})
+			c.Abort()
 			return
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			userId := uint(claims["sub"].(float64))
 
+			fmt.Println(userId)
 			//TODO peut-être faire une requête pour récupérer le user et passer le user direct dans le context
-			context.Set(r, "userId", userId)
+			c.Set("userId", userId)
 		}
-		next.ServeHTTP(w, r)
-	})
+		c.Next()
+	}
 }
