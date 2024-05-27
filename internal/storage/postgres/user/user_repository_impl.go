@@ -86,7 +86,6 @@ func NewRepo(db *gorm.DB) model.UserRepository {
 }
 
 func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, error) {
-
 	validationError := validation.ValidateUserCreation(args)
 
 	if len(validationError.Fields) > 0 {
@@ -125,15 +124,33 @@ func (repo *repoPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam
 		Lastname:  args.Lastname,
 		Email:     args.Email,
 		GoogleID:  &args.GoogleId,
+		Status:    1,
 		Roles:     args.Roles,
+		Username:  args.Username,
 	}
 
 	result := repo.db.Create(&userObject)
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) Update(user model.UserModel) (model.UserModel, error) {
-	return user, repo.db.Save(user).Error
+func (repo *repoPrivate) Update(args model.UserPatchParam) (model.UserModel, error) {
+	validationError := validation.ValidateUserPatch(args)
+
+	if len(validationError.Fields) > 0 {
+		return nil, validationError
+	}
+	userObject := User{}
+	repo.db.Where("email = ?", args.Email).First(&userObject)
+	if userObject.CreatedAt.IsZero() {
+		return nil, errors.New("user not found")
+	}
+
+	userObject.Firstname = args.Firstname
+	userObject.Lastname = args.Lastname
+	userObject.Username = args.Username
+
+	result := repo.db.Save(&userObject)
+	return &userObject, result.Error
 }
 
 func (repo *repoPrivate) Delete(id uint) error {

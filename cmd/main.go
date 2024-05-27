@@ -8,7 +8,7 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
-	repo := repositories.Setup(&wg)
+	repo := repositories.Setup()
 	wg.Add(1)
 	defer repo.Disconnect()
 

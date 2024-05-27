@@ -13,7 +13,7 @@ type UserRepository interface {
 	GetById(id uint) (UserModel, error)
 	Create(args UserCreationParam) (UserModel, error)
 	CreateWithGoogle(args UserCreationWithGoogleParam) (UserModel, error)
-	Update(user UserModel) (UserModel, error)
+	Update(args UserPatchParam) (UserModel, error)
 	Delete(id uint) error
 	GetAll() ([]UserModel, error)
 }
@@ -34,4 +34,11 @@ type UserCreationWithGoogleParam struct {
 	Username  string
 	GoogleId  string
 	Roles     []string
+}
+
+type UserPatchParam struct {
+	Email     string
+	Firstname string
+	Lastname  string
+	Username  string
 }
