@@ -34,16 +34,49 @@ const docTemplate = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Email",
-                        "name": "email",
-                        "in": "formData",
-                        "required": true
+                        "description": "Login object",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/account.TokenInfo"
+                        }
                     },
+                    "422": {
+                        "description": "Invalid email or password"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/oauth_token": {
+            "post": {
+                "description": "login with firebase id token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
                     {
                         "type": "string",
-                        "description": "Password",
-                        "name": "password",
+                        "description": "Firebase ID Token",
+                        "name": "idToken",
                         "in": "formData",
                         "required": true
                     }
@@ -56,7 +89,7 @@ const docTemplate = `{
                         }
                     },
                     "422": {
-                        "description": "Invalid email or password"
+                        "description": "Unprocessable Entity"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -93,6 +126,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/follows": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Follow user by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "follow"
+                ],
+                "summary": "Follow user",
+                "parameters": [
+                    {
+                        "description": "Follow creation object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FollowCreationParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/follow.Follow"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Create user",
@@ -118,8 +199,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/account.TokenInfo"
                         }
@@ -202,7 +283,7 @@ const docTemplate = `{
                 "expiry": {
                     "type": "integer"
                 },
-                "jwttoken": {
+                "jwtToken": {
                     "type": "string"
                 },
                 "refreshToken": {
@@ -218,6 +299,32 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "follow.Follow": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "followedID": {
+                    "type": "integer"
+                },
+                "followerID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },
@@ -292,6 +399,25 @@ const docTemplate = `{
                 }
             }
         },
+        "model.FollowCreationParam": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.LoginParam": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "model.UserCreationParam": {
             "type": "object",
             "properties": {
@@ -349,7 +475,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:3000",
-	BasePath:         "/api/v1",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Droppy API",
 	Description:      "This is the API documentation for Droppy",

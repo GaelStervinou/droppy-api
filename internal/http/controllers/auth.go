@@ -6,6 +6,7 @@ import (
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/pkg/jwt_helper"
+	"go-api/pkg/model"
 	"net/http"
 )
 
@@ -114,8 +115,7 @@ func GoogleAuthCallback(c *gin.Context) {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			email formData string true "Email"
-//	@Param			password formData string true "Password"
+//	@Param			login body		model.LoginParam	true	"Login object"
 //	@Success		200	{object} account.TokenInfo
 //	@Failure		422 "Invalid email or password"
 //	@Failure		500
@@ -124,11 +124,14 @@ func Login(c *gin.Context) {
 	acc := &account.AccountService{
 		Repo: repositories.Setup(),
 	}
+	var loginParam model.LoginParam
 
-	email := c.PostForm("email")
-	password := c.PostForm("password")
+	if err := c.ShouldBindJSON(&loginParam); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	tokenInfo, err := acc.Login(email, password)
+	tokenInfo, err := acc.Login(loginParam.Email, loginParam.Password)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid email or password"})
 		return

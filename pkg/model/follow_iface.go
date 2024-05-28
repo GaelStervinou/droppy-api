@@ -20,3 +20,7 @@ type FollowRepository interface {
 	GetFollowers(userID uint) ([]FollowModel, error)
 	AreAlreadyFollowing(followerID, followedID uint) (bool, error)
 }
+
+type FollowCreationParam struct {
+	UserToFollowID uint `json:"userId"`
+}
