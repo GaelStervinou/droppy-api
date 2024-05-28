@@ -55,7 +55,7 @@ func main() {
 			auth.GET("/:provider", controllers.GoogleAuth)
 			auth.GET("/:provider/callback", controllers.GoogleAuthCallback)
 			auth.POST("/", controllers.Login)
-			auth.POST("/oauth_auth", controllers.FirebaseLogin)
+			auth.POST("/oauth_token", controllers.FirebaseLogin)
 		}
 
 		user := v1.Group("/users")
