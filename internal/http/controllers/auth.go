@@ -114,7 +114,7 @@ func GoogleAuthCallback(c *gin.Context) {
 //	@Success		200	{object} account.TokenInfo
 //	@Failure		422 "Invalid email or password"
 //	@Failure		500
-//	@Router			/auth/login [post]
+//	@Router			/auth [post]
 func Login(c *gin.Context) {
 	acc := &account.AccountService{
 		Repo: repositories.Setup(),
@@ -126,6 +126,28 @@ func Login(c *gin.Context) {
 	tokenInfo, err := acc.Login(email, password)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, tokenInfo)
+}
+
+func FirebaseLogin(c *gin.Context) {
+	idToken := c.PostForm("id_token")
+
+	if "" == idToken {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "id_token is empty"})
+		return
+	}
+
+	acc := &account.AccountService{
+		Repo: repositories.Setup(),
+	}
+
+	tokenInfo, err := acc.LoginWithFirebase(idToken, c)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 

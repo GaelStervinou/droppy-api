@@ -12,7 +12,7 @@
     "host": "localhost:3000",
     "basePath": "/api/v1",
     "paths": {
-        "/auth/login": {
+        "/auth": {
             "post": {
                 "description": "login with email and password",
                 "consumes": [
@@ -136,7 +136,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get user by ID",
+                "description": "Patch user by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -146,7 +146,7 @@
                 "tags": [
                     "user"
                 ],
-                "summary": "Get user by ID",
+                "summary": "Patch user by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -154,6 +154,15 @@
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "User creation object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserPatchParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -238,6 +247,9 @@
                 "lastname": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "phoneNumber": {
                     "type": "string"
                 },
@@ -293,6 +305,23 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserPatchParam": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

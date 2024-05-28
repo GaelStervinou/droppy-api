@@ -218,3 +218,54 @@ func PatchUserById(c *gin.Context) {
 
 	c.JSON(200, requestedUser)
 }
+
+func FollowUser(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	sqlDB, err := postgres.Connect()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	us := user.NewRepo(sqlDB)
+
+	id := strings.TrimSpace(c.Param("id"))
+
+	if "" == id {
+		c.JSON(400, gin.H{"error": "id is required"})
+		return
+	}
+
+	userID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	requestedUser, err := us.GetById(uint(userID))
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == requestedUser {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	if currentUserId == uint(userID) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "You can't follow yourself"})
+		return
+	}
+
+	//TODO follow user ( vérifier si pas déjà suivi + si pas lui même)
+
+	c.JSON(200, gin.H{"message": "User followed"})
+}

@@ -54,7 +54,8 @@ func main() {
 			auth.GET("/refresh", controllers.RefreshToken)
 			auth.GET("/:provider", controllers.GoogleAuth)
 			auth.GET("/:provider/callback", controllers.GoogleAuthCallback)
-			auth.POST("/login", controllers.Login)
+			auth.POST("/", controllers.Login)
+			auth.POST("/oauth_auth", controllers.FirebaseLogin)
 		}
 
 		user := v1.Group("/users")
@@ -62,6 +63,7 @@ func main() {
 			user.GET("/:id", middlewares.CurrentUserMiddleware(), controllers.GetUserById)
 			user.POST("/", controllers.Create)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(), controllers.PatchUserById)
+			user.POST("/:id/follow", middlewares.CurrentUserMiddleware(), controllers.FollowUser)
 		}
 	}
 	r.GET("/api/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
