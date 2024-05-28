@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 // RefreshToken godoc
 //
 //	@Summary		Refresh auth token
@@ -24,17 +28,18 @@ func RefreshToken(c *gin.Context) {
 	acc := &account.AccountService{
 		Repo: repositories.Setup(),
 	}
-	tokenString := c.GetHeader("Authorization")
-	if "" == tokenString {
+
+	var refreshToken RefreshTokenRequest
+	if err := c.ShouldBindJSON(&refreshToken); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if "" == refreshToken.RefreshToken {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
 		return
 	}
-	if 7 > len(tokenString) || "Bearer " != tokenString[:7] {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token format"})
-		return
-	}
-	tokenString = tokenString[7:]
-	token, err := jwt_helper.VerifyToken(tokenString)
+
+	token, err := jwt_helper.VerifyToken(refreshToken.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
