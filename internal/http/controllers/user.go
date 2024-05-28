@@ -136,7 +136,7 @@ func Create(c *gin.Context) {
 // @Failure		403
 // @Failure		404
 // @Failure		500
-// @Router			/users/{id} [get]
+// @Router			/users/{id} [patch]
 func PatchUserById(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 

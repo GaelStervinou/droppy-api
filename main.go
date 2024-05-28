@@ -60,7 +60,7 @@ func main() {
 
 		user := v1.Group("/users")
 		{
-			user.GET("/:id", middlewares.CurrentUserMiddleware(), controllers.GetUserById)
+			user.GET("/:id", controllers.GetUserById)
 			user.POST("/", controllers.Create)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(), controllers.PatchUserById)
 		}
