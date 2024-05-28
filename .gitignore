@@ -1,3 +1,4 @@
 /.env
 /pg_data/
 /main
+/config/droppy-firebase-config.json
