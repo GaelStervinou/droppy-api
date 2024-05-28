@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"go-api/internal/storage/postgres/follow"
 	"go-api/internal/storage/postgres/token"
 	"go-api/internal/storage/postgres/user"
 	"gorm.io/driver/postgres"
@@ -27,5 +28,5 @@ func AutoMigrate() {
 	if err != nil {
 		panic(err)
 	}
-	sqlDB.AutoMigrate(&user.User{}, &token.AuthToken{})
+	sqlDB.AutoMigrate(&user.User{}, &token.AuthToken{}, &follow.Follow{})
 }

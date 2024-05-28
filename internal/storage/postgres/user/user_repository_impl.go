@@ -14,19 +14,19 @@ import (
 
 type User struct {
 	gorm.Model
-	GoogleID    *string `gorm:"unique"`
-	Email       string  `gorm:"unique"`
-	Password    string  `gorm:"size:255" json:"password,omitempty"`
-	Username    string  `gorm:"unique;not null"`
-	Firstname   string
-	Lastname    string
-	PhoneNumber string
-	Bio         string `gorm:"size:1000"`
-	Avatar      string
-	VerifyToken string
-	Status      int
-	IsPrivate   bool        `gorm:"default:false"`
-	Roles       StringSlice `gorm:"type:VARCHAR(255)"`
+	GoogleID    *string     `gorm:"unique" ;json:"googleId,omitempty"`
+	Email       string      `gorm:"unique" ;json:"email,omitempty"`
+	Password    string      `gorm:"size:255" json:"password,omitempty"`
+	Username    string      `gorm:"unique;not null" ;json:"username,omitempty"`
+	Firstname   string      `json:"firstname,omitempty"`
+	Lastname    string      `json:"lastname,omitempty"`
+	PhoneNumber string      `json:"phoneNumber,omitempty"`
+	Bio         string      `gorm:"size:1000" ;json:"bio,omitempty"`
+	Avatar      string      `json:"avatar,omitempty"`
+	VerifyToken string      `json:"verifyToken,omitempty"`
+	Status      int         `json:"status,omitempty"`
+	IsPrivate   bool        `gorm:"default:false" ;json:"isPrivate,omitempty"`
+	Roles       StringSlice `gorm:"type:VARCHAR(255)" ;json:"roles,omitempty"`
 }
 type StringSlice []string
 
@@ -71,6 +71,7 @@ func (u *User) GetRoles() []string  { return u.Roles }
 func (u *User) GetCreatedAt() int   { return int(u.CreatedAt.Unix()) }
 func (u *User) GetUpdatedAt() int   { return int(u.UpdatedAt.Unix()) }
 func (u *User) GetDeletedAt() int   { return int(u.UpdatedAt.Unix()) }
+func (u *User) IsPrivateUser() bool { return u.IsPrivate }
 
 var _ model.UserModel = (*User)(nil)
 
@@ -199,4 +200,15 @@ func (repo *repoPrivate) GetAll() ([]model.UserModel, error) {
 		models[i] = model.UserModel(v)
 	}
 	return models, result.Error
+}
+func (repo *repoPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
+	userObject := User{}
+	userObject.ID = followedId
+
+	result := repo.db.Find(&userObject)
+	if userObject.CreatedAt.IsZero() {
+		return false, errors.New("user not found")
+	}
+
+	return userObject.Status == 1, result.Error
 }

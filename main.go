@@ -22,7 +22,7 @@ import (
 // @contact.name   Droppy API Support
 // @contact.email  stervinou.g36@gmail.com
 // @host localhost:3000
-// @BasePath /api/v1
+// @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
@@ -63,10 +63,15 @@ func main() {
 			user.GET("/:id", middlewares.CurrentUserMiddleware(), controllers.GetUserById)
 			user.POST("/", controllers.Create)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(), controllers.PatchUserById)
-			user.POST("/:id/follow", middlewares.CurrentUserMiddleware(), controllers.FollowUser)
+		}
+
+		follow := v1.Group("/follows")
+		{
+			follow.POST("/", middlewares.CurrentUserMiddleware(), controllers.FollowUser)
+			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
 	}
-	r.GET("/api/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	err = r.Run(":3000")
 
 	if err != nil {

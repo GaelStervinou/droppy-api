@@ -5,6 +5,7 @@ type UserModel interface {
 	GetPassword() string
 	GetRoles() []string
 	GetEmail() string
+	IsPrivateUser() bool
 }
 
 type UserRepository interface {
@@ -16,6 +17,7 @@ type UserRepository interface {
 	Update(args UserPatchParam) (UserModel, error)
 	Delete(id uint) error
 	GetAll() ([]UserModel, error)
+	CanUserBeFollowed(followedId uint) (bool, error)
 }
 
 type UserCreationParam struct {
@@ -41,4 +43,9 @@ type UserPatchParam struct {
 	Firstname string
 	Lastname  string
 	Username  string
+}
+
+type LoginParam struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

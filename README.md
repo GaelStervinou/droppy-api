@@ -10,5 +10,5 @@ You should have a functional API running on port 3000, with hot reload enabled.
 
 ## API DOCUMENTATION
 
-You can find the API documentation at the following URL: [http://localhost:3000/api-docs](http://localhost:3000/api/v1/swagger)
+You can find the API documentation at the following URL: [http://localhost:3000/api-docs](http://localhost:3000/swagger)
 To generate the swagger documentation, run the following command: `swag init --parseDependency --parseInternal`
