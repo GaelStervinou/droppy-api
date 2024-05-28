@@ -137,10 +137,31 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, tokenInfo)
 }
 
-func FirebaseLogin(c *gin.Context) {
-	idToken := c.PostForm("id_token")
+type FirebaseToken struct {
+	IDToken string `json:"id_token"`
+}
 
-	if "" == idToken {
+// FirebaseLogin godoc
+//
+//	@Summary		Login
+//	@Description	login with firebase id token
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			idToken formData string true "Firebase ID Token"
+//	@Success		200	{object} account.TokenInfo
+//	@Failure		422
+//	@Failure		500
+//	@Router			/auth/oauth_token [post]
+func FirebaseLogin(c *gin.Context) {
+	token := FirebaseToken{}
+
+	if err := c.ShouldBindJSON(&token); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if "" == token.IDToken {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "id_token is empty"})
 		return
 	}
@@ -149,7 +170,7 @@ func FirebaseLogin(c *gin.Context) {
 		Repo: repositories.Setup(),
 	}
 
-	tokenInfo, err := acc.LoginWithFirebase(idToken, c)
+	tokenInfo, err := acc.LoginWithFirebase(token.IDToken, c)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
