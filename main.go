@@ -51,7 +51,7 @@ func main() {
 	{
 		auth := v1.Group("/auth")
 		{
-			auth.GET("/refresh", controllers.RefreshToken)
+			auth.POST("/refresh", controllers.RefreshToken)
 			auth.GET("/:provider", controllers.GoogleAuth)
 			auth.GET("/:provider/callback", controllers.GoogleAuthCallback)
 			auth.POST("/login", controllers.Login)
