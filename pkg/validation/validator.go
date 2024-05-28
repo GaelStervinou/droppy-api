@@ -1,9 +1,12 @@
 package validation
 
 import (
+	"errors"
+	"go-api/internal/services/drop_type"
 	errors2 "go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/mail"
+	"slices"
 )
 
 func ValidateUserCreation(args model.UserCreationParam) errors2.MultiFieldsError {
@@ -53,4 +56,40 @@ func ValidateUserPatch(args model.UserPatchParam) errors2.MultiFieldsError {
 	}
 
 	return finalErrors
+}
+
+func ValidateDropCreation(args model.DropCreationParam) errors2.MultiFieldsError {
+	finalErrors := errors2.MultiFieldsError{
+		Fields: map[string]string{},
+	}
+
+	validTypes := []string{"youtube", "spotify", "film"}
+
+	if slices.Contains(validTypes, args.Type) == false {
+		finalErrors.Fields["type"] = "Invalid type"
+	}
+
+	/*err := validateContentByType(args.Content, args.Type)
+
+	if err != nil {
+		finalErrors.Fields["content"] = err.Error()
+	}*/
+
+	return finalErrors
+}
+
+func validateContentByType(content string, dropType string) error {
+	dropTypeFactory := drop_type.NewDropTypeFactory()
+
+	dropTypeInstance := dropTypeFactory.CreateDropType(dropType)
+
+	if dropTypeInstance == nil {
+		return errors.New("invalid drop type")
+	}
+
+	if false == dropTypeInstance.IsValidContent(content) {
+		return errors.New("invalid content")
+	}
+
+	return nil
 }

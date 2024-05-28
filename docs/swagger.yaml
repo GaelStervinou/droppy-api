@@ -9,6 +9,38 @@ definitions:
       refreshToken:
         type: string
     type: object
+  controllers.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  drop.Drop:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      createdById:
+        type: integer
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      deletedById:
+        type: integer
+      description:
+        type: string
+      dropNotificationID:
+        type: integer
+      id:
+        type: integer
+      isPinned:
+        type: boolean
+      status:
+        type: integer
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   errors2.MultiFieldsError:
     properties:
       fields:
@@ -79,6 +111,17 @@ definitions:
       valid:
         description: Valid is true if Time is not NULL
         type: boolean
+    type: object
+  model.DropCreationParam:
+    properties:
+      content:
+        type: string
+      description:
+        type: string
+      dropNotificationId:
+        type: integer
+      type:
+        type: string
     type: object
   model.FollowCreationParam:
     properties:
@@ -185,6 +228,13 @@ paths:
       consumes:
       - application/json
       description: get a new jwt token from a refresh token
+      parameters:
+      - description: Refresh object
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RefreshTokenRequest'
       produces:
       - application/json
       responses:
@@ -199,6 +249,34 @@ paths:
       summary: Refresh auth token
       tags:
       - auth
+  /drops:
+    post:
+      consumes:
+      - application/json
+      description: Create a new drop
+      parameters:
+      - description: Drop object
+        in: body
+        name: drop
+        required: true
+        schema:
+          $ref: '#/definitions/model.DropCreationParam'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/drop.Drop'
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create a new drop
+      tags:
+      - drop
   /follows:
     post:
       consumes:
@@ -357,6 +435,33 @@ paths:
       summary: Create user
       tags:
       - user
+  /users/:id/drops:
+    get:
+      consumes:
+      - application/json
+      description: List drops by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/drop.Drop'
+            type: array
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      summary: List drops by user ID
+      tags:
+      - drop
   /users/{id}:
     get:
       consumes:

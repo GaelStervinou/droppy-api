@@ -21,6 +21,7 @@ type RefreshTokenRequest struct {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
+//	@Param			token body		RefreshTokenRequest	true	"Refresh object"
 //	@Success		200	{object} account.TokenInfo
 //	@Failure		401
 //	@Failure		500

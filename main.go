@@ -70,6 +70,11 @@ func main() {
 			follow.POST("/", middlewares.CurrentUserMiddleware(), controllers.FollowUser)
 			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
+
+		drop := v1.Group("/drops")
+		{
+			drop.POST("/", middlewares.CurrentUserMiddleware(), controllers.CreateDrop)
+		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	err = r.Run(":3000")

@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"go-api/internal/storage/postgres/drop"
+	"go-api/internal/storage/postgres/drop_notification"
 	"go-api/internal/storage/postgres/follow"
 	"go-api/internal/storage/postgres/token"
 	"go-api/internal/storage/postgres/user"
@@ -28,5 +30,5 @@ func AutoMigrate() {
 	if err != nil {
 		panic(err)
 	}
-	sqlDB.AutoMigrate(&user.User{}, &token.AuthToken{}, &follow.Follow{})
+	sqlDB.AutoMigrate(&user.User{}, &token.AuthToken{}, &follow.Follow{}, &drop.Drop{}, &drop_notification.DropNotification{})
 }
