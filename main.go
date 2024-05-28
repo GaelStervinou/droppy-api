@@ -75,6 +75,11 @@ func main() {
 		{
 			drop.POST("/", middlewares.CurrentUserMiddleware(), controllers.CreateDrop)
 		}
+
+		fixtures := v1.Group("/fixtures")
+		{
+			fixtures.GET("/users", controllers.PopulateUsers)
+		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	err = r.Run(":3000")

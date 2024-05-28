@@ -4,7 +4,7 @@ go 1.22.1
 
 require (
 	firebase.google.com/go/v4 v4.14.0
-	github.com/bxcodec/faker v2.0.1+incompatible
+	github.com/bxcodec/faker/v4 v4.0.0-beta.3
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gorilla/sessions v1.1.1
@@ -17,6 +17,7 @@ require (
 	github.com/swaggo/swag v1.8.12
 	go.uber.org/mock v0.4.0
 	golang.org/x/crypto v0.21.0
+	google.golang.org/api v0.170.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.7
 )
@@ -87,7 +88,6 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
-	google.golang.org/api v0.170.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
