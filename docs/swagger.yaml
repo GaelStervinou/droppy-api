@@ -229,6 +229,106 @@ paths:
       summary: Follow user
       tags:
       - follow
+  /follows/accept/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Accept request by its ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            type: array
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Accept request
+      tags:
+      - follow
+  /follows/my-followers:
+    get:
+      consumes:
+      - application/json
+      description: Get all followers of the current user
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            type: array
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get my followers
+      tags:
+      - follow
+  /follows/pending:
+    get:
+      consumes:
+      - application/json
+      description: Get all pending requests of the current user
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            type: array
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get my pending requests
+      tags:
+      - follow
+  /follows/refuse/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Refuse follow request by its ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            type: array
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Refuse follow request
+      tags:
+      - follow
   /users:
     post:
       consumes:

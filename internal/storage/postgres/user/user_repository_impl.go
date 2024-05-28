@@ -212,3 +212,14 @@ func (repo *repoPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
 
 	return userObject.Status == 1, result.Error
 }
+
+func (repo *repoPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, error) {
+	var foundStudents []*User
+	result := repo.db.Where("id IN ?", ids).Find(&foundStudents)
+
+	models := make([]model.UserModel, len(foundStudents))
+	for i, v := range foundStudents {
+		models[i] = model.UserModel(v)
+	}
+	return models, result.Error
+}
