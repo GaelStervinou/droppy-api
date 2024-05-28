@@ -47,7 +47,7 @@ func main() {
 	r := gin.Default()
 	r.Use(gin.Recovery())
 
-	v1 := r.Group("/api/v1")
+	v1 := r.Group("/")
 	{
 		auth := v1.Group("/auth")
 		{

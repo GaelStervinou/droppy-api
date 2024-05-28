@@ -2,7 +2,6 @@ package account
 
 import "context"
 
-// TODO peut-être créer des objets pour les paramètres de création et de login
 type AccountServiceIface interface {
 	Create(string, string, string, string, string) error
 	CreateWithGoogle(string, string, string, string) error
@@ -15,7 +14,7 @@ type AccountServiceIface interface {
 }
 
 type TokenInfo struct {
-	JWTToken     string
-	RefreshToken string
+	JWTToken     string `json:"jwtToken"`
+	RefreshToken string `json:"refreshToken"`
 	Expiry       int
 }
