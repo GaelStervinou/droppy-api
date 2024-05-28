@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/login": {
+        "/auth": {
             "post": {
                 "description": "login with email and password",
                 "consumes": [
@@ -143,7 +143,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get user by ID",
+                "description": "Patch user by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Get user by ID",
+                "summary": "Patch user by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -161,6 +161,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "User creation object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserPatchParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -245,6 +254,9 @@ const docTemplate = `{
                 "lastname": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "phoneNumber": {
                     "type": "string"
                 },
@@ -300,6 +312,23 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserPatchParam": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

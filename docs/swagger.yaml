@@ -38,6 +38,8 @@ definitions:
         type: boolean
       lastname:
         type: string
+      password:
+        type: string
       phoneNumber:
         type: string
       roles:
@@ -78,6 +80,17 @@ definitions:
       username:
         type: string
     type: object
+  model.UserPatchParam:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -87,7 +100,7 @@ info:
   title: Droppy API
   version: "1.0"
 paths:
-  /auth/login:
+  /auth:
     post:
       consumes:
       - application/json
@@ -168,13 +181,19 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get user by ID
+      description: Patch user by ID
       parameters:
       - description: User ID
         in: path
         name: id
         required: true
         type: integer
+      - description: User creation object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserPatchParam'
       produces:
       - application/json
       responses:
@@ -192,7 +211,7 @@ paths:
           description: Internal Server Error
       security:
       - BearerAuth: []
-      summary: Get user by ID
+      summary: Patch user by ID
       tags:
       - user
 securityDefinitions:

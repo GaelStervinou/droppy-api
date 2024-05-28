@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"go-api/internal/repositories"
+	"go-api/internal/storage/firebase"
 	"go-api/pkg/hash"
 	"go-api/pkg/jwt_helper"
 	"go-api/pkg/model"
@@ -88,6 +89,46 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 	}
 
 	return &account.TokenInfo{JWTToken: newToken, RefreshToken: refreshToken, Expiry: newTokenExpiry}, nil
+}
+
+func (a *AccountService) LoginWithFirebase(token string, ctx context.Context) (*account.TokenInfo, error) {
+	firebaseRepo, err := firebase.NewRepo()
+
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	client, err := firebaseRepo.App.Auth(ctx)
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	decodedToken, err := client.VerifyIDToken(ctx, token)
+
+	if err != nil {
+		return &account.TokenInfo{}, err
+	}
+
+	user, err := a.Repo.UserRepository.GetByGoogleAuthId(decodedToken.UID)
+
+	if err != nil {
+		if "user not found" == err.Error() {
+			err = a.CreateWithGoogle(decodedToken.Claims["name"].(string), decodedToken.Claims["name"].(string), decodedToken.Claims["email"].(string), decodedToken.UID)
+			if err != nil {
+				return &account.TokenInfo{}, err
+			}
+
+			user, err = a.Repo.UserRepository.GetByGoogleAuthId(decodedToken.UID)
+
+			if err != nil {
+				return &account.TokenInfo{}, err
+			}
+		} else {
+			return &account.TokenInfo{}, err
+		}
+	}
+
+	return a.LoginWithGoogle(user.GetEmail())
 }
 
 func (a *AccountService) LoginFromRefreshToken(refreshToken string) (*account.TokenInfo, error) {
