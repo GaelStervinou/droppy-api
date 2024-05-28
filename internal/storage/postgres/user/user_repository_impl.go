@@ -14,19 +14,19 @@ import (
 
 type User struct {
 	gorm.Model
-	GoogleID    *string     `gorm:"unique" ;json:"googleId,omitempty"`
-	Email       string      `gorm:"unique" ;json:"email,omitempty"`
-	Password    string      `gorm:"size:255" json:"password,omitempty"`
-	Username    string      `gorm:"unique;not null" ;json:"username,omitempty"`
-	Firstname   string      `json:"firstname,omitempty"`
-	Lastname    string      `json:"lastname,omitempty"`
-	PhoneNumber string      `json:"phoneNumber,omitempty"`
-	Bio         string      `gorm:"size:1000" ;json:"bio,omitempty"`
-	Avatar      string      `json:"avatar,omitempty"`
-	VerifyToken string      `json:"verifyToken,omitempty"`
-	Status      int         `json:"status,omitempty"`
-	IsPrivate   bool        `gorm:"default:false" ;json:"isPrivate,omitempty"`
-	Roles       StringSlice `gorm:"type:VARCHAR(255)" ;json:"roles,omitempty"`
+	GoogleID    *string `gorm:"unique"`
+	Email       string  `gorm:"unique"`
+	Password    string  `gorm:"size:255"`
+	Username    string  `gorm:"unique;not null"`
+	Firstname   string
+	Lastname    string
+	PhoneNumber string
+	Bio         string `gorm:"size:1000"`
+	Avatar      string
+	VerifyToken string
+	Status      int
+	IsPrivate   bool        `gorm:"default:false"`
+	Roles       StringSlice `gorm:"type:VARCHAR(255)"`
 }
 type StringSlice []string
 
