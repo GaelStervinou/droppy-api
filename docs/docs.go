@@ -720,11 +720,8 @@ const docTemplate = `{
                 "phoneNumber": {
                     "type": "string"
                 },
-                "roles": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "role": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"
@@ -803,11 +800,8 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "roles": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "role": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

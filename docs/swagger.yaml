@@ -91,10 +91,8 @@ definitions:
         type: string
       phoneNumber:
         type: string
-      roles:
-        items:
-          type: string
-        type: array
+      role:
+        type: string
       status:
         type: integer
       updatedAt:
@@ -145,10 +143,8 @@ definitions:
         type: string
       password:
         type: string
-      roles:
-        items:
-          type: string
-        type: array
+      role:
+        type: string
       username:
         type: string
     type: object
