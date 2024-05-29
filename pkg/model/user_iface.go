@@ -3,9 +3,18 @@ package model
 type UserModel interface {
 	GetID() uint
 	GetPassword() string
-	GetRoles() []string
+	GetRole() string
 	GetEmail() string
+	GetGoogleID() *string
+	GetFirstname() string
+	GetLastname() string
+	GetUsername() string
+	GetPhoneNumber() string
+	GetBio() string
+	GetAvatar() string
 	IsPrivateUser() bool
+	GetCreatedAt() int
+	GetUpdatedAt() int
 }
 
 type UserRepository interface {
@@ -27,7 +36,7 @@ type UserCreationParam struct {
 	Email     string
 	Password  string
 	Username  string
-	Roles     []string
+	Role      string
 }
 
 type UserCreationWithGoogleParam struct {
@@ -36,7 +45,7 @@ type UserCreationWithGoogleParam struct {
 	Email     string
 	Username  string
 	GoogleId  string
-	Roles     []string
+	Role      string
 }
 
 type UserPatchParam struct {

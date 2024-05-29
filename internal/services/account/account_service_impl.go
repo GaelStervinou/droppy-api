@@ -25,8 +25,7 @@ func (a *AccountService) Create(firstname string, lastname string, email string,
 		Email:     email,
 		Password:  password,
 		Username:  username,
-		//TODO peut-être passé par une struct pour le role ou au moins un enum ?
-		Roles: []string{"user"},
+		Role:      "user",
 	}
 	validationError := validation.ValidateUserCreation(user)
 	if len(validationError.Fields) > 0 {
@@ -52,11 +51,9 @@ func (a *AccountService) CreateWithGoogle(firstname string, lastname string, ema
 			Email:     email,
 			GoogleId:  googleId,
 			Username:  random.RandStringRunes(10),
-			//TODO peut-être passé par une struct pour le role ou au moins un enum ?
-			Roles: []string{"user"},
+			Role:      "user",
 		},
 	)
-
 	return err
 }
 
@@ -73,7 +70,7 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 		return &account.TokenInfo{}, errors.New("email or password does not match our record")
 	}
 
-	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
+	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRole())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
@@ -149,7 +146,7 @@ func (a *AccountService) LoginFromRefreshToken(refreshToken string) (*account.To
 		return &account.TokenInfo{}, err
 	}
 
-	newToken, newRefreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
+	newToken, newRefreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRole())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
@@ -176,7 +173,7 @@ func (a *AccountService) LoginWithGoogle(email string) (*account.TokenInfo, erro
 	}
 
 	//TODO refacto avec function login juste au dessus
-	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRoles())
+	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRole())
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}

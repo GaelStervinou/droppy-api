@@ -60,25 +60,27 @@ func main() {
 
 		user := v1.Group("/users")
 		{
-			user.GET("/:id", controllers.GetUserById)
+			user.GET("/:id", middlewares.CurrentUserMiddleware(false), controllers.GetUserById)
 			user.POST("/", controllers.Create)
-			user.PATCH("/:id", middlewares.CurrentUserMiddleware(), controllers.PatchUserById)
+			user.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchUserById)
 		}
 
 		follow := v1.Group("/follows")
 		{
-			follow.POST("/", middlewares.CurrentUserMiddleware(), controllers.FollowUser)
+			follow.POST("/", middlewares.CurrentUserMiddleware(true), controllers.FollowUser)
 			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
 
 		drop := v1.Group("/drops")
 		{
-			drop.POST("/", middlewares.CurrentUserMiddleware(), controllers.CreateDrop)
+			drop.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateDrop)
 		}
 
 		fixtures := v1.Group("/fixtures")
 		{
 			fixtures.GET("/users", controllers.PopulateUsers)
+			fixtures.GET("/follows", controllers.PopulateFollows)
+			fixtures.GET("/drops", controllers.PopulateDrops)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

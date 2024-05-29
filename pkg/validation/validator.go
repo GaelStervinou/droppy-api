@@ -28,8 +28,8 @@ func ValidateUserCreation(args model.UserCreationParam) errors2.MultiFieldsError
 	if len(args.Username) < 4 {
 		finalErrors.Fields["username"] = "Username must be at least 4 characters long"
 	}
-	if len(args.Roles) == 0 {
-		finalErrors.Fields["role"] = "Role must not be empty"
+	if slices.Contains([]string{"user", "admin"}, args.Role) == false {
+		finalErrors.Fields["role"] = "Invalid role"
 	}
 	if len(args.Username) < 4 {
 		finalErrors.Fields["username"] = "Username must be at least 4 characters long"

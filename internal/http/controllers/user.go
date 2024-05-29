@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // GetUserById godoc
@@ -62,7 +64,62 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, requestedUser)
+	currentUserId, exists := c.Get("userId")
+
+	uintCurrentUserId := uint(0)
+	if exists {
+		toUint, ok := currentUserId.(uint)
+		fmt.Println(toUint, ok)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+
+		uintCurrentUserId = toUint
+	}
+
+	email := requestedUser.GetEmail()
+	emailPointer := &email
+	phoneNumber := requestedUser.GetPhoneNumber()
+	phoneNumberPointer := &phoneNumber
+	bio := requestedUser.GetBio()
+	bioPointer := &bio
+	if "" == bio {
+		bioPointer = nil
+	}
+	avatar := requestedUser.GetAvatar()
+	avatarPointer := &avatar
+	if "" == avatar {
+		avatarPointer = nil
+	}
+	createdAt := time.Unix(int64(requestedUser.GetCreatedAt()), 0)
+	updatedAt := time.Unix(int64(requestedUser.GetUpdatedAt()), 0)
+	createdAtPointer := &createdAt
+	updatedAtPointer := &updatedAt
+
+	userResponse := UserResponse{
+		ID:          requestedUser.GetID(),
+		GoogleID:    requestedUser.GetGoogleID(),
+		Email:       emailPointer,
+		Username:    requestedUser.GetUsername(),
+		Firstname:   requestedUser.GetFirstname(),
+		Lastname:    requestedUser.GetLastname(),
+		PhoneNumber: phoneNumberPointer,
+		Bio:         bioPointer,
+		Avatar:      avatarPointer,
+		IsPrivate:   requestedUser.IsPrivateUser(),
+		Role:        requestedUser.GetRole(),
+		CreatedAt:   createdAtPointer,
+		UpdatedAt:   updatedAtPointer,
+	}
+
+	fmt.Println(uintCurrentUserId, userResponse.ID)
+	if uintCurrentUserId != userResponse.ID {
+		userResponse.HidePersonalInfo()
+		fmt.Println(userResponse)
+	}
+
+	c.JSON(200, userResponse)
 }
 
 // Create godoc
@@ -86,13 +143,13 @@ func Create(c *gin.Context) {
 	}
 
 	var userToCreate model.UserCreationParam
-	userToCreate.Roles = []string{"user"}
 
 	if err := c.ShouldBindJSON(&userToCreate); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 
+	userToCreate.Role = "user"
 	us := user.NewRepo(sqlDB)
 	createdUser, err := us.Create(userToCreate)
 
@@ -204,4 +261,28 @@ func PatchUserById(c *gin.Context) {
 	}
 
 	c.JSON(200, requestedUser)
+}
+
+type UserResponse struct {
+	ID          uint
+	GoogleID    *string
+	Email       *string
+	Username    string
+	Firstname   string
+	Lastname    string
+	PhoneNumber *string
+	Bio         *string
+	Avatar      *string
+	IsPrivate   bool
+	Role        string
+	CreatedAt   *time.Time
+	UpdatedAt   *time.Time
+}
+
+func (u *UserResponse) HidePersonalInfo() {
+	u.Email = nil
+	u.PhoneNumber = nil
+	u.GoogleID = nil
+	u.CreatedAt = nil
+	u.UpdatedAt = nil
 }

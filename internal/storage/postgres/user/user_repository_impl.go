@@ -1,7 +1,6 @@
 package user
 
 import (
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"go-api/pkg/errors2"
@@ -9,7 +8,6 @@ import (
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
 	"gorm.io/gorm"
-	"strings"
 )
 
 type User struct {
@@ -25,33 +23,16 @@ type User struct {
 	Avatar      string
 	VerifyToken string
 	Status      int
-	IsPrivate   bool        `gorm:"default:false"`
-	Roles       StringSlice `gorm:"type:VARCHAR(255)"`
-}
-type StringSlice []string
-
-func (s *StringSlice) Scan(src any) error {
-	if strings.Contains(src.(string), ",") {
-		*s = strings.Split(src.(string), ",")
-		return nil
-	} else {
-		*s = []string{src.(string)}
-		return nil
-	}
-}
-func (s StringSlice) Value() (driver.Value, error) {
-	if len(s) == 0 {
-		return nil, nil
-	}
-	return strings.Join(s, ","), nil
+	IsPrivate   bool `gorm:"default:false"`
+	Role        string
 }
 
 func (u *User) GetID() uint {
 	return u.ID
 }
 
-func (u *User) GetGoogleID() string {
-	return *u.GoogleID
+func (u *User) GetGoogleID() *string {
+	return u.GoogleID
 }
 
 func (u *User) GetEmail() string {
@@ -66,12 +47,15 @@ func (u *User) GetFirstname() string {
 func (u *User) GetLastname() string {
 	return u.Lastname
 }
-func (u *User) GetUsername() string { return u.Username }
-func (u *User) GetRoles() []string  { return u.Roles }
-func (u *User) GetCreatedAt() int   { return int(u.CreatedAt.Unix()) }
-func (u *User) GetUpdatedAt() int   { return int(u.UpdatedAt.Unix()) }
-func (u *User) GetDeletedAt() int   { return int(u.UpdatedAt.Unix()) }
-func (u *User) IsPrivateUser() bool { return u.IsPrivate }
+func (u *User) GetUsername() string    { return u.Username }
+func (u *User) GetRole() string        { return u.Role }
+func (u *User) GetCreatedAt() int      { return int(u.CreatedAt.Unix()) }
+func (u *User) GetUpdatedAt() int      { return int(u.UpdatedAt.Unix()) }
+func (u *User) GetDeletedAt() int      { return int(u.UpdatedAt.Unix()) }
+func (u *User) IsPrivateUser() bool    { return u.IsPrivate }
+func (u *User) GetPhoneNumber() string { return u.PhoneNumber }
+func (u *User) GetBio() string         { return u.Bio }
+func (u *User) GetAvatar() string      { return u.Avatar }
 
 var _ model.UserModel = (*User)(nil)
 
@@ -105,7 +89,7 @@ func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, 
 		Email:     args.Email,
 		Password:  hashedPassword,
 		Username:  args.Username,
-		Roles:     args.Roles,
+		Role:      args.Role,
 	}
 
 	result := repo.db.Create(&userObject)
@@ -126,7 +110,7 @@ func (repo *repoPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam
 		Email:     args.Email,
 		GoogleID:  &args.GoogleId,
 		Status:    1,
-		Roles:     args.Roles,
+		Role:      args.Role,
 		Username:  args.Username,
 	}
 
