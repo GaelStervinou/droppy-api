@@ -525,6 +525,35 @@ paths:
       summary: Patch user by ID
       tags:
       - user
+  /users/search:
+    get:
+      consumes:
+      - application/json
+      description: Search users
+      parameters:
+      - description: Search query
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Search users
+      tags:
+      - user
 securityDefinitions:
   BearerAuth:
     in: header

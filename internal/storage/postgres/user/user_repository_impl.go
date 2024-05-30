@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"go-api/pkg/errors2"
@@ -203,6 +204,20 @@ func (repo *repoPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, err
 
 	models := make([]model.UserModel, len(foundStudents))
 	for i, v := range foundStudents {
+		models[i] = model.UserModel(v)
+	}
+	return models, result.Error
+}
+
+func (repo *repoPrivate) Search(query string) ([]model.UserModel, error) {
+	var foundUsers []*User
+	searchParam := "%" + query + "%"
+	result := repo.db.Where("username LIKE @search OR firstname LIKE @search OR lastname LIKE @search", sql.Named("search", searchParam)).Find(&foundUsers)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	models := make([]model.UserModel, len(foundUsers))
+	for i, v := range foundUsers {
 		models[i] = model.UserModel(v)
 	}
 	return models, result.Error

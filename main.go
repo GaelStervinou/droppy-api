@@ -62,6 +62,7 @@ func main() {
 		{
 			user.GET("/:id", middlewares.CurrentUserMiddleware(false), controllers.GetUserById)
 			user.POST("/", controllers.Create)
+			user.GET("/search", controllers.SearchUsers)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchUserById)
 		}
 

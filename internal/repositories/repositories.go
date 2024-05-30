@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"go-api/internal/storage/postgres"
 	"go-api/internal/storage/postgres/drop"
 	"go-api/internal/storage/postgres/drop_notification"
@@ -22,7 +21,6 @@ type Repositories struct {
 func Setup() *Repositories {
 	sqlDB, err := postgres.Connect()
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 
