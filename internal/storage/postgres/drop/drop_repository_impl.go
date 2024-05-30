@@ -96,3 +96,17 @@ func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, 
 	}
 	return &drop, nil
 }
+
+func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
+	var drops []Drop
+	if err := r.db.Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
+		return nil, err
+	}
+	stmt := r.db.Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Statement
+	sql := stmt.SQL.String()
+	var result []model.DropModel
+	for _, drop := range drops {
+		result = append(result, &drop)
+	}
+	return result, nil
+}

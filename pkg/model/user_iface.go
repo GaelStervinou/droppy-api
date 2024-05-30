@@ -29,6 +29,7 @@ type UserRepository interface {
 	CanUserBeFollowed(followedId uint) (bool, error)
 	GetUsersFromUserIds(userIds []uint) ([]UserModel, error)
 	Search(query string) ([]UserModel, error)
+	IsActiveUser(userId uint) (bool, error)
 }
 
 type UserCreationParam struct {

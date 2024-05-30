@@ -70,3 +70,44 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 	args.Type = dropNotification.GetType()
 	return s.Repo.DropRepository.Create(args.DropNotificationId, args.Type, args.Content, args.Description, userId, statusActive.ToInt(), false)
 }
+
+func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
+	isActiveUser, err := s.Repo.UserRepository.IsActiveUser(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !isActiveUser {
+		return nil, errors.New("User is not active")
+	}
+
+	lastDropNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if lastDropNotification == nil {
+		return nil, errors.New("No drop notifications found")
+	}
+
+	followingUsers, err := s.Repo.FollowRepository.GetFollowing(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var followingUserIds []uint
+	for _, user := range followingUsers {
+		followingUserIds = append(followingUserIds, user.GetFollowedID())
+	}
+
+	drops, err := s.Repo.DropRepository.GetDropsByUserIdsAndDropNotificationId(followingUserIds, lastDropNotification.GetID())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return drops, nil
+}

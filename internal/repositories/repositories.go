@@ -4,6 +4,7 @@ import (
 	"go-api/internal/storage/postgres"
 	"go-api/internal/storage/postgres/drop"
 	"go-api/internal/storage/postgres/drop_notification"
+	"go-api/internal/storage/postgres/follow"
 	"go-api/internal/storage/postgres/token"
 	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
@@ -16,6 +17,7 @@ type Repositories struct {
 	TokenRepository            model.AuthTokenRepository
 	DropRepository             model.DropRepository
 	DropNotificationRepository model.DropNotificationRepository
+	FollowRepository           model.FollowRepository
 }
 
 func Setup() *Repositories {
@@ -30,6 +32,7 @@ func Setup() *Repositories {
 		TokenRepository:            token.NewRepo(sqlDB),
 		DropRepository:             drop.NewRepo(sqlDB),
 		DropNotificationRepository: drop_notification.NewRepo(sqlDB),
+		FollowRepository:           follow.NewRepo(sqlDB),
 	}
 }
 
