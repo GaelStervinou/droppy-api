@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // GetUserById godoc
@@ -23,7 +23,7 @@ import (
 // @Produce		json
 // @Security BearerAuth
 // @Param			id path int true "User ID"
-// @Success		200	{object} user.User
+// @Success		200	{object} response_models.UserResponse
 // @Failure		400
 // @Failure		403
 // @Failure		404
@@ -77,7 +77,7 @@ func GetUserById(c *gin.Context) {
 		uintCurrentUserId = toUint
 	}
 
-	userResponse := formatUserFromModel(requestedUser)
+	userResponse := response_models.FormatUserFromModel(requestedUser)
 
 	if uintCurrentUserId != userResponse.ID {
 		userResponse.HidePersonalInfo()
@@ -236,7 +236,7 @@ func PatchUserById(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 // @Param			search query string true "Search query"
-// @Success		200	{object} []user.User
+// @Success		200	{object} []response_models.UserResponse
 // @Failure		400
 // @Failure		500
 // @Router			/users/search [get]
@@ -269,72 +269,11 @@ func SearchUsers(c *gin.Context) {
 		return
 	}
 
-	var usersResponse []UserResponse
+	var usersResponse []response_models.UserResponse
 	for i, searchedUser := range users {
-		usersResponse = append(usersResponse, formatUserFromModel(searchedUser))
+		usersResponse = append(usersResponse, response_models.FormatUserFromModel(searchedUser))
 		usersResponse[i].HidePersonalInfo()
 	}
 
 	c.JSON(200, usersResponse)
-}
-
-type UserResponse struct {
-	ID          uint
-	GoogleID    *string
-	Email       *string
-	Username    string
-	Firstname   string
-	Lastname    string
-	PhoneNumber *string
-	Bio         *string
-	Avatar      *string
-	IsPrivate   bool
-	Role        string
-	CreatedAt   *time.Time
-	UpdatedAt   *time.Time
-}
-
-func (u *UserResponse) HidePersonalInfo() {
-	u.Email = nil
-	u.PhoneNumber = nil
-	u.GoogleID = nil
-	u.CreatedAt = nil
-	u.UpdatedAt = nil
-}
-
-func formatUserFromModel(user model.UserModel) UserResponse {
-	email := user.GetEmail()
-	emailPointer := &email
-	phoneNumber := user.GetPhoneNumber()
-	phoneNumberPointer := &phoneNumber
-	bio := user.GetBio()
-	bioPointer := &bio
-	if "" == bio {
-		bioPointer = nil
-	}
-	avatar := user.GetAvatar()
-	avatarPointer := &avatar
-	if "" == avatar {
-		avatarPointer = nil
-	}
-	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
-	updatedAt := time.Unix(int64(user.GetUpdatedAt()), 0)
-	createdAtPointer := &createdAt
-	updatedAtPointer := &updatedAt
-
-	return UserResponse{
-		ID:          user.GetID(),
-		GoogleID:    user.GetGoogleID(),
-		Email:       emailPointer,
-		Username:    user.GetUsername(),
-		Firstname:   user.GetFirstname(),
-		Lastname:    user.GetLastname(),
-		PhoneNumber: phoneNumberPointer,
-		Bio:         bioPointer,
-		Avatar:      avatarPointer,
-		IsPrivate:   user.IsPrivateUser(),
-		Role:        user.GetRole(),
-		CreatedAt:   createdAtPointer,
-		UpdatedAt:   updatedAtPointer,
-	}
 }

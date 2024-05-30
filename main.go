@@ -64,6 +64,7 @@ func main() {
 			user.POST("/", controllers.Create)
 			user.GET("/search", controllers.SearchUsers)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchUserById)
+			user.GET("/my-feed", middlewares.CurrentUserMiddleware(true), controllers.GetCurrentUserFeed)
 		}
 
 		follow := v1.Group("/follows")

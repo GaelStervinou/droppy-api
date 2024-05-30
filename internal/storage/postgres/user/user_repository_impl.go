@@ -222,3 +222,15 @@ func (repo *repoPrivate) Search(query string) ([]model.UserModel, error) {
 	}
 	return models, result.Error
 }
+
+func (repo *repoPrivate) IsActiveUser(userId uint) (bool, error) {
+	userObject := User{}
+	userObject.ID = userId
+
+	result := repo.db.Find(&userObject)
+	if userObject.CreatedAt.IsZero() {
+		return false, errors.New("user not found")
+	}
+
+	return userObject.Status == 1, result.Error
+}

@@ -21,12 +21,14 @@ type DropRepository interface {
 	Delete(dropId uint) error
 	GetUserDrops(userId uint) ([]DropModel, error)
 	GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (DropModel, error)
+	GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]DropModel, error)
 }
 
 type DropService interface {
 	CanCreateDrop(current, userId uint) (bool, error)
 	IsValidDropCreation(args DropCreationParam) (bool, error)
 	CreateDrop(userId uint, args DropCreationParam) (DropModel, error)
+	GetUserFeed(userId uint) ([]DropModel, error)
 }
 
 type DropCreationParam struct {

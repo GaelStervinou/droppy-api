@@ -18,6 +18,7 @@ type FollowRepository interface {
 	Delete(followId uint) error
 	GetPendingRequests(userID uint) ([]FollowModel, error)
 	GetFollowers(userID uint) ([]FollowModel, error)
+	GetFollowing(userID uint) ([]FollowModel, error)
 	AreAlreadyFollowing(followerID, followedID uint) (bool, error)
 }
 

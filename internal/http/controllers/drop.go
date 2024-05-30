@@ -102,3 +102,41 @@ func DropsByUserId(c *gin.Context) {
 
 	c.JSON(200, drops)
 }
+
+// GetCurrentUserFeed godoc
+//
+//	@Summary		Get feed
+//	@Description	Get feed
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Security BearerAuth
+//	@Success		200	{object} []drop.Drop
+//	@Failure		500
+//	@Router			/users/my-feed [get]
+func GetCurrentUserFeed(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+
+	drops, err := ds.GetUserFeed(uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, drops)
+}

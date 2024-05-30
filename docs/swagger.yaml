@@ -159,6 +159,35 @@ definitions:
       username:
         type: string
     type: object
+  response_models.UserResponse:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      googleID:
+        type: string
+      id:
+        type: integer
+      isPrivate:
+        type: boolean
+      lastname:
+        type: string
+      phoneNumber:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -475,7 +504,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+            $ref: '#/definitions/response_models.UserResponse'
         "400":
           description: Bad Request
         "403":
@@ -525,6 +554,27 @@ paths:
       summary: Patch user by ID
       tags:
       - user
+  /users/my-feed:
+    get:
+      consumes:
+      - application/json
+      description: Get feed
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/drop.Drop'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get feed
+      tags:
+      - user
   /users/search:
     get:
       consumes:
@@ -543,7 +593,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
+              $ref: '#/definitions/response_models.UserResponse'
             type: array
         "400":
           description: Bad Request
