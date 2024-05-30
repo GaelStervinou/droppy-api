@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go-api/pkg/jwt_helper"
@@ -31,7 +30,6 @@ func CurrentUserMiddleware(forceLogin bool) gin.HandlerFunc {
 			c.Next()
 		}
 
-		fmt.Println(len(parts))
 		if 2 == len(parts) {
 			tokenString := parts[1]
 			token, err := jwt_helper.VerifyToken(tokenString)

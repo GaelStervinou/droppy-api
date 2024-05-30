@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
 	"go-api/internal/storage/postgres/user"
+	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
@@ -69,7 +69,6 @@ func GetUserById(c *gin.Context) {
 	uintCurrentUserId := uint(0)
 	if exists {
 		toUint, ok := currentUserId.(uint)
-		fmt.Println(toUint, ok)
 		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
@@ -78,45 +77,10 @@ func GetUserById(c *gin.Context) {
 		uintCurrentUserId = toUint
 	}
 
-	email := requestedUser.GetEmail()
-	emailPointer := &email
-	phoneNumber := requestedUser.GetPhoneNumber()
-	phoneNumberPointer := &phoneNumber
-	bio := requestedUser.GetBio()
-	bioPointer := &bio
-	if "" == bio {
-		bioPointer = nil
-	}
-	avatar := requestedUser.GetAvatar()
-	avatarPointer := &avatar
-	if "" == avatar {
-		avatarPointer = nil
-	}
-	createdAt := time.Unix(int64(requestedUser.GetCreatedAt()), 0)
-	updatedAt := time.Unix(int64(requestedUser.GetUpdatedAt()), 0)
-	createdAtPointer := &createdAt
-	updatedAtPointer := &updatedAt
+	userResponse := formatUserFromModel(requestedUser)
 
-	userResponse := UserResponse{
-		ID:          requestedUser.GetID(),
-		GoogleID:    requestedUser.GetGoogleID(),
-		Email:       emailPointer,
-		Username:    requestedUser.GetUsername(),
-		Firstname:   requestedUser.GetFirstname(),
-		Lastname:    requestedUser.GetLastname(),
-		PhoneNumber: phoneNumberPointer,
-		Bio:         bioPointer,
-		Avatar:      avatarPointer,
-		IsPrivate:   requestedUser.IsPrivateUser(),
-		Role:        requestedUser.GetRole(),
-		CreatedAt:   createdAtPointer,
-		UpdatedAt:   updatedAtPointer,
-	}
-
-	fmt.Println(uintCurrentUserId, userResponse.ID)
 	if uintCurrentUserId != userResponse.ID {
 		userResponse.HidePersonalInfo()
-		fmt.Println(userResponse)
 	}
 
 	c.JSON(200, userResponse)
@@ -186,7 +150,7 @@ func Create(c *gin.Context) {
 // @Security BearerAuth
 // @Param			id path int true "User ID"
 //
-//	@Param			user	body		model.UserPatchParam	true	"User creation object"
+// @Param			user	body		model.UserPatchParam	true	"User creation object"
 //
 // @Success		200	{object} user.User
 // @Failure		400
@@ -263,6 +227,57 @@ func PatchUserById(c *gin.Context) {
 	c.JSON(200, requestedUser)
 }
 
+// SearchUsers godoc
+//
+// @Summary		Search users
+// @Description	Search users
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			search query string true "Search query"
+// @Success		200	{object} []user.User
+// @Failure		400
+// @Failure		500
+// @Router			/users/search [get]
+func SearchUsers(c *gin.Context) {
+	sqlDB, err := postgres.Connect()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	us := user.NewRepo(sqlDB)
+
+	query := strings.TrimSpace(c.Query("search"))
+
+	if "" == query {
+		c.JSON(400, errors2.MultiFieldsError{Fields: map[string]string{"search": "Search query is required"}})
+		return
+	}
+
+	users, err := us.Search(query)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == users {
+		c.JSON(404, gin.H{"error": "Users not found"})
+		return
+	}
+
+	var usersResponse []UserResponse
+	for i, searchedUser := range users {
+		usersResponse = append(usersResponse, formatUserFromModel(searchedUser))
+		usersResponse[i].HidePersonalInfo()
+	}
+
+	c.JSON(200, usersResponse)
+}
+
 type UserResponse struct {
 	ID          uint
 	GoogleID    *string
@@ -285,4 +300,41 @@ func (u *UserResponse) HidePersonalInfo() {
 	u.GoogleID = nil
 	u.CreatedAt = nil
 	u.UpdatedAt = nil
+}
+
+func formatUserFromModel(user model.UserModel) UserResponse {
+	email := user.GetEmail()
+	emailPointer := &email
+	phoneNumber := user.GetPhoneNumber()
+	phoneNumberPointer := &phoneNumber
+	bio := user.GetBio()
+	bioPointer := &bio
+	if "" == bio {
+		bioPointer = nil
+	}
+	avatar := user.GetAvatar()
+	avatarPointer := &avatar
+	if "" == avatar {
+		avatarPointer = nil
+	}
+	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
+	updatedAt := time.Unix(int64(user.GetUpdatedAt()), 0)
+	createdAtPointer := &createdAt
+	updatedAtPointer := &updatedAt
+
+	return UserResponse{
+		ID:          user.GetID(),
+		GoogleID:    user.GetGoogleID(),
+		Email:       emailPointer,
+		Username:    user.GetUsername(),
+		Firstname:   user.GetFirstname(),
+		Lastname:    user.GetLastname(),
+		PhoneNumber: phoneNumberPointer,
+		Bio:         bioPointer,
+		Avatar:      avatarPointer,
+		IsPrivate:   user.IsPrivateUser(),
+		Role:        user.GetRole(),
+		CreatedAt:   createdAtPointer,
+		UpdatedAt:   updatedAtPointer,
+	}
 }
