@@ -6,8 +6,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"go-api/authentication"
-	"go-api/authentication/provider"
 	_ "go-api/docs"
 	"go-api/internal/http/controllers"
 	"go-api/internal/http/middlewares"
@@ -34,15 +32,11 @@ func main() {
 		return
 	}
 
-	provider.UseGoogleAuth()
-
 	postgres.AutoMigrate()
 
 	//var wg sync.WaitGroup
 	//repo := repositories.Setup(&wg)
 	//defer repo.Disconnect()
-
-	authentication.Init()
 
 	r := gin.Default()
 	r.Use(gin.Recovery())
@@ -70,6 +64,10 @@ func main() {
 		follow := v1.Group("/follows")
 		{
 			follow.POST("/", middlewares.CurrentUserMiddleware(true), controllers.FollowUser)
+			follow.GET("/pending", middlewares.CurrentUserMiddleware(true), controllers.GetMyPendingRequests)
+			follow.GET("/my-followers", middlewares.CurrentUserMiddleware(true), controllers.GetMyFollowers)
+			follow.POST("/accept/:id", middlewares.CurrentUserMiddleware(true), controllers.AcceptRequest)
+			follow.POST("/reject/:id", middlewares.CurrentUserMiddleware(true), controllers.RejectRequest)
 			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
 

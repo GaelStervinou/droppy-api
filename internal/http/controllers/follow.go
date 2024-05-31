@@ -5,6 +5,7 @@ import (
 	"go-api/internal/storage/postgres"
 	"go-api/internal/storage/postgres/follow"
 	"go-api/internal/storage/postgres/user"
+	"go-api/pkg/converters"
 	"go-api/pkg/model"
 	"net/http"
 )
@@ -225,7 +226,56 @@ func GetMyPendingRequests(c *gin.Context) {
 // @Failure		500
 // @Router			/follows/accept/{id} [post]
 func AcceptRequest(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
 
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	sqlDB, err := postgres.Connect()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(400, gin.H{"error": "id is required"})
+		return
+	}
+
+	followId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid follow ID"})
+		return
+	}
+
+	followRepo := follow.NewRepo(sqlDB)
+
+	IsMyFollow, err := followRepo.IsMyFollow(uintCurrentUserId, followId)
+
+	if IsMyFollow == false {
+		c.JSON(403, gin.H{"error": "Forbidden"})
+		return
+	}
+
+	err = followRepo.AcceptRequest(followId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Follow request accepted"})
 }
 
 // RejectRequest godoc
@@ -243,5 +293,54 @@ func AcceptRequest(c *gin.Context) {
 // @Failure		500
 // @Router			/follows/refuse/{id} [post]
 func RejectRequest(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
 
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	sqlDB, err := postgres.Connect()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(400, gin.H{"error": "id is required"})
+		return
+	}
+
+	followId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid follow ID"})
+		return
+	}
+
+	followRepo := follow.NewRepo(sqlDB)
+
+	IsMyFollow, err := followRepo.IsMyFollow(uintCurrentUserId, followId)
+
+	if IsMyFollow == false {
+		c.JSON(403, gin.H{"error": "Forbidden"})
+		return
+	}
+
+	err = followRepo.RejectRequest(followId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Follow request refused"})
 }

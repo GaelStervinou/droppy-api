@@ -133,15 +133,11 @@ func (r *repoPrivate) AreAlreadyFollowing(followerID, followedID uint) (bool, er
 	return true, nil
 }
 
-func (r *repoPrivate) GetPendingRequestsByUserId(userID uint) ([]model.FollowModel, error) {
-	var follows []Follow
-	result := r.db.Where("follower_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
+func (r *repoPrivate) IsMyFollow(followerID, followedID uint) (bool, error) {
+	var follow Follow
+	result := r.db.Where("follower_id = ? AND followed_id = ?", followerID, followedID).Find(&follow)
 	if result.Error != nil {
-		return nil, result.Error
+		return false, result.Error
 	}
-	var models []model.FollowModel
-	for _, follow := range follows {
-		models = append(models, &follow)
-	}
-	return models, nil
+	return true, nil
 }
