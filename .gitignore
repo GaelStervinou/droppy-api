@@ -2,3 +2,10 @@
 /pg_data/
 /main
 /config/droppy-firebase-config.json
+/.idea/workspace.xml
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/droppy-api.iml
+/.idea/dataSources.xml
+/.idea/.gitignore
+/.DS_Store
