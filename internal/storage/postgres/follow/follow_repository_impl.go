@@ -133,7 +133,7 @@ func (r *repoPrivate) AreAlreadyFollowing(followerID, followedID uint) (bool, er
 	return true, nil
 }
 
-func (r *repoPrivate) IsMyFollow(followerID, followedID uint) (bool, error) {
+func (r *repoPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
 	var follow Follow
 	result := r.db.Where("follower_id = ? AND followed_id = ?", followerID, followedID).Find(&follow)
 	if result.Error != nil {

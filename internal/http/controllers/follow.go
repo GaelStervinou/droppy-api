@@ -260,7 +260,7 @@ func AcceptRequest(c *gin.Context) {
 
 	followRepo := follow.NewRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsMyFollow(uintCurrentUserId, followId)
+	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
 
 	if IsMyFollow == false {
 		c.JSON(403, gin.H{"error": "Forbidden"})
@@ -327,7 +327,7 @@ func RejectRequest(c *gin.Context) {
 
 	followRepo := follow.NewRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsMyFollow(uintCurrentUserId, followId)
+	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
 
 	if IsMyFollow == false {
 		c.JSON(403, gin.H{"error": "Forbidden"})

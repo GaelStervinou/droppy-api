@@ -14,10 +14,14 @@ type DropModel interface {
 	GetDeletedById() uint
 	GetIsPinned() bool
 	GetDropNotificationID() uint
+	GetLat() float64
+	GetLng() float64
+	GetPicturePath() string
+	GetCreatedAt() int
 }
 
 type DropRepository interface {
-	Create(dropNotificationId uint, contentType string, content string, description string, createdById uint, status uint, isPinned bool) (DropModel, error)
+	Create(dropNotificationId uint, contentType string, content string, description string, createdById uint, status uint, isPinned bool, picturePath string, lat float64, lng float64) (DropModel, error)
 	Delete(dropId uint) error
 	GetUserDrops(userId uint) ([]DropModel, error)
 	GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (DropModel, error)
@@ -25,15 +29,27 @@ type DropRepository interface {
 }
 
 type DropService interface {
-	CanCreateDrop(current, userId uint) (bool, error)
+	CanCreateDrop(userId uint) (bool, error)
 	IsValidDropCreation(args DropCreationParam) (bool, error)
 	CreateDrop(userId uint, args DropCreationParam) (DropModel, error)
 	GetUserFeed(userId uint) ([]DropModel, error)
+	GetDropsByUserId(userId uint, currentUser UserModel) ([]DropModel, error)
 }
 
 type DropCreationParam struct {
-	Type               string `json:"type"`
-	Content            string `json:"content"`
-	Description        string `json:"description"`
-	DropNotificationId uint   `json:"dropNotificationId"`
+	Content     string  `json:"content"`
+	Description string  `json:"description"`
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
+	Picture     string  `json:"picture"`
+}
+
+type FilledDropCreation struct {
+	Type               string  `json:"type"`
+	Content            string  `json:"content"`
+	Description        string  `json:"description"`
+	DropNotificationId uint    `json:"dropNotificationId"`
+	PicturePath        string  `json:"picturePath"`
+	Lat                float64 `json:"lat"`
+	Lng                float64 `json:"lng"`
 }

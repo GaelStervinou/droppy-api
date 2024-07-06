@@ -41,6 +41,9 @@ func PopulateDrops(db *gorm.DB) error {
 				Status:             uint(status),
 				IsPinned:           isPinned,
 				DropNotificationID: dropNotifications[i].ID,
+				Lat:                faker.Latitude(),
+				Lng:                faker.Longitude(),
+				PicturePath:        faker.URL(),
 			})
 		}
 	}

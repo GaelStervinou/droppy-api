@@ -253,7 +253,7 @@ func SearchUsers(c *gin.Context) {
 		return
 	}
 
-	var usersResponse []response_models.GetUserResponse
+	var usersResponse []response_models.GetUserResponseInterface
 	for _, searchedUser := range users {
 		usersResponse = append(usersResponse, response_models.FormatGetUserResponse(searchedUser))
 	}
