@@ -91,6 +91,7 @@ func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, 
 		Password:  hashedPassword,
 		Username:  args.Username,
 		Role:      args.Role,
+		Status:    1,
 	}
 
 	result := repo.db.Create(&userObject)

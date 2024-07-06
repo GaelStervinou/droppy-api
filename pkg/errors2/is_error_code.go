@@ -7,7 +7,6 @@ import (
 
 const (
 	UniqueViolationErr = "23505"
-	RecordNotFoundErr  = "23503"
 )
 
 func IsErrorCode(err error, errcode string) bool {
