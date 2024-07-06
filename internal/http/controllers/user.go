@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -23,11 +24,10 @@ import (
 // @Produce		json
 // @Security BearerAuth
 // @Param			id path int true "User ID"
-// @Success		200	{object} response_models.UserResponse
+// @Success		200	{object} response_models.GetUserResponse
 // @Failure		400
 // @Failure		403
 // @Failure		404
-// @Failure		500
 // @Router			/users/{id} [get]
 func GetUserById(c *gin.Context) {
 	sqlDB, err := postgres.Connect()
@@ -42,48 +42,32 @@ func GetUserById(c *gin.Context) {
 	id := strings.TrimSpace(c.Param("id"))
 
 	if "" == id {
-		c.JSON(400, gin.H{"error": "id is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
 		return
 	}
 
 	userID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 
 	requestedUser, err := us.GetById(uint(userID))
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	if nil == requestedUser {
-		c.JSON(404, gin.H{"error": "User not found"})
+		fmt.Println("User not found")
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	currentUserId, exists := c.Get("userId")
+	userResponse := response_models.FormatGetUserResponse(requestedUser)
 
-	uintCurrentUserId := uint(0)
-	if exists {
-		toUint, ok := currentUserId.(uint)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			return
-		}
-
-		uintCurrentUserId = toUint
-	}
-
-	userResponse := response_models.FormatUserFromModel(requestedUser)
-
-	if uintCurrentUserId != userResponse.ID {
-		userResponse.HidePersonalInfo()
-	}
-
-	c.JSON(200, userResponse)
+	c.JSON(http.StatusOK, userResponse)
 }
 
 // Create godoc
@@ -236,7 +220,7 @@ func PatchUserById(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 // @Param			search query string true "Search query"
-// @Success		200	{object} []response_models.UserResponse
+// @Success		200	{object} []response_models.GetUserResponse
 // @Failure		400
 // @Failure		500
 // @Router			/users/search [get]
@@ -269,10 +253,9 @@ func SearchUsers(c *gin.Context) {
 		return
 	}
 
-	var usersResponse []response_models.UserResponse
-	for i, searchedUser := range users {
-		usersResponse = append(usersResponse, response_models.FormatUserFromModel(searchedUser))
-		usersResponse[i].HidePersonalInfo()
+	var usersResponse []response_models.GetUserResponse
+	for _, searchedUser := range users {
+		usersResponse = append(usersResponse, response_models.FormatGetUserResponse(searchedUser))
 	}
 
 	c.JSON(200, usersResponse)

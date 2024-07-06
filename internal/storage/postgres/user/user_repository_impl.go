@@ -157,7 +157,7 @@ func (repo *repoPrivate) GetById(id uint) (model.UserModel, error) {
 
 	result := repo.db.Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
-		return &userObject, errors.New("user not found")
+		return nil, nil
 	}
 
 	return &userObject, result.Error

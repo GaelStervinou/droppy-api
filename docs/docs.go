@@ -541,7 +541,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response_models.UserResponse"
+                                "$ref": "#/definitions/response_models.GetUserResponse"
                             }
                         }
                     },
@@ -585,7 +585,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response_models.UserResponse"
+                            "$ref": "#/definitions/response_models.GetUserResponse"
                         }
                     },
                     "400": {
@@ -596,9 +596,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -887,7 +884,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response_models.UserResponse": {
+        "response_models.GetUserResponse": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -899,26 +896,11 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "googleID": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "phoneNumber": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
                 },
                 "username": {
                     "type": "string"
