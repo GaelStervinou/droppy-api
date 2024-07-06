@@ -289,8 +289,8 @@ const docTemplate = `{
                 ],
                 "summary": "Get my followers",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -329,8 +329,8 @@ const docTemplate = `{
                 ],
                 "summary": "Get my pending requests",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -779,9 +779,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
                 "googleID": {
                     "type": "string"
                 },
@@ -790,9 +787,6 @@ const docTemplate = `{
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
                 },
                 "password": {
                     "type": "string"
@@ -871,12 +865,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },
@@ -892,12 +880,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
                     "type": "string"
                 },
                 "username": {
@@ -920,9 +902,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
                 "googleID": {
                     "type": "string"
                 },
@@ -931,9 +910,6 @@ const docTemplate = `{
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
                 },
                 "phoneNumber": {
                     "type": "string"

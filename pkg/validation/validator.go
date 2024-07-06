@@ -16,12 +16,6 @@ func ValidateUserCreation(args model.UserCreationParam) errors2.MultiFieldsError
 	if _, err := mail.ParseAddress(args.Email); err != nil {
 		finalErrors.Fields["email"] = "Invalid email address"
 	}
-	if len(args.Firstname) < 2 {
-		finalErrors.Fields["firstname"] = "Firstname must be at least 2 characters long"
-	}
-	if len(args.Lastname) < 2 {
-		finalErrors.Fields["lastname"] = "Lastname must be at least 2 characters long"
-	}
 	if len(args.Password) < 8 {
 		finalErrors.Fields["password"] = "Password must be at least 8 characters long"
 	}
@@ -44,12 +38,6 @@ func ValidateUserPatch(args model.UserPatchParam) errors2.MultiFieldsError {
 	}
 	if _, err := mail.ParseAddress(args.Email); err != nil {
 		finalErrors.Fields["email"] = "Invalid email address"
-	}
-	if len(args.Firstname) < 2 {
-		finalErrors.Fields["firstname"] = "Firstname must be at least 2 characters long"
-	}
-	if len(args.Lastname) < 2 {
-		finalErrors.Fields["lastname"] = "Lastname must be at least 2 characters long"
 	}
 	if len(args.Username) < 4 {
 		finalErrors.Fields["username"] = "Username must be at least 4 characters long"

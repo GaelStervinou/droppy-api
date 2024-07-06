@@ -282,8 +282,8 @@
                 ],
                 "summary": "Get my followers",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -322,8 +322,8 @@
                 ],
                 "summary": "Get my pending requests",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -772,9 +772,6 @@
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
                 "googleID": {
                     "type": "string"
                 },
@@ -783,9 +780,6 @@
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
                 },
                 "password": {
                     "type": "string"
@@ -864,12 +858,6 @@
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },
@@ -885,12 +873,6 @@
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
                     "type": "string"
                 },
                 "username": {
@@ -913,9 +895,6 @@
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
                 "googleID": {
                     "type": "string"
                 },
@@ -924,9 +903,6 @@
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
                 },
                 "phoneNumber": {
                     "type": "string"

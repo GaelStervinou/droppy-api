@@ -77,16 +77,12 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
         type: string
-      firstname:
-        type: string
       googleID:
         type: string
       id:
         type: integer
       isPrivate:
         type: boolean
-      lastname:
-        type: string
       password:
         type: string
       phoneNumber:
@@ -137,10 +133,6 @@ definitions:
     properties:
       email:
         type: string
-      firstname:
-        type: string
-      lastname:
-        type: string
       password:
         type: string
       role:
@@ -151,10 +143,6 @@ definitions:
   model.UserPatchParam:
     properties:
       email:
-        type: string
-      firstname:
-        type: string
-      lastname:
         type: string
       username:
         type: string
@@ -169,16 +157,12 @@ definitions:
         type: string
       email:
         type: string
-      firstname:
-        type: string
       googleID:
         type: string
       id:
         type: integer
       isPrivate:
         type: boolean
-      lastname:
-        type: string
       phoneNumber:
         type: string
       role:
@@ -365,8 +349,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
@@ -390,8 +374,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/go-api_internal_storage_postgres_user.User'

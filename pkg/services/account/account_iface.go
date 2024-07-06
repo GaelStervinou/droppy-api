@@ -3,8 +3,8 @@ package account
 import "context"
 
 type AccountServiceIface interface {
-	Create(string, string, string, string, string) error
-	CreateWithGoogle(string, string, string, string) error
+	Create(string, string, string) error
+	CreateWithGoogle(string, string) error
 	Login(string, string) (*TokenInfo, error)
 	LoginWithFirebase(string, context.Context) (*TokenInfo, error)
 	LoginWithGoogle(string) (*TokenInfo, error)

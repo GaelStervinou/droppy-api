@@ -10,8 +10,6 @@ type UserResponse struct {
 	GoogleID    *string
 	Email       *string
 	Username    string
-	Firstname   string
-	Lastname    string
 	PhoneNumber *string
 	Bio         *string
 	Avatar      *string
@@ -54,8 +52,6 @@ func FormatUserFromModel(user model.UserModel) UserResponse {
 		GoogleID:    user.GetGoogleID(),
 		Email:       emailPointer,
 		Username:    user.GetUsername(),
-		Firstname:   user.GetFirstname(),
-		Lastname:    user.GetLastname(),
 		PhoneNumber: phoneNumberPointer,
 		Bio:         bioPointer,
 		Avatar:      avatarPointer,
