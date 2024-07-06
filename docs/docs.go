@@ -170,14 +170,14 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/drop.Drop"
+                            "$ref": "#/definitions/response_models.GetDropResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "422": {
                         "description": "Unprocessable Entity"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -461,12 +461,9 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/drop.Drop"
+                                "$ref": "#/definitions/response_models.GetDropResponse"
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -710,6 +707,15 @@ const docTemplate = `{
                 "isPinned": {
                     "type": "boolean"
                 },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
+                "picturePath": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "integer"
                 },
@@ -829,10 +835,13 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "dropNotificationId": {
-                    "type": "integer"
+                "lat": {
+                    "type": "number"
                 },
-                "type": {
+                "lng": {
+                    "type": "number"
+                },
+                "picture": {
                     "type": "string"
                 }
             }
@@ -880,6 +889,36 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "response_models.GetDropResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {},
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
+                "picturePath": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }

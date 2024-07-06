@@ -15,6 +15,9 @@ type Drop struct {
 	DeletedById        uint
 	IsPinned           bool `gorm:"default:false"`
 	DropNotificationID uint `gorm:"not null"`
+	Lat                float64
+	Lng                float64
+	PicturePath        string
 }
 
 func (d *Drop) GetID() uint { return d.ID }
@@ -34,6 +37,14 @@ func (d *Drop) GetStatus() uint { return d.Status }
 func (d *Drop) GetDeletedById() uint { return d.DeletedById }
 
 func (d *Drop) GetIsPinned() bool { return d.IsPinned }
+
+func (d *Drop) GetLat() float64 { return d.Lat }
+
+func (d *Drop) GetLng() float64 { return d.Lng }
+
+func (d *Drop) GetPicturePath() string { return d.PicturePath }
+
+func (d *Drop) GetCreatedAt() int { return int(d.CreatedAt.Unix()) }
 
 type DropStatusActive struct{}
 
@@ -57,7 +68,19 @@ func NewRepo(db *gorm.DB) model.DropRepository {
 	return &repoPrivate{db: db}
 }
 
-func (r *repoPrivate) Create(dropNotificationId uint, contentType string, content string, description string, createdById uint, status uint, isPinned bool) (model.DropModel, error) {
+func (r *repoPrivate) Create(
+	dropNotificationId uint,
+	contentType string,
+	content string,
+	description string,
+	createdById uint,
+	status uint,
+	isPinned bool,
+	picturePath string,
+	lat float64,
+	lng float64,
+
+) (model.DropModel, error) {
 	drop := &Drop{
 		Type:               contentType,
 		Content:            content,
@@ -66,6 +89,9 @@ func (r *repoPrivate) Create(dropNotificationId uint, contentType string, conten
 		Status:             status,
 		IsPinned:           isPinned,
 		DropNotificationID: dropNotificationId,
+		PicturePath:        picturePath,
+		Lat:                lat,
+		Lng:                lng,
 	}
 	if err := r.db.Create(drop).Error; err != nil {
 		return nil, err

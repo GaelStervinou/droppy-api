@@ -14,24 +14,18 @@ type DropService struct {
 	Repo *repositories.Repositories
 }
 
-func (s *DropService) CanCreateDrop(dropNotificationId uint, userId uint) (bool, error) {
-	alreadyDropped, err := s.Repo.DropRepository.GetDropByDropNotificationAndUser(dropNotificationId, userId)
+func (s *DropService) CanCreateDrop(userId uint) (bool, error) {
+	currentNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
+	if err != nil {
+		return false, err
+	}
+	alreadyDropped, err := s.Repo.DropRepository.GetDropByDropNotificationAndUser(currentNotification.GetID(), userId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
 	}
 
 	if alreadyDropped != nil {
 		return false, errors2.CannotDropError{Reason: "User already dropped this notification"}
-	}
-
-	currentNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
-
-	if err != nil {
-		return false, err
-	}
-
-	if currentNotification.GetID() != dropNotificationId {
-		return false, errors2.CannotDropError{Reason: "Drop notification is not the current one"}
 	}
 
 	return true, nil
@@ -48,7 +42,7 @@ func (s *DropService) IsValidDropCreation(args model.DropCreationParam) (bool, e
 }
 
 func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (model.DropModel, error) {
-	if can, err := s.CanCreateDrop(args.DropNotificationId, userId); !can || err != nil {
+	if can, err := s.CanCreateDrop(userId); !can || err != nil {
 		return nil, err
 	}
 
@@ -56,19 +50,42 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		return nil, err
 	}
 
-	statusActive := drop.DropStatusActive{}
-	dropNotification, err := s.Repo.DropNotificationRepository.GetNotificationByID(args.DropNotificationId)
-
+	currentDropNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
 	if err != nil {
 		return nil, err
 	}
 
-	if dropNotification == nil {
-		return nil, errors.New("Drop notification not found")
+	var picturePath string
+	if args.Picture != "" {
+		// Upload picture to storage
+		// Save picture path to DB
+		picturePath = "https://example.com/picture.jpg"
 	}
 
-	args.Type = dropNotification.GetType()
-	return s.Repo.DropRepository.Create(args.DropNotificationId, args.Type, args.Content, args.Description, userId, statusActive.ToInt(), false)
+	filledDrop := model.FilledDropCreation{
+		Type:               currentDropNotification.GetType(),
+		Content:            args.Content,
+		Description:        args.Description,
+		DropNotificationId: currentDropNotification.GetID(),
+		PicturePath:        picturePath,
+		Lat:                args.Lat,
+		Lng:                args.Lng,
+	}
+
+	statusActive := drop.DropStatusActive{}
+
+	return s.Repo.DropRepository.Create(
+		filledDrop.DropNotificationId,
+		filledDrop.Type,
+		filledDrop.Content,
+		filledDrop.Description,
+		userId,
+		statusActive.ToInt(),
+		false,
+		filledDrop.PicturePath,
+		filledDrop.Lat,
+		filledDrop.Lng,
+	)
 }
 
 func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
@@ -105,6 +122,52 @@ func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
 
 	drops, err := s.Repo.DropRepository.GetDropsByUserIdsAndDropNotificationId(followingUserIds, lastDropNotification.GetID())
 
+	if err != nil {
+		return nil, err
+	}
+
+	return drops, nil
+}
+
+func (s *DropService) GetDropsByUserId(userId uint, currentUser model.UserModel) ([]model.DropModel, error) {
+	isActiveUser, err := s.Repo.UserRepository.IsActiveUser(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !isActiveUser {
+		return nil, errors.New("User not found")
+	}
+
+	user, err := s.Repo.UserRepository.GetById(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("User not found")
+	}
+
+	if user.IsPrivateUser() {
+		if nil == currentUser {
+			return nil, nil
+		}
+
+		currentUserIsFollowing, err := s.Repo.FollowRepository.IsFollowing(currentUser.GetID(), userId)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if !currentUserIsFollowing {
+			return nil, nil
+		}
+	}
+
+	drops, err := s.Repo.DropRepository.GetUserDrops(userId)
+	
 	if err != nil {
 		return nil, err
 	}

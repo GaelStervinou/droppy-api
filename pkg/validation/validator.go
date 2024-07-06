@@ -51,11 +51,27 @@ func ValidateDropCreation(args model.DropCreationParam) errors2.MultiFieldsError
 		Fields: map[string]string{},
 	}
 
-	validTypes := []string{"youtube", "spotify", "film"}
+	if len(args.Content) < 1 {
+		finalErrors.Fields["content"] = "Content must be at least 1 character long"
+	}
+
+	if len(args.Description) < 1 || len(args.Description) > 255 {
+		finalErrors.Fields["description"] = "Description must be at least 1 character long and at most 255 characters long"
+	}
+
+	if args.Lat < -90 || args.Lat > 90 {
+		finalErrors.Fields["lat"] = "Invalid latitude"
+	}
+
+	if args.Lng < -180 || args.Lng > 180 {
+		finalErrors.Fields["lng"] = "Invalid longitude"
+	}
+
+	/*validTypes := []string{"youtube", "spotify", "film"}
 
 	if slices.Contains(validTypes, args.Type) == false {
 		finalErrors.Fields["type"] = "Invalid type"
-	}
+	}*/
 
 	/*err := validateContentByType(args.Content, args.Type)
 
