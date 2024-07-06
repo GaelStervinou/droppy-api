@@ -78,6 +78,7 @@ func main() {
 		group := v1.Group("/groups")
 		{
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
+			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
 		}
 
 		fixtures := v1.Group("/fixtures")

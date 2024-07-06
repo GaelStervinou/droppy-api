@@ -5,6 +5,7 @@ import (
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	groupservice "go-api/internal/services/group"
+	"go-api/pkg/converters"
 	"go-api/pkg/model"
 	"net/http"
 )
@@ -17,6 +18,9 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			group	body		model.GroupCreationParam	true	"Group creation object"
+//
+// @Security BearerAuth
+//
 //	@Success		201	{object} response_models.GetGroupResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
@@ -57,15 +61,73 @@ func CreateGroup(c *gin.Context) {
 		return
 	}
 
-	user, err := gs.Repo.UserRepository.GetById(uintCurrentUserId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	groupResponse := response_models.FormatGetGroupResponse(createdGroup)
+
+	c.JSON(http.StatusCreated, groupResponse)
+}
+
+// PatchGroup godoc
+//
+//	@Summary		Patch group
+//	@Description	Patch group
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+// @Param			id path int true "User ID"
+//
+//	@Produce		json
+//	@Param			group	body		model.GroupPatchParam	true	"Group patch object"
+//	@Success		200	{object} response_models.GetGroupResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		500
+//	@Router			/groups/{id} [patch]
+func PatchGroup(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	userResponse := response_models.FormatGetUserResponse(user)
+	id := c.Param("id")
 
-	groupResponse := response_models.FormatGetGroupResponse(createdGroup, userResponse)
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
 
-	c.JSON(http.StatusCreated, groupResponse)
+	groupId, err := converters.StringToUint(id)
+
+	var groupPatch model.GroupPatchParam
+
+	if err := c.ShouldBindJSON(&groupPatch); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	gs := &groupservice.GroupService{
+		Repo: repositories.Setup(),
+	}
+
+	group, err := gs.PatchGroup(groupId, uintCurrentUserId, groupPatch)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == group {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group not found"})
+		return
+	}
+
+	groupResponse := response_models.FormatGetGroupResponse(group)
+
+	c.JSON(http.StatusOK, groupResponse)
 }

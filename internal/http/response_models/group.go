@@ -10,12 +10,13 @@ type GetGroupResponse struct {
 	ID          uint
 	Name        string
 	Description string
+	IsPrivate   bool
 	PicturePath custom_type.NullString
 	CreatedAt   *time.Time
 	CreatedBy   GetUserResponseInterface `json:",omitempty"`
 }
 
-func FormatGetGroupResponse(group model.GroupModel, createdBy GetUserResponseInterface) GetGroupResponse {
+func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 	if nil == group {
 		return GetGroupResponse{}
 	}
@@ -24,22 +25,13 @@ func FormatGetGroupResponse(group model.GroupModel, createdBy GetUserResponseInt
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
 
-	if nil == createdBy {
-		return GetGroupResponse{
-			ID:          group.GetID(),
-			Name:        group.GetName(),
-			Description: group.GetDescription(),
-			PicturePath: picturePath,
-			CreatedAt:   &createdAt,
-		}
-	}
-
 	return GetGroupResponse{
 		ID:          group.GetID(),
 		Name:        group.GetName(),
 		Description: group.GetDescription(),
+		IsPrivate:   group.IsPrivateGroup(),
 		PicturePath: picturePath,
 		CreatedAt:   &createdAt,
-		CreatedBy:   createdBy,
+		CreatedBy:   FormatGetUserResponse(group.GetCreatedBy()),
 	}
 }

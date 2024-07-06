@@ -50,6 +50,9 @@ func (g *Group) GetStatus() uint {
 func (g *Group) IsPrivateGroup() bool {
 	return g.IsPrivate
 }
+func (g *Group) GetCreatedByID() uint {
+	return g.CreatedByID
+}
 
 var _ model.GroupModel = (*Group)(nil)
 
@@ -93,14 +96,48 @@ func (r repoPrivate) FindAllByUserId(userId uint) ([]model.GroupModel, error) {
 	return models, nil
 }
 
-func (r repoPrivate) GetById(userId uint, id uint) (model.GroupModel, error) {
-	//TODO implement me
-	panic("implement me")
+func (r repoPrivate) Update(args model.FilledGroupPatchParam) (model.GroupModel, error) {
+	object := Group{}
+
+	r.db.Where("id = ?", args.ID).First(&object)
+	if object.CreatedAt.IsZero() {
+		return nil, fmt.Errorf("group with id %d not found", args.ID)
+	}
+
+	if args.Name != "" {
+		object.Name = args.Name
+	}
+	if args.Description != "" {
+		object.Description = args.Description
+	}
+	object.IsPrivate = args.IsPrivate
+	object.PicturePath = sql.NullString{String: args.Picture, Valid: args.Picture != ""}
+
+	result := r.db.Save(&object)
+	return &object, result.Error
+}
+
+func (r repoPrivate) GetById(id uint) (model.GroupModel, error) {
+	object := Group{}
+	object.ID = id
+
+	result := r.db.Find(&object)
+	if object.CreatedAt.IsZero() {
+		return nil, fmt.Errorf("group with id %d not found", id)
+	}
+
+	return &object, result.Error
 }
 
 func (r repoPrivate) GetByName(name string) (model.GroupModel, error) {
-	//TODO implement me
-	panic("implement me")
+	object := Group{}
+
+	result := r.db.Where("name = ?", name).First(&object)
+	if object.CreatedAt.IsZero() {
+		return nil, fmt.Errorf("group with name %s not found", name)
+	}
+
+	return &object, result.Error
 }
 
 func (r repoPrivate) Delete(id uint) error {
