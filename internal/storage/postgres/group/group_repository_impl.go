@@ -144,3 +144,19 @@ func (r repoPrivate) Delete(id uint) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (r repoPrivate) Search(query string) ([]model.GroupModel, error) {
+	var groups []*Group
+
+	result := r.db.Where("name LIKE ?", "%"+query+"%").Find(&groups)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	models := make([]model.GroupModel, len(groups))
+	for i, v := range groups {
+		models[i] = model.GroupModel(v)
+	}
+
+	return models, nil
+}

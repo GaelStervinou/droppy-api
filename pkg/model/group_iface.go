@@ -20,6 +20,7 @@ type GroupRepository interface {
 	GetByName(name string) (GroupModel, error)
 	Update(args FilledGroupPatchParam) (GroupModel, error)
 	Delete(id uint) error
+	Search(query string) ([]GroupModel, error)
 }
 
 type GroupService interface {

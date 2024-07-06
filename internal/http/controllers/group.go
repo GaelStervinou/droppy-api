@@ -5,9 +5,13 @@ import (
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	groupservice "go-api/internal/services/group"
+	"go-api/internal/storage/postgres"
+	"go-api/internal/storage/postgres/group"
 	"go-api/pkg/converters"
+	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/http"
+	"strings"
 )
 
 // CreateGroup godoc
@@ -130,4 +134,54 @@ func PatchGroup(c *gin.Context) {
 	groupResponse := response_models.FormatGetGroupResponse(group)
 
 	c.JSON(http.StatusOK, groupResponse)
+}
+
+// SearchGroups godoc
+//
+// @Summary		Search groups
+// @Description	Search groups
+// @Tags			group
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			search query string true "Search query"
+// @Success		200	{object} []response_models.GetGroupResponse
+// @Failure		400
+// @Failure		500
+// @Router			/groups/search [get]
+func SearchGroups(c *gin.Context) {
+	sqlDB, err := postgres.Connect()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	gr := group.NewRepo(sqlDB)
+
+	query := strings.TrimSpace(c.Query("search"))
+
+	if "" == query {
+		c.JSON(400, errors2.MultiFieldsError{Fields: map[string]string{"search": "Search query is required"}})
+		return
+	}
+
+	users, err := gr.Search(query)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == users {
+		c.JSON(404, gin.H{"error": "Users not found"})
+		return
+	}
+
+	var groupResponse []response_models.GetGroupResponse
+	for _, searchedGroup := range users {
+		groupResponse = append(groupResponse, response_models.FormatGetGroupResponse(searchedGroup))
+	}
+
+	c.JSON(200, groupResponse)
 }

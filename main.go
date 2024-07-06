@@ -79,6 +79,7 @@ func main() {
 		{
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
 			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
+			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
 		}
 
 		fixtures := v1.Group("/fixtures")
