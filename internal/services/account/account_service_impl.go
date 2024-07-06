@@ -18,14 +18,12 @@ type AccountService struct {
 	Repo *repositories.Repositories
 }
 
-func (a *AccountService) Create(firstname string, lastname string, email string, password string, username string) error {
+func (a *AccountService) Create(email string, password string, username string) error {
 	user := model.UserCreationParam{
-		Firstname: firstname,
-		Lastname:  lastname,
-		Email:     email,
-		Password:  password,
-		Username:  username,
-		Role:      "user",
+		Email:    email,
+		Password: password,
+		Username: username,
+		Role:     "user",
 	}
 	validationError := validation.ValidateUserCreation(user)
 	if len(validationError.Fields) > 0 {
@@ -43,15 +41,13 @@ func (a *AccountService) Create(firstname string, lastname string, email string,
 	return err
 }
 
-func (a *AccountService) CreateWithGoogle(firstname string, lastname string, email string, googleId string) error {
+func (a *AccountService) CreateWithGoogle(email string, googleId string) error {
 	_, err := a.Repo.UserRepository.CreateWithGoogle(
 		model.UserCreationWithGoogleParam{
-			Firstname: firstname,
-			Lastname:  lastname,
-			Email:     email,
-			GoogleId:  googleId,
-			Username:  random.RandStringRunes(10),
-			Role:      "user",
+			Email:    email,
+			GoogleId: googleId,
+			Username: random.RandStringRunes(10),
+			Role:     "user",
 		},
 	)
 	return err
@@ -110,7 +106,7 @@ func (a *AccountService) LoginWithFirebase(token string, ctx context.Context) (*
 
 	if err != nil {
 		if "user not found" == err.Error() {
-			err = a.CreateWithGoogle(decodedToken.Claims["name"].(string), decodedToken.Claims["name"].(string), decodedToken.Claims["email"].(string), decodedToken.UID)
+			err = a.CreateWithGoogle(decodedToken.Claims["email"].(string), decodedToken.UID)
 			if err != nil {
 				return &account.TokenInfo{}, err
 			}

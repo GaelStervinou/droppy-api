@@ -6,8 +6,6 @@ type UserModel interface {
 	GetRole() string
 	GetEmail() string
 	GetGoogleID() *string
-	GetFirstname() string
-	GetLastname() string
 	GetUsername() string
 	GetPhoneNumber() string
 	GetBio() string
@@ -33,28 +31,22 @@ type UserRepository interface {
 }
 
 type UserCreationParam struct {
-	Firstname string
-	Lastname  string
-	Email     string
-	Password  string
-	Username  string
-	Role      string
+	Email    string
+	Password string
+	Username string
+	Role     string
 }
 
 type UserCreationWithGoogleParam struct {
-	Firstname string
-	Lastname  string
-	Email     string
-	Username  string
-	GoogleId  string
-	Role      string
+	Email    string
+	Username string
+	GoogleId string
+	Role     string
 }
 
 type UserPatchParam struct {
-	Email     string
-	Firstname string
-	Lastname  string
-	Username  string
+	Email    string
+	Username string
 }
 
 type LoginParam struct {

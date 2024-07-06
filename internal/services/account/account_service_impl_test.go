@@ -10,6 +10,31 @@ import (
 
 type MockUserRepository struct{}
 
+func (m *MockUserRepository) Update(args model.UserPatchParam) (model.UserModel, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserRepository) CanUserBeFollowed(followedId uint) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserRepository) GetUsersFromUserIds(userIds []uint) ([]model.UserModel, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserRepository) Search(query string) ([]model.UserModel, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserRepository) IsActiveUser(userId uint) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *MockUserRepository) Create(args model.UserCreationParam) (model.UserModel, error) {
 	return nil, nil
 }
@@ -31,9 +56,6 @@ func (m *MockUserRepository) GetById(id uint) (model.UserModel, error) {
 func (m *MockUserRepository) GetByGoogleAuthId(googleID string) (model.UserModel, error) {
 	return nil, nil
 }
-func (m *MockUserRepository) Update(user model.UserModel) (model.UserModel, error) {
-	return nil, nil
-}
 
 func TestAccountService_Create(t *testing.T) {
 	repo := repositories.Repositories{
@@ -46,11 +68,9 @@ func TestAccountService_Create(t *testing.T) {
 	}
 
 	type args struct {
-		email     string
-		password  string
-		firstname string
-		lastname  string
-		username  string
+		email    string
+		password string
+		username string
 	}
 	tests := []struct {
 		name        string
@@ -65,14 +85,12 @@ func TestAccountService_Create(t *testing.T) {
 				Repo: &repo,
 			},
 			args: args{
-				email:     "test",
-				password:  "test123",
-				firstname: "G",
-				lastname:  "B",
-				username:  "gae",
+				email:    "test",
+				password: "test123",
+				username: "gae",
 			},
 			wantErr:     true,
-			errorFields: []string{"email", "firstname", "lastname", "username", "password"},
+			errorFields: []string{"email", "username", "password"},
 		},
 	}
 	for _, tt := range tests {
@@ -80,7 +98,7 @@ func TestAccountService_Create(t *testing.T) {
 			a := AccountService{
 				Repo: tt.fields.Repo,
 			}
-			err := a.Create(tt.args.firstname, tt.args.lastname, tt.args.email, tt.args.password, tt.args.username)
+			err := a.Create(tt.args.email, tt.args.password, tt.args.username)
 			if err == nil && tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -17,8 +17,6 @@ type User struct {
 	Email       string  `gorm:"unique"`
 	Password    string  `gorm:"size:255"`
 	Username    string  `gorm:"unique;not null"`
-	Firstname   string
-	Lastname    string
 	PhoneNumber string
 	Bio         string `gorm:"size:1000"`
 	Avatar      string
@@ -41,12 +39,6 @@ func (u *User) GetEmail() string {
 }
 func (u *User) GetPassword() string {
 	return u.Password
-}
-func (u *User) GetFirstname() string {
-	return u.Firstname
-}
-func (u *User) GetLastname() string {
-	return u.Lastname
 }
 func (u *User) GetUsername() string    { return u.Username }
 func (u *User) GetRole() string        { return u.Role }
@@ -85,13 +77,11 @@ func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, 
 	}
 
 	userObject := User{
-		Firstname: args.Firstname,
-		Lastname:  args.Lastname,
-		Email:     args.Email,
-		Password:  hashedPassword,
-		Username:  args.Username,
-		Role:      args.Role,
-		Status:    1,
+		Email:    args.Email,
+		Password: hashedPassword,
+		Username: args.Username,
+		Role:     args.Role,
+		Status:   1,
 	}
 
 	result := repo.db.Create(&userObject)
@@ -107,13 +97,11 @@ func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, 
 
 func (repo *repoPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam) (model.UserModel, error) {
 	userObject := User{
-		Firstname: args.Firstname,
-		Lastname:  args.Lastname,
-		Email:     args.Email,
-		GoogleID:  &args.GoogleId,
-		Status:    1,
-		Role:      args.Role,
-		Username:  args.Username,
+		Email:    args.Email,
+		GoogleID: &args.GoogleId,
+		Status:   1,
+		Role:     args.Role,
+		Username: args.Username,
 	}
 
 	result := repo.db.Create(&userObject)
@@ -132,8 +120,6 @@ func (repo *repoPrivate) Update(args model.UserPatchParam) (model.UserModel, err
 		return nil, errors.New("user not found")
 	}
 
-	userObject.Firstname = args.Firstname
-	userObject.Lastname = args.Lastname
 	userObject.Username = args.Username
 
 	result := repo.db.Save(&userObject)
@@ -171,7 +157,7 @@ func (repo *repoPrivate) GetById(id uint) (model.UserModel, error) {
 
 	result := repo.db.Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
-		return &userObject, errors.New("user not found")
+		return nil, nil
 	}
 
 	return &userObject, result.Error
@@ -213,7 +199,7 @@ func (repo *repoPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, err
 func (repo *repoPrivate) Search(query string) ([]model.UserModel, error) {
 	var foundUsers []*User
 	searchParam := "%" + query + "%"
-	result := repo.db.Where("username LIKE @search OR firstname LIKE @search OR lastname LIKE @search", sql.Named("search", searchParam)).Find(&foundUsers)
+	result := repo.db.Where("username LIKE @search", sql.Named("search", searchParam)).Find(&foundUsers)
 	if result.Error != nil {
 		return nil, result.Error
 	}

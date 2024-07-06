@@ -77,16 +77,12 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
         type: string
-      firstname:
-        type: string
       googleID:
         type: string
       id:
         type: integer
       isPrivate:
         type: boolean
-      lastname:
-        type: string
       password:
         type: string
       phoneNumber:
@@ -137,10 +133,6 @@ definitions:
     properties:
       email:
         type: string
-      firstname:
-        type: string
-      lastname:
-        type: string
       password:
         type: string
       role:
@@ -152,14 +144,10 @@ definitions:
     properties:
       email:
         type: string
-      firstname:
-        type: string
-      lastname:
-        type: string
       username:
         type: string
     type: object
-  response_models.UserResponse:
+  response_models.GetUserResponse:
     properties:
       avatar:
         type: string
@@ -167,24 +155,10 @@ definitions:
         type: string
       createdAt:
         type: string
-      email:
-        type: string
-      firstname:
-        type: string
-      googleID:
-        type: string
       id:
         type: integer
       isPrivate:
         type: boolean
-      lastname:
-        type: string
-      phoneNumber:
-        type: string
-      role:
-        type: string
-      updatedAt:
-        type: string
       username:
         type: string
     type: object
@@ -365,8 +339,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
@@ -390,8 +364,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/go-api_internal_storage_postgres_user.User'
@@ -504,15 +478,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response_models.UserResponse'
+            $ref: '#/definitions/response_models.GetUserResponse'
         "400":
           description: Bad Request
         "403":
           description: Forbidden
         "404":
           description: Not Found
-        "500":
-          description: Internal Server Error
       security:
       - BearerAuth: []
       summary: Get user by ID
@@ -593,7 +565,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/response_models.UserResponse'
+              $ref: '#/definitions/response_models.GetUserResponse'
             type: array
         "400":
           description: Bad Request

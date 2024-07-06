@@ -5,13 +5,20 @@ import (
 	"time"
 )
 
+type GetUserResponse struct {
+	ID        uint
+	Username  string
+	Bio       *string
+	Avatar    *string
+	IsPrivate bool
+	CreatedAt *time.Time
+}
+
 type UserResponse struct {
 	ID          uint
 	GoogleID    *string
 	Email       *string
 	Username    string
-	Firstname   string
-	Lastname    string
 	PhoneNumber *string
 	Bio         *string
 	Avatar      *string
@@ -27,6 +34,31 @@ func (u *UserResponse) HidePersonalInfo() {
 	u.GoogleID = nil
 	u.CreatedAt = nil
 	u.UpdatedAt = nil
+}
+
+func FormatGetUserResponse(user model.UserModel) GetUserResponse {
+	bio := user.GetBio()
+	bioPointer := &bio
+	if "" == bio {
+		bioPointer = nil
+	}
+
+	avatar := user.GetAvatar()
+	avatarPointer := &avatar
+	if "" == avatar {
+		avatarPointer = nil
+	}
+
+	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
+
+	return GetUserResponse{
+		ID:        user.GetID(),
+		Username:  user.GetUsername(),
+		Bio:       bioPointer,
+		Avatar:    avatarPointer,
+		IsPrivate: user.IsPrivateUser(),
+		CreatedAt: &createdAt,
+	}
 }
 
 func FormatUserFromModel(user model.UserModel) UserResponse {
@@ -54,8 +86,6 @@ func FormatUserFromModel(user model.UserModel) UserResponse {
 		GoogleID:    user.GetGoogleID(),
 		Email:       emailPointer,
 		Username:    user.GetUsername(),
-		Firstname:   user.GetFirstname(),
-		Lastname:    user.GetLastname(),
 		PhoneNumber: phoneNumberPointer,
 		Bio:         bioPointer,
 		Avatar:      avatarPointer,

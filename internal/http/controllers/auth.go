@@ -92,7 +92,7 @@ func GoogleAuthCallback(c *gin.Context) {
 	}
 
 	if false == isKnown {
-		err := acc.CreateWithGoogle(user.FirstName, user.LastName, user.Email, user.UserID)
+		err := acc.CreateWithGoogle(user.Email, user.UserID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

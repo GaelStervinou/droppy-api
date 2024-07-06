@@ -289,8 +289,8 @@ const docTemplate = `{
                 ],
                 "summary": "Get my followers",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -329,8 +329,8 @@ const docTemplate = `{
                 ],
                 "summary": "Get my pending requests",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -541,7 +541,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response_models.UserResponse"
+                                "$ref": "#/definitions/response_models.GetUserResponse"
                             }
                         }
                     },
@@ -585,7 +585,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response_models.UserResponse"
+                            "$ref": "#/definitions/response_models.GetUserResponse"
                         }
                     },
                     "400": {
@@ -596,9 +596,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -779,9 +776,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
                 "googleID": {
                     "type": "string"
                 },
@@ -790,9 +784,6 @@ const docTemplate = `{
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
                 },
                 "password": {
                     "type": "string"
@@ -871,12 +862,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },
@@ -894,18 +879,12 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
                 }
             }
         },
-        "response_models.UserResponse": {
+        "response_models.GetUserResponse": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -917,32 +896,11 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "googleID": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "isPrivate": {
                     "type": "boolean"
-                },
-                "lastname": {
-                    "type": "string"
-                },
-                "phoneNumber": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
                 },
                 "username": {
                     "type": "string"
