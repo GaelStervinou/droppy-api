@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -95,22 +94,20 @@ func DropsByUserId(c *gin.Context) {
 
 	currentUserId, exists := c.Get("userId")
 	var currentUser model.UserModel
-	fmt.Println(currentUser)
 
 	if exists {
 		uintCurrentUserId, ok := currentUserId.(uint)
 		if ok {
 
-			currentUser, err := repo.UserRepository.GetById(uintCurrentUserId)
-			fmt.Println(currentUser)
+			targetedUser, err := repo.UserRepository.GetById(uintCurrentUserId)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
+			currentUser = targetedUser
 		}
 	}
 
-	fmt.Println(currentUser)
 	id := c.Param("id")
 
 	if "" == id {
@@ -139,7 +136,6 @@ func DropsByUserId(c *gin.Context) {
 	}
 
 	userResponse := response_models.FormatGetUserResponse(dropUser)
-	fmt.Println(userResponse.GetID())
 	for _, drop := range drops {
 		dropResponse := response_models.FormatGetDropResponse(drop, userResponse)
 		dropsResponse = append(dropsResponse, dropResponse)
@@ -152,7 +148,7 @@ func DropsByUserId(c *gin.Context) {
 //
 //	@Summary		Get feed
 //	@Description	Get feed
-//	@Tags			user
+//	@Tags			drop
 //	@Accept			json
 //	@Produce		json
 //	@Security BearerAuth

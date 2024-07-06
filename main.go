@@ -75,6 +75,11 @@ func main() {
 			drop.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateDrop)
 		}
 
+		group := v1.Group("/groups")
+		{
+			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
+		}
+
 		fixtures := v1.Group("/fixtures")
 		{
 			fixtures.GET("/users", controllers.PopulateUsers)

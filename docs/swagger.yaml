@@ -130,6 +130,17 @@ definitions:
       userId:
         type: integer
     type: object
+  model.GroupCreationParam:
+    properties:
+      description:
+        type: string
+      isPrivate:
+        type: boolean
+      name:
+        type: string
+      picture:
+        type: string
+    type: object
   model.LoginParam:
     properties:
       email:
@@ -173,6 +184,20 @@ definitions:
       picturePath:
         type: string
       type:
+        type: string
+    type: object
+  response_models.GetGroupResponse:
+    properties:
+      createdAt:
+        type: string
+      createdBy: {}
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      picturePath:
         type: string
     type: object
   response_models.GetUserResponse:
@@ -434,6 +459,34 @@ paths:
       summary: Refuse follow request
       tags:
       - follow
+  /groups:
+    post:
+      consumes:
+      - application/json
+      description: Create group
+      parameters:
+      - description: Group creation object
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/model.GroupCreationParam'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response_models.GetGroupResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      summary: Create group
+      tags:
+      - group
   /users:
     post:
       consumes:
@@ -572,7 +625,7 @@ paths:
       - BearerAuth: []
       summary: Get feed
       tags:
-      - user
+      - drop
   /users/search:
     get:
       consumes:
