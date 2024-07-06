@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	log2 "github.com/google/martian/v3/log"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"go-api/cmd/drop_notif"
 	_ "go-api/docs"
 	"go-api/internal/http/controllers"
 	"go-api/internal/http/middlewares"
@@ -33,11 +36,6 @@ func main() {
 	}
 
 	postgres.AutoMigrate()
-
-	//var wg sync.WaitGroup
-	//repo := repositories.Setup(&wg)
-	//defer repo.Disconnect()
-
 	r := gin.Default()
 	r.Use(gin.Recovery())
 
@@ -84,6 +82,17 @@ func main() {
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	c := cron.New()
+	_, err = c.AddFunc("0 0 * * *", drop_notif.GenerateRandomNotification)
+
+	if err != nil {
+		log2.Errorf("Error adding cron job: %v", err)
+	}
+
+	c.Start()
+	fmt.Println("Scheduler started...")
+
 	err = r.Run(":3000")
 
 	if err != nil {

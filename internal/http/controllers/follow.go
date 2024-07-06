@@ -108,7 +108,7 @@ func FollowUser(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []user.User
+// @Success		200	{object} []user.User
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -142,7 +142,6 @@ func GetMyFollowers(c *gin.Context) {
 		followerIds = append(followerIds, follower.GetFollowerID())
 	}
 
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -174,7 +173,7 @@ func GetMyFollowers(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []user.User
+// @Success		200	{object} []user.User
 // @Failure		422
 // @Failure		401
 // @Failure		500
