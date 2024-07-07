@@ -134,21 +134,7 @@ func (s *GroupMemberService) AcceptGroupMember(userId uint, groupID uint, member
 
 	return finalGroupMember, nil
 }
-func (s *GroupMemberService) RejectGroupMember(userId uint, groupID uint, memberID uint) (model.GroupMemberModel, error) {
-	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
 
-	if err != nil {
-		return nil, err
-	}
-
-	if groupMember == nil {
-		return nil, errors.New(fmt.Sprintf("Group member with id %d not found", memberID))
-	}
-
-	err = s.DeleteGroupMember(userId, groupID, memberID)
-
-	return nil, err
-}
 func (s *GroupMemberService) UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args model.GroupMemberPatchParam) (model.GroupMemberModel, error) {
 	targetedGroup, err := s.Repo.GroupRepository.GetById(groupID)
 

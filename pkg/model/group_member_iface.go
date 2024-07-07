@@ -27,7 +27,6 @@ type GroupMemberService interface {
 	JoinGroup(currentUserId uint, userId uint, args GroupMemberCreationParam) (GroupMemberModel, error)
 	DeleteGroupMember(actionRequesterID uint, groupID uint, memberID uint) error
 	AcceptGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
-	RejectGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
 	UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args GroupMemberPatchParam) (GroupMemberModel, error)
 	FindAllUserGroups(userId uint) ([]GroupModel, error)
 }
