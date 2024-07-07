@@ -161,8 +161,19 @@ func (r gmRepoPrivate) IsGroupMember(groupID uint, memberID uint) (bool, error) 
 }
 
 func (r gmRepoPrivate) UpdateRole(groupID uint, memberID uint, role string) (model.GroupMemberModel, error) {
-	//TODO implement me
-	panic("implement me")
+	var groupMember GroupMember
+	result := r.db.Model(&GroupMember{
+		MemberID: memberID,
+	}).Where("group_id = ? AND member_id = ?", groupID, memberID).Update("role", role)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	finalGroupMember, err := r.GetByGroupIDAndMemberID(groupID, memberID)
+	if err != nil {
+		return nil, err
+	}
+	return finalGroupMember, nil
 }
 
 func (r gmRepoPrivate) UpdateStatus(groupID uint, memberID uint, status uint) (model.GroupMemberModel, error) {

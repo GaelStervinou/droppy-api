@@ -28,12 +28,15 @@ type GroupMemberService interface {
 	DeleteGroupMember(actionRequesterID uint, groupID uint, memberID uint) error
 	AcceptGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
 	RejectGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
-	AddGroupManager(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
-	RemoveGroupManager(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
+	UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args GroupMemberPatchParam) (GroupMemberModel, error)
 	FindAllUserGroups(userId uint) ([]GroupModel, error)
 }
 
 type GroupMemberCreationParam struct {
 	GroupID uint   `json:"groupId"`
 	Role    string `json:"role"`
+}
+
+type GroupMemberPatchParam struct {
+	Role string `json:"role"`
 }

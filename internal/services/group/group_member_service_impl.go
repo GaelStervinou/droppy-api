@@ -8,6 +8,7 @@ import (
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
+	"slices"
 )
 
 type GroupMemberService struct {
@@ -142,7 +143,7 @@ func (s *GroupMemberService) RejectGroupMember(userId uint, groupID uint, member
 
 	return nil, err
 }
-func (s *GroupMemberService) AddGroupManager(userId uint, groupID uint, memberID uint) (model.GroupMemberModel, error) {
+func (s *GroupMemberService) UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args model.GroupMemberPatchParam) (model.GroupMemberModel, error) {
 	targetedGroup, err := s.Repo.GroupRepository.GetById(groupID)
 
 	if err != nil {
@@ -151,10 +152,6 @@ func (s *GroupMemberService) AddGroupManager(userId uint, groupID uint, memberID
 
 	if targetedGroup == nil {
 		return nil, errors.New(fmt.Sprintf("Group with id %d not found", groupID))
-	}
-
-	if targetedGroup.GetCreatedByID() != userId {
-		return nil, errors.New("You are not the owner of the group")
 	}
 
 	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
@@ -167,38 +164,35 @@ func (s *GroupMemberService) AddGroupManager(userId uint, groupID uint, memberID
 		return nil, errors.New(fmt.Sprintf("Group member with id %d not found", memberID))
 	}
 
-	role := &grouprepository.GroupMemberRoleManager{}
-	groupMember, err = s.Repo.GroupMemberRepository.UpdateRole(groupID, memberID, role.ToString())
-
-	return groupMember, err
-}
-func (s *GroupMemberService) RemoveGroupManager(userId uint, groupID uint, memberID uint) (model.GroupMemberModel, error) {
-	targetedGroup, err := s.Repo.GroupRepository.GetById(groupID)
+	requester, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, requesterId)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if targetedGroup == nil {
-		return nil, errors.New(fmt.Sprintf("Group with id %d not found", groupID))
+	if requester == nil {
+		return nil, errors.New(fmt.Sprintf("Requester with id %d not found in group %d", requesterId, groupID))
 	}
 
-	if targetedGroup.GetCreatedByID() != userId {
-		return nil, errors.New("You are not the owner of the group")
-	}
-
-	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
+	canMakeAction, err := s.CanMakeActionOnUser(requester, groupMember)
 
 	if err != nil {
-		return nil, err
+		return nil, errors2.NotAllowedError{
+			Reason: err.Error(),
+		}
 	}
 
-	if groupMember == nil {
-		return nil, errors.New(fmt.Sprintf("Group member with id %d not found", memberID))
+	if !canMakeAction {
+		return nil, errors2.NotAllowedError{
+			Reason: "You are not allowed to make this action",
+		}
 	}
 
-	role := &grouprepository.GroupMemberRoleMember{}
-	groupMember, err = s.Repo.GroupMemberRepository.UpdateRole(groupID, memberID, role.ToString())
+	if !slices.Contains(grouprepository.GroupMemberRoles(), args.Role) {
+		return nil, errors.New("Invalid role")
+	}
+
+	groupMember, err = s.Repo.GroupMemberRepository.UpdateRole(groupID, memberID, args.Role)
 
 	return groupMember, err
 }
@@ -225,7 +219,7 @@ func (s *GroupMemberService) CanJoinGroup(userId uint, groupID uint) (bool, erro
 
 func (s *GroupMemberService) CanMakeActionOnUser(actionRequester model.GroupMemberModel, groupMember model.GroupMemberModel) (bool, error) {
 	if groupMember.GetMemberID() == groupMember.GetGroup().GetCreatedByID() && groupMember.GetMemberID() != actionRequester.GetMemberID() {
-		return false, errors.New("You can not make this action")
+		return false, errors2.NotAllowedError{Reason: "You can not make this action"}
 	}
 
 	managerRole := &grouprepository.GroupMemberRoleManager{}

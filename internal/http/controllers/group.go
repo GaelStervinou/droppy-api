@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -230,6 +231,9 @@ func SearchGroups(c *gin.Context) {
 //	@Description	Join Group
 //	@Tags			group
 //	@Accept			json
+//
+// @Security BearerAuth
+//
 //	@Produce		json
 //	@Param			group	body		model.GroupMemberCreationParam	true	"Join group creation object"
 //	@Success		201	{object} response_models.GetGroupMemberResponse
@@ -299,9 +303,13 @@ func JoinGroup(c *gin.Context) {
 //	@Description	Delete Group Member
 //	@Tags			group
 //	@Accept			json
+//
+// @Security BearerAuth
+//
 //	@Produce		json
 //	@Success		204
 //	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
 //	@Failure		500
 //	@Router			/group/{groupId}/{memberId} [delete]
 func DeleteGroupMember(c *gin.Context) {
@@ -353,4 +361,94 @@ func DeleteGroupMember(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, gin.H{"message": "Group member deleted"})
+}
+
+// PatchGroupMember godoc
+//
+//	@Summary		Patch Group Member
+//	@Description	Patch Group Member
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Param			group	body		model.GroupMemberPatchParam	true	"Group member patch object"
+//	@Success		200	{object} response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/group/{groupId}/{memberId} [patch]
+func PatchGroupMember(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("groupId")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	var groupMemberPatch model.GroupMemberPatchParam
+
+	if err := c.ShouldBindJSON(&groupMemberPatch); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	uintCurrentUserId = 2
+	patchedGroupMember, err := gms.UpdateGroupMemberRole(uintCurrentUserId, groupIdUint, memberIdUint, groupMemberPatch)
+
+	if err != nil {
+		var notAllowedErr errors2.NotAllowedError
+		if errors.As(err, &notAllowedErr) {
+			c.JSON(http.StatusForbidden, gin.H{"error": notAllowedErr.Reason})
+			return
+		}
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == patchedGroupMember {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group member not found"})
+		return
+	}
+
+	groupMemberResponse := response_models.FormatGetGroupMemberResponse(patchedGroupMember)
+
+	c.JSON(http.StatusOK, groupMemberResponse)
+
 }
