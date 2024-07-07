@@ -82,6 +82,7 @@ func main() {
 			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
 
 			group.POST("/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
+			group.DELETE("/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.DeleteGroupMember)
 		}
 
 		fixtures := v1.Group("/fixtures")

@@ -390,6 +390,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/group/{groupId}/{memberId}": {
+            "delete": {
+                "description": "Delete Group Member",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "group"
+                ],
+                "summary": "Delete Group Member",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/group/{id}/join": {
             "post": {
                 "description": "Join Group",

@@ -181,8 +181,12 @@ func (r gmRepoPrivate) UpdateStatus(groupID uint, memberID uint, status uint) (m
 }
 
 func (r gmRepoPrivate) Delete(groupID uint, memberID uint) error {
-	//TODO implement me
-	panic("implement me")
+	result := r.db.Where("group_id = ? AND member_id = ?", groupID, memberID).Delete(&GroupMember{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func (r gmRepoPrivate) IsGroupManager(groupID uint, memberID uint) (bool, error) {

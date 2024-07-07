@@ -292,3 +292,65 @@ func JoinGroup(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, groupMemberResponse)
 }
+
+// DeleteGroupMember godoc
+//
+//	@Summary		Delete Group Member
+//	@Description	Delete Group Member
+//	@Tags			group
+//	@Accept			json
+//	@Produce		json
+//	@Success		204
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		500
+//	@Router			/group/{groupId}/{memberId} [delete]
+func DeleteGroupMember(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("groupId")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	err = gms.DeleteGroupMember(uintCurrentUserId, groupIdUint, memberIdUint)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{"message": "Group member deleted"})
+}

@@ -80,11 +80,7 @@ func (s *GroupMemberService) DeleteGroupMember(actionRequesterID uint, groupID u
 
 	canMakeAction, err := s.CanMakeActionOnUser(actionRequester, groupMember)
 
-	if err != nil {
-		return err
-	}
-
-	if !canMakeAction {
+	if actionRequester.GetMemberID() != groupMember.GetMemberID() && !canMakeAction {
 		return errors.New("You are not allowed to make this action")
 	}
 	err = s.Repo.GroupMemberRepository.Delete(groupID, memberID)
