@@ -519,6 +519,25 @@ paths:
       summary: Refuse follow request
       tags:
       - follow
+  /group/{groupId}/{memberId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Group Member
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      summary: Delete Group Member
+      tags:
+      - group
   /group/{id}/join:
     post:
       consumes:

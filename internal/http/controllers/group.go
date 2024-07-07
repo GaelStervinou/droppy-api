@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -230,12 +231,15 @@ func SearchGroups(c *gin.Context) {
 //	@Description	Join Group
 //	@Tags			group
 //	@Accept			json
+//
+// @Security BearerAuth
+//
 //	@Produce		json
 //	@Param			group	body		model.GroupMemberCreationParam	true	"Join group creation object"
 //	@Success		201	{object} response_models.GetGroupMemberResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
-//	@Router			/group/{id}/join [post]
+//	@Router			/groups/members/{id}/join [post]
 func JoinGroup(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
@@ -291,4 +295,360 @@ func JoinGroup(c *gin.Context) {
 	groupMemberResponse := response_models.FormatGetGroupMemberResponse(createdGroupMember)
 
 	c.JSON(http.StatusCreated, groupMemberResponse)
+}
+
+// DeleteGroupMember godoc
+//
+//	@Summary		Delete Group Member
+//	@Description	Delete Group Member
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Success		204
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/groups/members/{groupId}/{memberId} [delete]
+func DeleteGroupMember(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("groupId")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	err = gms.DeleteGroupMember(uintCurrentUserId, groupIdUint, memberIdUint)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{"message": "Group member deleted"})
+}
+
+// PatchGroupMember godoc
+//
+//	@Summary		Patch Group Member
+//	@Description	Patch Group Member
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Param			group	body		model.GroupMemberPatchParam	true	"Group member patch object"
+//	@Success		200	{object} response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/groups/members/{groupId}/{memberId} [patch]
+func PatchGroupMember(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("groupId")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	var groupMemberPatch model.GroupMemberPatchParam
+
+	if err := c.ShouldBindJSON(&groupMemberPatch); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	patchedGroupMember, err := gms.UpdateGroupMemberRole(uintCurrentUserId, groupIdUint, memberIdUint, groupMemberPatch)
+
+	if err != nil {
+		var notAllowedErr errors2.NotAllowedError
+		if errors.As(err, &notAllowedErr) {
+			c.JSON(http.StatusForbidden, gin.H{"error": notAllowedErr.Reason})
+			return
+		}
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == patchedGroupMember {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group member not found"})
+		return
+	}
+
+	groupMemberResponse := response_models.FormatGetGroupMemberResponse(patchedGroupMember)
+
+	c.JSON(http.StatusOK, groupMemberResponse)
+}
+
+// AcceptGroupMemberRequest godoc
+//
+//	@Summary		Accept Group Member Request
+//	@Description	Accept Group Member Request
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Success		200	{object} response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/group/{id}/{memberId}/accept [post]
+func AcceptGroupMemberRequest(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("id")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	groupMember, err := gms.AcceptGroupMember(uintCurrentUserId, groupIdUint, memberIdUint)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == groupMember {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group member not found"})
+		return
+	}
+
+	groupMemberResponse := response_models.FormatGetGroupMemberResponse(groupMember)
+
+	c.JSON(http.StatusOK, groupMemberResponse)
+}
+
+// RefuseGroupMemberRequest godoc
+//
+//	@Summary		Refuse Group Member Request
+//	@Description	Refuse Group Member Request
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Success		204	{} No Content
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/groups/members/{id}/{memberId}/refuse/ [post]
+func RefuseGroupMemberRequest(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("id")
+	memberId := c.Param("memberId")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "groupId is required"})
+		return
+	}
+
+	if "" == memberId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "memberId is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	memberIdUint, err := converters.StringToUint(memberId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid member ID"})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	err = gms.DeleteGroupMember(uintCurrentUserId, groupIdUint, memberIdUint)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{"message": "Group member deleted"})
+}
+
+// GetPendingGroupMemberRequests godoc
+//
+//	@Summary		Get Pending Group Member Requests
+//	@Description	Get Pending Group Member Requests
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Success		200	{object} []response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400 {object}
+//	@Failure		500
+//	@Router			/groups/members/{id}/pending [get]
+func GetPendingGroupMemberRequests(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	groupId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	groupMembers, err := gms.GetPendingGroupMemberRequests(uintCurrentUserId, groupId)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	var groupMemberResponse []response_models.GetGroupMemberResponse
+	for _, groupMember := range groupMembers {
+		groupMemberResponse = append(groupMemberResponse, response_models.FormatGetGroupMemberResponse(groupMember))
+	}
+
+	c.JSON(http.StatusOK, groupMemberResponse)
 }

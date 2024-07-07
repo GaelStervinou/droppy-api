@@ -161,8 +161,18 @@ func (r gmRepoPrivate) IsGroupMember(groupID uint, memberID uint) (bool, error) 
 }
 
 func (r gmRepoPrivate) UpdateRole(groupID uint, memberID uint, role string) (model.GroupMemberModel, error) {
-	//TODO implement me
-	panic("implement me")
+	result := r.db.Model(&GroupMember{
+		MemberID: memberID,
+	}).Where("group_id = ? AND member_id = ?", groupID, memberID).Update("role", role)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	finalGroupMember, err := r.GetByGroupIDAndMemberID(groupID, memberID)
+	if err != nil {
+		return nil, err
+	}
+	return finalGroupMember, nil
 }
 
 func (r gmRepoPrivate) UpdateStatus(groupID uint, memberID uint, status uint) (model.GroupMemberModel, error) {
@@ -181,8 +191,12 @@ func (r gmRepoPrivate) UpdateStatus(groupID uint, memberID uint, status uint) (m
 }
 
 func (r gmRepoPrivate) Delete(groupID uint, memberID uint) error {
-	//TODO implement me
-	panic("implement me")
+	result := r.db.Where("group_id = ? AND member_id = ?", groupID, memberID).Delete(&GroupMember{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func (r gmRepoPrivate) IsGroupManager(groupID uint, memberID uint) (bool, error) {
@@ -195,4 +209,20 @@ func (r gmRepoPrivate) IsGroupManager(groupID uint, memberID uint) (bool, error)
 	role := &GroupMemberRoleManager{}
 
 	return groupMember.GetRole() == role.ToString(), nil
+}
+
+func (r gmRepoPrivate) GetPendingGroupMemberRequests(groupID uint) ([]model.GroupMemberModel, error) {
+	var groupMembers []GroupMember
+	pendingStatus := &GroupMemberStatusPending{}
+	result := r.db.Preload("Group").Preload("Member").Preload("Group.CreatedBy").Where("group_id = ? AND status = ?", groupID, pendingStatus.ToIntGroupMemberStatus()).Find(&groupMembers)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	var groupMembersModel []model.GroupMemberModel
+	for _, groupMember := range groupMembers {
+		groupMembersModel = append(groupMembersModel, &groupMember)
+	}
+
+	return groupMembersModel, nil
 }
