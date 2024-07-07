@@ -141,8 +141,23 @@ func (r gmRepoPrivate) GetByMemberID(memberID uint) ([]model.GroupMemberModel, e
 }
 
 func (r gmRepoPrivate) GetByGroupIDAndMemberID(groupID uint, memberID uint) (model.GroupMemberModel, error) {
-	//TODO implement me
-	panic("implement me")
+	var groupMember GroupMember
+	result := r.db.Preload("Group").Preload("Group.CreatedBy").Preload("Member").Where("group_id = ? AND member_id = ?", groupID, memberID).First(&groupMember)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &groupMember, nil
+}
+
+func (r gmRepoPrivate) IsGroupMember(groupID uint, memberID uint) (bool, error) {
+	var groupMember GroupMember
+	result := r.db.Model(&GroupMember{}).Where("group_id = ? AND member_id = ?", groupID, memberID).First(&groupMember)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	return true, nil
 }
 
 func (r gmRepoPrivate) UpdateRole(groupID uint, memberID uint, role string) (model.GroupMemberModel, error) {

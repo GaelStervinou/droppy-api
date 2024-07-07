@@ -67,3 +67,29 @@ func FormatGetSearchGroupResponse(group model.GroupModel, isMember bool) GetSear
 		IsMember:    isMember,
 	}
 }
+
+type GetGroupMemberResponse struct {
+	ID        uint
+	Member    GetUserResponseInterface
+	Group     GetGroupResponse
+	Status    uint
+	Role      string
+	CreatedAt *time.Time
+}
+
+func FormatGetGroupMemberResponse(groupMember model.GroupMemberModel) GetGroupMemberResponse {
+	if nil == groupMember {
+		return GetGroupMemberResponse{}
+	}
+
+	createdAt := time.Unix(int64(groupMember.GetCreatedAt()), 0)
+
+	return GetGroupMemberResponse{
+		ID:        groupMember.GetID(),
+		Member:    FormatGetUserResponse(groupMember.GetMember()),
+		Group:     FormatGetGroupResponse(groupMember.GetGroup()),
+		Status:    groupMember.GetStatus(),
+		Role:      groupMember.GetRole(),
+		CreatedAt: &createdAt,
+	}
+}

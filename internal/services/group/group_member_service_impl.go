@@ -15,17 +15,17 @@ type GroupMemberService struct {
 }
 
 func (s *GroupMemberService) JoinGroup(currentUserId uint, userId uint, args model.GroupMemberCreationParam) (model.GroupMemberModel, error) {
+	if currentUserId == userId {
+		role := &grouprepository.GroupMemberRoleMember{}
+		args.Role = role.ToString()
+	}
+
 	if can, err := s.IsValidGroupMemberCreation(args); !can || err != nil {
 		return nil, err
 	}
 
 	if can, err := s.CanJoinGroup(userId, args.GroupID); !can || err != nil {
 		return nil, err
-	}
-
-	if currentUserId == userId {
-		role := &grouprepository.GroupMemberRoleMember{}
-		args.Role = role.ToString()
 	}
 
 	targetedGroup, err := s.Repo.GroupRepository.GetById(args.GroupID)
@@ -43,13 +43,19 @@ func (s *GroupMemberService) JoinGroup(currentUserId uint, userId uint, args mod
 	} else {
 		status = &grouprepository.GroupMemberStatusActive{}
 	}
-	groupMember, err := s.Repo.GroupMemberRepository.Create(args.GroupID, userId, args.Role, status.ToIntGroupMemberStatus())
+	_, err = s.Repo.GroupMemberRepository.Create(args.GroupID, userId, args.Role, status.ToIntGroupMemberStatus())
 
 	if err != nil {
 		return nil, err
 	}
 
-	return groupMember, nil
+	finalGroupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(args.GroupID, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return finalGroupMember, nil
 }
 func (s *GroupMemberService) DeleteGroupMember(actionRequesterID uint, groupID uint, memberID uint) error {
 	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
@@ -212,13 +218,9 @@ func (s *GroupMemberService) IsValidGroupMemberCreation(args model.GroupMemberCr
 }
 
 func (s *GroupMemberService) CanJoinGroup(userId uint, groupID uint) (bool, error) {
-	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, userId)
+	isGroupMember, _ := s.Repo.GroupMemberRepository.IsGroupMember(groupID, userId)
 
-	if err != nil {
-		return false, err
-	}
-
-	if groupMember != nil {
+	if isGroupMember {
 		return false, errors2.CannotJoinGroupError{Reason: "User already joined this group"}
 	}
 

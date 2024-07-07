@@ -80,6 +80,8 @@ func main() {
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
 			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
 			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
+
+			group.POST("/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
 		}
 
 		fixtures := v1.Group("/fixtures")

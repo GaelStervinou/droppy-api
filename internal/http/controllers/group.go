@@ -223,3 +223,72 @@ func SearchGroups(c *gin.Context) {
 
 	c.JSON(200, groupResponse)
 }
+
+// JoinGroup godoc
+//
+//	@Summary		Join Group
+//	@Description	Join Group
+//	@Tags			group
+//	@Accept			json
+//	@Produce		json
+//	@Param			group	body		model.GroupMemberCreationParam	true	"Join group creation object"
+//	@Success		201	{object} response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		500
+//	@Router			/group/{id}/join [post]
+func JoinGroup(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	groupId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	var groupMemberToCreate model.GroupMemberCreationParam
+
+	if err := c.ShouldBindJSON(&groupMemberToCreate); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+	groupMemberToCreate.GroupID = groupId
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	createdGroupMember, err := gms.JoinGroup(uintCurrentUserId, uintCurrentUserId, groupMemberToCreate)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == createdGroupMember {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group member not created"})
+		return
+	}
+
+	groupMemberResponse := response_models.FormatGetGroupMemberResponse(createdGroupMember)
+
+	c.JSON(http.StatusCreated, groupMemberResponse)
+}

@@ -390,6 +390,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/group/{id}/join": {
+            "post": {
+                "description": "Join Group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "group"
+                ],
+                "summary": "Join Group",
+                "parameters": [
+                    {
+                        "description": "Join group creation object",
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupMemberCreationParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetGroupMemberResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/groups": {
             "post": {
                 "security": [
@@ -1032,6 +1075,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.GroupMemberCreationParam": {
+            "type": "object",
+            "properties": {
+                "groupId": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
         "model.GroupPatchParam": {
             "type": "object",
             "properties": {
@@ -1115,6 +1169,27 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "response_models.GetGroupMemberResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "group": {
+                    "$ref": "#/definitions/response_models.GetGroupResponse"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "member": {},
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         },

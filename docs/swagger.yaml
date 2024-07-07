@@ -149,6 +149,13 @@ definitions:
       picture:
         type: string
     type: object
+  model.GroupMemberCreationParam:
+    properties:
+      groupId:
+        type: integer
+      role:
+        type: string
+    type: object
   model.GroupPatchParam:
     properties:
       description:
@@ -204,6 +211,20 @@ definitions:
         type: string
       type:
         type: string
+    type: object
+  response_models.GetGroupMemberResponse:
+    properties:
+      createdAt:
+        type: string
+      group:
+        $ref: '#/definitions/response_models.GetGroupResponse'
+      id:
+        type: integer
+      member: {}
+      role:
+        type: string
+      status:
+        type: integer
     type: object
   response_models.GetGroupResponse:
     properties:
@@ -498,6 +519,34 @@ paths:
       summary: Refuse follow request
       tags:
       - follow
+  /group/{id}/join:
+    post:
+      consumes:
+      - application/json
+      description: Join Group
+      parameters:
+      - description: Join group creation object
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/model.GroupMemberCreationParam'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response_models.GetGroupMemberResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      summary: Join Group
+      tags:
+      - group
   /groups:
     post:
       consumes:

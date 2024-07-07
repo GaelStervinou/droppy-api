@@ -20,6 +20,7 @@ type GroupMemberRepository interface {
 	UpdateStatus(groupID uint, memberID uint, status uint) (GroupMemberModel, error)
 	Delete(groupID uint, memberID uint) error
 	IsGroupManager(groupID uint, memberID uint) (bool, error)
+	IsGroupMember(groupID uint, memberID uint) (bool, error)
 }
 
 type GroupMemberService interface {
