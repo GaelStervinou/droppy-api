@@ -1,7 +1,6 @@
 package group
 
 import (
-	"fmt"
 	"go-api/internal/repositories"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
@@ -13,7 +12,7 @@ type GroupService struct {
 }
 
 func (s *GroupService) CanCreateGroup(userId uint) (bool, error) {
-	userGroupsOwned, err := s.Repo.GroupRepository.FindAllByUserId(userId)
+	userGroupsOwned, err := s.Repo.GroupRepository.FindAllGroupOwnedByUserId(userId)
 
 	if err != nil {
 		return false, err
@@ -92,7 +91,6 @@ func (s *GroupService) CanUpdateGroup(groupId uint, userId uint) (bool, error) {
 	}
 
 	//TODO rajouter les modérateurs qd ils seront dispo
-	fmt.Println(groupToUpdate.GetCreatedByID(), userId)
 	if groupToUpdate.GetCreatedByID() != userId {
 		return false, errors2.CannotUpdateGroupError{Reason: "You are not the owner of the group"}
 	}

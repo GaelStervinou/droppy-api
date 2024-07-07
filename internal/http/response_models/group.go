@@ -16,6 +16,17 @@ type GetGroupResponse struct {
 	CreatedBy   GetUserResponseInterface `json:",omitempty"`
 }
 
+type GetSearchGroupResponse struct {
+	ID          uint
+	Name        string
+	Description string
+	IsPrivate   bool
+	PicturePath custom_type.NullString
+	CreatedAt   *time.Time
+	CreatedBy   GetUserResponseInterface `json:",omitempty"`
+	IsMember    bool
+}
+
 func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 	if nil == group {
 		return GetGroupResponse{}
@@ -33,5 +44,26 @@ func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 		PicturePath: picturePath,
 		CreatedAt:   &createdAt,
 		CreatedBy:   FormatGetUserResponse(group.GetCreatedBy()),
+	}
+}
+
+func FormatGetSearchGroupResponse(group model.GroupModel, isMember bool) GetSearchGroupResponse {
+	if nil == group {
+		return GetSearchGroupResponse{}
+	}
+
+	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
+
+	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+
+	return GetSearchGroupResponse{
+		ID:          group.GetID(),
+		Name:        group.GetName(),
+		Description: group.GetDescription(),
+		IsPrivate:   group.IsPrivateGroup(),
+		PicturePath: picturePath,
+		CreatedAt:   &createdAt,
+		CreatedBy:   FormatGetUserResponse(group.GetCreatedBy()),
+		IsMember:    isMember,
 	}
 }

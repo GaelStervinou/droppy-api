@@ -1,0 +1,38 @@
+package model
+
+type GroupMemberModel interface {
+	GetID() uint
+	GetGroupID() uint
+	GetGroup() GroupModel
+	GetMemberID() uint
+	GetMember() UserModel
+	GetRole() string
+	GetCreatedAt() int
+	GetStatus() uint
+}
+
+type GroupMemberRepository interface {
+	Create(groupID uint, memberID uint, role string, status uint) (GroupMemberModel, error)
+	GetByGroupID(groupID uint) ([]GroupMemberModel, error)
+	GetByMemberID(memberID uint) ([]GroupMemberModel, error)
+	GetByGroupIDAndMemberID(groupID uint, memberID uint) (GroupMemberModel, error)
+	UpdateRole(groupID uint, memberID uint, role string) (GroupMemberModel, error)
+	UpdateStatus(groupID uint, memberID uint, status uint) (GroupMemberModel, error)
+	Delete(groupID uint, memberID uint) error
+	IsGroupManager(groupID uint, memberID uint) (bool, error)
+}
+
+type GroupMemberService interface {
+	JoinGroup(currentUserId uint, userId uint, args GroupMemberCreationParam) (GroupMemberModel, error)
+	DeleteGroupMember(actionRequesterID uint, groupID uint, memberID uint) error
+	AcceptGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
+	RejectGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
+	AddGroupManager(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
+	RemoveGroupManager(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
+	FindAllUserGroups(userId uint) ([]GroupModel, error)
+}
+
+type GroupMemberCreationParam struct {
+	GroupID uint   `json:"groupId"`
+	Role    string `json:"role"`
+}

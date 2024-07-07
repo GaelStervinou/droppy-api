@@ -81,11 +81,10 @@ func NewRepo(db *gorm.DB) model.GroupRepository {
 	return &repoPrivate{db: db}
 }
 
-func (r repoPrivate) FindAllByUserId(userId uint) ([]model.GroupModel, error) {
+func (r repoPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupModel, error) {
 	var groups []*Group
 
 	result := r.db.Where("created_by_id = ?", userId).Find(&groups)
-	fmt.Println(result)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -42,6 +42,7 @@ func AutoMigrate() {
 		&drop.Drop{},
 		&drop_notification.DropNotification{},
 		&group.Group{},
+		&group.GroupMember{},
 	)
 	fmt.Println("Migrations done")
 }

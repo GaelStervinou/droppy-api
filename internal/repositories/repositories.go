@@ -20,6 +20,7 @@ type Repositories struct {
 	DropNotificationRepository model.DropNotificationRepository
 	FollowRepository           model.FollowRepository
 	GroupRepository            model.GroupRepository
+	GroupMemberRepository      model.GroupMemberRepository
 }
 
 func Setup() *Repositories {
@@ -36,6 +37,7 @@ func Setup() *Repositories {
 		DropNotificationRepository: drop_notification.NewRepo(sqlDB),
 		FollowRepository:           follow.NewRepo(sqlDB),
 		GroupRepository:            group.NewRepo(sqlDB),
+		GroupMemberRepository:      group.NewGroupMemberRepo(sqlDB),
 	}
 }
 

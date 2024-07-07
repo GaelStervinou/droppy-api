@@ -14,6 +14,14 @@ definitions:
       refresh_token:
         type: string
     type: object
+  custom_type.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
   drop.Drop:
     properties:
       content:
@@ -141,6 +149,17 @@ definitions:
       picture:
         type: string
     type: object
+  model.GroupPatchParam:
+    properties:
+      description:
+        type: string
+      isPrivate:
+        type: boolean
+      name:
+        type: string
+      picture:
+        type: string
+    type: object
   model.LoginParam:
     properties:
       email:
@@ -195,10 +214,30 @@ definitions:
         type: string
       id:
         type: integer
+      isPrivate:
+        type: boolean
       name:
         type: string
       picturePath:
+        $ref: '#/definitions/custom_type.NullString'
+    type: object
+  response_models.GetSearchGroupResponse:
+    properties:
+      createdAt:
         type: string
+      createdBy: {}
+      description:
+        type: string
+      id:
+        type: integer
+      isMember:
+        type: boolean
+      isPrivate:
+        type: boolean
+      name:
+        type: string
+      picturePath:
+        $ref: '#/definitions/custom_type.NullString'
     type: object
   response_models.GetUserResponse:
     properties:
@@ -484,7 +523,73 @@ paths:
             $ref: '#/definitions/errors2.MultiFieldsError'
         "500":
           description: Internal Server Error
+      security:
+      - BearerAuth: []
       summary: Create group
+      tags:
+      - group
+  /groups/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Patch group
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Group patch object
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/model.GroupPatchParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response_models.GetGroupResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Patch group
+      tags:
+      - group
+  /groups/search:
+    get:
+      consumes:
+      - application/json
+      description: Search groups
+      parameters:
+      - description: Search query
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.GetSearchGroupResponse'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Search groups
       tags:
       - group
   /users:
