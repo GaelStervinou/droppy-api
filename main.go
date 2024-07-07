@@ -90,6 +90,14 @@ func main() {
 			fixtures.GET("/follows", controllers.PopulateFollows)
 			fixtures.GET("/drops", controllers.PopulateDrops)
 		}
+
+		admin := v1.Group("/admin")
+		{
+			admin.GET("/users", middlewares.AdminRequired(), controllers.GetAllUsers)
+			admin.GET("/groups", middlewares.AdminRequired(), controllers.GetAllGroups)
+			//admin.GET("/drops", controllers.GetAllDrops)
+			//admin.GET("/follows", controllers.GetAllFollows)
+		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

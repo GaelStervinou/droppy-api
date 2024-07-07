@@ -21,6 +21,7 @@ type GroupRepository interface {
 	Update(args FilledGroupPatchParam) (GroupModel, error)
 	Delete(id uint) error
 	Search(query string) ([]GroupModel, error)
+	GetAllGroups() ([]GroupModel, error)
 }
 
 type GroupService interface {
