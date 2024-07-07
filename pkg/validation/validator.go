@@ -3,7 +3,7 @@ package validation
 import (
 	"errors"
 	"go-api/internal/services/drop_type"
-	errors2 "go-api/pkg/errors2"
+	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/mail"
 	"slices"
@@ -125,6 +125,18 @@ func ValidateGroupPatch(args model.GroupPatchParam) errors2.MultiFieldsError {
 
 	if len(args.Description) < 1 && len(args.Description) > 255 {
 		finalErrors.Fields["description"] = "Description must be at least 1 character long and at most 255 characters long"
+	}
+
+	return finalErrors
+}
+
+func ValidateGroupMemberCreation(args model.GroupMemberCreationParam) errors2.MultiFieldsError {
+	finalErrors := errors2.MultiFieldsError{
+		Fields: map[string]string{},
+	}
+
+	if slices.Contains([]string{"manager", "member"}, args.Role) == false {
+		finalErrors.Fields["role"] = "Invalid role"
 	}
 
 	return finalErrors

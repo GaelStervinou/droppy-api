@@ -15,7 +15,7 @@ type GroupModel interface {
 
 type GroupRepository interface {
 	Create(name string, description string, isPrivate bool, picturePath string, createdBy UserModel) (GroupModel, error)
-	FindAllByUserId(userId uint) ([]GroupModel, error)
+	FindAllGroupOwnedByUserId(userId uint) ([]GroupModel, error)
 	GetById(id uint) (GroupModel, error)
 	GetByName(name string) (GroupModel, error)
 	Update(args FilledGroupPatchParam) (GroupModel, error)

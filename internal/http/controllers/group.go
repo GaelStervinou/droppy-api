@@ -7,6 +7,7 @@ import (
 	groupservice "go-api/internal/services/group"
 	"go-api/internal/storage/postgres"
 	"go-api/internal/storage/postgres/group"
+	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/converters"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
@@ -119,19 +120,19 @@ func PatchGroup(c *gin.Context) {
 		Repo: repositories.Setup(),
 	}
 
-	group, err := gs.PatchGroup(groupId, uintCurrentUserId, groupPatch)
+	patchedGroup, err := gs.PatchGroup(groupId, uintCurrentUserId, groupPatch)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 
-	if nil == group {
+	if nil == patchedGroup {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group not found"})
 		return
 	}
 
-	groupResponse := response_models.FormatGetGroupResponse(group)
+	groupResponse := response_models.FormatGetGroupResponse(patchedGroup)
 
 	c.JSON(http.StatusOK, groupResponse)
 }
@@ -145,7 +146,7 @@ func PatchGroup(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 // @Param			search query string true "Search query"
-// @Success		200	{object} []response_models.GetGroupResponse
+// @Success		200	{object} []response_models.GetSearchGroupResponse
 // @Failure		400
 // @Failure		500
 // @Router			/groups/search [get]
@@ -166,21 +167,58 @@ func SearchGroups(c *gin.Context) {
 		return
 	}
 
-	users, err := gr.Search(query)
+	searchedGroups, err := gr.Search(query)
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	if nil == users {
+	if nil == searchedGroups {
 		c.JSON(404, gin.H{"error": "Users not found"})
 		return
 	}
 
-	var groupResponse []response_models.GetGroupResponse
-	for _, searchedGroup := range users {
-		groupResponse = append(groupResponse, response_models.FormatGetGroupResponse(searchedGroup))
+	currentUserId, exists := c.Get("userId")
+
+	var currentUser model.UserModel
+
+	if exists {
+		uintCurrentUserId, ok := currentUserId.(uint)
+		if ok {
+			us := user.NewRepo(sqlDB)
+			targetedUser, err := us.GetById(uintCurrentUserId)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			currentUser = targetedUser
+		}
+	}
+
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	var currentUserGroups []model.GroupModel
+	if currentUser != nil {
+		currentUserGroups, err = gms.FindAllUserGroups(currentUser.GetID())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	var groupResponse []response_models.GetSearchGroupResponse
+	for _, searchedGroup := range searchedGroups {
+		isMember := false
+		for _, currentUserGroup := range currentUserGroups {
+			if searchedGroup.GetID() == currentUserGroup.GetID() {
+				isMember = true
+				continue
+			}
+		}
+		groupResponse = append(groupResponse, response_models.FormatGetSearchGroupResponse(searchedGroup, isMember))
 	}
 
 	c.JSON(200, groupResponse)
