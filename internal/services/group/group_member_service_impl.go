@@ -237,3 +237,29 @@ func (s *GroupMemberService) FindAllUserGroups(userId uint) ([]model.GroupModel,
 
 	return groups, nil
 }
+
+func (s *GroupMemberService) GetPendingGroupMemberRequests(requesterId uint, groupID uint) ([]model.GroupMemberModel, error) {
+	requester, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, requesterId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if requester == nil {
+		return nil, errors.New(fmt.Sprintf("Requester with id %d not found in group %d", requesterId, groupID))
+	}
+
+	managerRole := &grouprepository.GroupMemberRoleManager{}
+
+	if requester.GetRole() != managerRole.ToString() {
+		return nil, errors2.NotAllowedError{Reason: "You are not a manager"}
+	}
+
+	pendingGroupMembers, err := s.Repo.GroupMemberRepository.GetPendingGroupMemberRequests(groupID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pendingGroupMembers, nil
+}

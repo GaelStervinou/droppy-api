@@ -82,6 +82,7 @@ func main() {
 			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
 
 			group.POST("/members/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
+			group.GET("/members/:id/pending", middlewares.CurrentUserMiddleware(true), controllers.GetPendingGroupMemberRequests)
 			group.POST("/members/:id/:memberId/accept", middlewares.CurrentUserMiddleware(true), controllers.AcceptGroupMemberRequest)
 			group.POST("/members/:id/:memberId/refuse", middlewares.CurrentUserMiddleware(true), controllers.RefuseGroupMemberRequest)
 			group.PATCH("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.PatchGroupMember)

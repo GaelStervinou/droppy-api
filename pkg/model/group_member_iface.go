@@ -21,6 +21,7 @@ type GroupMemberRepository interface {
 	Delete(groupID uint, memberID uint) error
 	IsGroupManager(groupID uint, memberID uint) (bool, error)
 	IsGroupMember(groupID uint, memberID uint) (bool, error)
+	GetPendingGroupMemberRequests(groupID uint) ([]GroupMemberModel, error)
 }
 
 type GroupMemberService interface {
@@ -29,6 +30,7 @@ type GroupMemberService interface {
 	AcceptGroupMember(userId uint, groupID uint, memberID uint) (GroupMemberModel, error)
 	UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args GroupMemberPatchParam) (GroupMemberModel, error)
 	FindAllUserGroups(userId uint) ([]GroupModel, error)
+	GetPendingGroupMemberRequests(requesterId uint, groupID uint) ([]GroupMemberModel, error)
 }
 
 type GroupMemberCreationParam struct {

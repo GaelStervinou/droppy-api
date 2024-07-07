@@ -210,3 +210,19 @@ func (r gmRepoPrivate) IsGroupManager(groupID uint, memberID uint) (bool, error)
 
 	return groupMember.GetRole() == role.ToString(), nil
 }
+
+func (r gmRepoPrivate) GetPendingGroupMemberRequests(groupID uint) ([]model.GroupMemberModel, error) {
+	var groupMembers []GroupMember
+	pendingStatus := &GroupMemberStatusPending{}
+	result := r.db.Preload("Group").Preload("Member").Preload("Group.CreatedBy").Where("group_id = ? AND status = ?", groupID, pendingStatus.ToIntGroupMemberStatus()).Find(&groupMembers)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	var groupMembersModel []model.GroupMemberModel
+	for _, groupMember := range groupMembers {
+		groupMembersModel = append(groupMembersModel, &groupMember)
+	}
+
+	return groupMembersModel, nil
+}
