@@ -159,3 +159,14 @@ func (r repoPrivate) Search(query string) ([]model.GroupModel, error) {
 
 	return models, nil
 }
+
+func (r repoPrivate) GetAllGroups() ([]model.GroupModel, error) {
+	var foundGroups []*Group
+	result := r.db.Find(&foundGroups)
+
+	models := make([]model.GroupModel, len(foundGroups))
+	for i, v := range foundGroups {
+		models[i] = model.GroupModel(v)
+	}
+	return models, result.Error
+}
