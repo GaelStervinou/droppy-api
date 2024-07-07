@@ -82,6 +82,7 @@ func main() {
 			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
 
 			group.POST("/members/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
+			group.POST("/members/:id/:memberId/accept", middlewares.CurrentUserMiddleware(true), controllers.AcceptGroupMemberRequest)
 			group.PATCH("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.PatchGroupMember)
 			group.DELETE("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.DeleteGroupMember)
 		}

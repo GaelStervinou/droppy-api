@@ -126,7 +126,13 @@ func (s *GroupMemberService) AcceptGroupMember(userId uint, groupID uint, member
 	activeStatus := &grouprepository.GroupMemberStatusActive{}
 	groupMember, err = s.Repo.GroupMemberRepository.UpdateStatus(groupID, memberID, activeStatus.ToIntGroupMemberStatus())
 
-	return nil, nil
+	finalGroupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return finalGroupMember, nil
 }
 func (s *GroupMemberService) RejectGroupMember(userId uint, groupID uint, memberID uint) (model.GroupMemberModel, error) {
 	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, memberID)
