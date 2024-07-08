@@ -17,7 +17,7 @@ type GetDropResponse struct {
 	CreatedBy   GetUserResponseInterface `json:",omitempty"`
 }
 
-func FormatGetDropResponse(drop model.DropModel, createdBy GetUserResponseInterface) GetDropResponse {
+func FormatGetDropResponse(drop model.DropModel) GetDropResponse {
 	if nil == drop {
 		return GetDropResponse{}
 	}
@@ -30,19 +30,6 @@ func FormatGetDropResponse(drop model.DropModel, createdBy GetUserResponseInterf
 
 	createdAt := time.Unix(int64(drop.GetCreatedAt()), 0)
 
-	if nil == createdBy {
-		return GetDropResponse{
-			ID:          drop.GetID(),
-			Type:        drop.GetType(),
-			Content:     drop.GetContent(),
-			Description: drop.GetDescription(),
-			Lat:         latPointer,
-			Lng:         lngPointer,
-			PicturePath: picturePathPointer,
-			CreatedAt:   &createdAt,
-		}
-	}
-
 	return GetDropResponse{
 		ID:          drop.GetID(),
 		Type:        drop.GetType(),
@@ -52,6 +39,6 @@ func FormatGetDropResponse(drop model.DropModel, createdBy GetUserResponseInterf
 		Lng:         lngPointer,
 		PicturePath: picturePathPointer,
 		CreatedAt:   &createdAt,
-		CreatedBy:   createdBy,
+		CreatedBy:   FormatGetUserResponse(drop.GetCreatedBy()),
 	}
 }
