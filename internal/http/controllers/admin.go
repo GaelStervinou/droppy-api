@@ -43,7 +43,7 @@ func GetAllUsers(c *gin.Context) {
 
 	var usersResponse []response_models.GetUserResponseInterface
 	for _, userModel := range users {
-		usersResponse = append(usersResponse, response_models.FormatGetUserResponse(userModel))
+		usersResponse = append(usersResponse, response_models.FormatAdminGetUserResponse(userModel))
 	}
 
 	c.JSON(http.StatusOK, usersResponse)

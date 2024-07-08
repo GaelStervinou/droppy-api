@@ -74,3 +74,94 @@ func FormatGetUserResponse(user model.UserModel) GetUserResponseInterface {
 		CreatedAt: &createdAt,
 	}
 }
+
+type AdminGetUserResponseInterface interface {
+	GetID() uint
+	GetUsername() string
+	GetRole() string
+	GetPhoneNumber() string
+	GetEmail() string
+	GetBio() *string
+	GetAvatar() *string
+	IsPrivateUser() bool
+	GetCreatedAt() *time.Time
+}
+
+func (u *AdminGetUserResponse) GetID() uint {
+	return u.ID
+}
+
+func (u *AdminGetUserResponse) GetUsername() string {
+	return u.Username
+}
+
+func (u *AdminGetUserResponse) GetRole() string {
+	return u.Role
+}
+
+func (u *AdminGetUserResponse) GetPhoneNumber() string {
+	return u.PhoneNumber
+}
+
+func (u *AdminGetUserResponse) GetEmail() string {
+	return u.Email
+}
+
+func (u *AdminGetUserResponse) GetBio() *string {
+	return u.Bio
+}
+
+func (u *AdminGetUserResponse) GetAvatar() *string {
+	return u.Avatar
+}
+
+func (u *AdminGetUserResponse) IsPrivateUser() bool {
+	return u.IsPrivate
+}
+
+func (u *AdminGetUserResponse) GetCreatedAt() *time.Time {
+	return u.CreatedAt
+}
+
+type AdminGetUserResponse struct {
+	ID          uint
+	Username    string
+	Role        string
+	PhoneNumber string
+	Email       string
+	Bio         *string
+	Avatar      *string
+	IsPrivate   bool
+	CreatedAt   *time.Time
+}
+
+func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterface {
+	if nil == user {
+		return nil
+	}
+	bio := user.GetBio()
+	bioPointer := &bio
+	if "" == bio {
+		bioPointer = nil
+	}
+
+	avatar := user.GetAvatar()
+	avatarPointer := &avatar
+	if "" == avatar {
+		avatarPointer = nil
+	}
+
+	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
+
+	return &AdminGetUserResponse{
+		ID:          user.GetID(),
+		Username:    user.GetUsername(),
+		Role:        user.GetRole(),
+		PhoneNumber: user.GetPhoneNumber(),
+		Email:       user.GetEmail(),
+		Bio:         bioPointer,
+		Avatar:      avatarPointer,
+		IsPrivate:   user.IsPrivateUser(),
+		CreatedAt:   &createdAt,
+	}
+}
