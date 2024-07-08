@@ -18,6 +18,7 @@ type DropModel interface {
 	GetLng() float64
 	GetPicturePath() string
 	GetCreatedAt() int
+	GetCreatedBy() UserModel
 }
 
 type DropRepository interface {
@@ -26,6 +27,8 @@ type DropRepository interface {
 	GetUserDrops(userId uint) ([]DropModel, error)
 	GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (DropModel, error)
 	GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]DropModel, error)
+	HasUserDropped(dropNotificationId uint, userId uint) (bool, error)
+	GetDropById(dropId uint) (DropModel, error)
 }
 
 type DropService interface {
@@ -34,6 +37,7 @@ type DropService interface {
 	CreateDrop(userId uint, args DropCreationParam) (DropModel, error)
 	GetUserFeed(userId uint) ([]DropModel, error)
 	GetDropsByUserId(userId uint, currentUser UserModel) ([]DropModel, error)
+	HasUserDroppedToday(userId uint) (bool, error)
 }
 
 type DropCreationParam struct {

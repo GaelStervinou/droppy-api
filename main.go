@@ -52,12 +52,13 @@ func main() {
 
 		user := v1.Group("/users")
 		{
-			user.GET("/:id", middlewares.CurrentUserMiddleware(false), controllers.GetUserById)
+			user.GET("/:id", middlewares.CurrentUserMiddleware(true), controllers.GetUserById)
 			user.POST("/", controllers.Create)
 			user.GET("/search", controllers.SearchUsers)
 			user.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchUserById)
+			user.GET("/my-feed/ws", middlewares.CurrentUserMiddleware(true), controllers.GetCurrentUserFeedWS)
 			user.GET("/my-feed", middlewares.CurrentUserMiddleware(true), controllers.GetCurrentUserFeed)
-			user.GET("/:id/drops", middlewares.CurrentUserMiddleware(false), controllers.DropsByUserId)
+			user.GET("/:id/drops", middlewares.CurrentUserMiddleware(true), controllers.DropsByUserId)
 		}
 
 		follow := v1.Group("/follows")
@@ -79,7 +80,7 @@ func main() {
 		{
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
 			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
-			group.GET("/search", middlewares.CurrentUserMiddleware(false), controllers.SearchGroups)
+			group.GET("/search", middlewares.CurrentUserMiddleware(true), controllers.SearchGroups)
 
 			group.POST("/members/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
 			group.GET("/members/:id/pending", middlewares.CurrentUserMiddleware(true), controllers.GetPendingGroupMemberRequests)

@@ -74,7 +74,7 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 
 	statusActive := drop.DropStatusActive{}
 
-	return s.Repo.DropRepository.Create(
+	createdDrop, err := s.Repo.DropRepository.Create(
 		filledDrop.DropNotificationId,
 		filledDrop.Type,
 		filledDrop.Content,
@@ -86,6 +86,12 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		filledDrop.Lat,
 		filledDrop.Lng,
 	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Repo.DropRepository.GetDropById(createdDrop.GetID())
 }
 
 func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
@@ -167,10 +173,30 @@ func (s *DropService) GetDropsByUserId(userId uint, currentUser model.UserModel)
 	}
 
 	drops, err := s.Repo.DropRepository.GetUserDrops(userId)
-	
+
 	if err != nil {
 		return nil, err
 	}
 
 	return drops, nil
+}
+
+func (s *DropService) HasUserDroppedToday(userId uint) (bool, error) {
+	currentDropNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
+
+	if err != nil {
+		return false, err
+	}
+
+	if currentDropNotification == nil {
+		return false, errors.New("no drop notifications found")
+	}
+
+	hasDropped, err := s.Repo.DropRepository.HasUserDropped(currentDropNotification.GetID(), userId)
+
+	if err != nil {
+		return false, err
+	}
+
+	return hasDropped, nil
 }

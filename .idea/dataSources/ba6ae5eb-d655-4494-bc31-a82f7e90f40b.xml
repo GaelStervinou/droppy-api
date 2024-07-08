@@ -11,9 +11,9 @@
 4||10|c|G
 4||10|C|G
 4||10|T|G</Grants>
-      <IntrospectionStateNumber>178267</IntrospectionStateNumber>
+      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
       <ServerVersion>16.3</ServerVersion>
-      <StartupTime>1720337864</StartupTime>
+      <StartupTime>1720465630</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -1407,7 +1407,7 @@ true posixrules
 13212||10|C|G
 13212||-9223372036854775808|U|G
 13212||10|U|G</Grants>
-      <IntrospectionStateNumber>178267</IntrospectionStateNumber>
+      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
       <ObjectId>16384</ObjectId>
       <OwnerName>root</OwnerName>
     </database>
@@ -4831,8 +4831,8 @@ true posixrules
     <schema id="264" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>178267</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-07-07.09:15:19</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-07-08.19:43:25</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4931,7 +4931,7 @@ true posixrules
     </table>
     <table id="278" parent="264" name="users">
       <ObjectId>32985</ObjectId>
-      <StateNumber>178229</StateNumber>
+      <StateNumber>178334</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
@@ -5528,7 +5528,25 @@ true posixrules
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <index id="367" parent="278" name="users_pkey">
+    <column id="367" parent="278" name="firstname">
+      <DasType>text|0s</DasType>
+      <Position>16</Position>
+      <StateNumber>178332</StateNumber>
+      <TypeId>25</TypeId>
+    </column>
+    <column id="368" parent="278" name="lastname">
+      <DasType>text|0s</DasType>
+      <Position>17</Position>
+      <StateNumber>178333</StateNumber>
+      <TypeId>25</TypeId>
+    </column>
+    <column id="369" parent="278" name="roles">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>18</Position>
+      <StateNumber>178334</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="370" parent="278" name="users_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>32992</ObjectId>
@@ -5537,7 +5555,7 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="368" parent="278" name="uni_users_google_id">
+    <index id="371" parent="278" name="uni_users_google_id">
       <ColNames>google_id</ColNames>
       <ObjectId>32994</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5547,7 +5565,7 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="369" parent="278" name="uni_users_email">
+    <index id="372" parent="278" name="uni_users_email">
       <ColNames>email</ColNames>
       <ObjectId>32996</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5557,7 +5575,7 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="370" parent="278" name="uni_users_username">
+    <index id="373" parent="278" name="uni_users_username">
       <ColNames>username</ColNames>
       <ObjectId>32998</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5567,30 +5585,30 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="371" parent="278" name="idx_users_deleted_at">
+    <index id="374" parent="278" name="idx_users_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33000</ObjectId>
       <StateNumber>131569</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="372" parent="278" name="users_pkey">
+    <key id="375" parent="278" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>32993</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32992</UnderlyingIndexId>
     </key>
-    <key id="373" parent="278" name="uni_users_google_id">
+    <key id="376" parent="278" name="uni_users_google_id">
       <ObjectId>32995</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32994</UnderlyingIndexId>
     </key>
-    <key id="374" parent="278" name="uni_users_email">
+    <key id="377" parent="278" name="uni_users_email">
       <ObjectId>32997</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32996</UnderlyingIndexId>
     </key>
-    <key id="375" parent="278" name="uni_users_username">
+    <key id="378" parent="278" name="uni_users_username">
       <ObjectId>32999</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32998</UnderlyingIndexId>
