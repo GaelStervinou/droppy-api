@@ -188,3 +188,35 @@ func (r *repoPrivate) HasUserDropped(dropNotificationId uint, userId uint) (bool
 	}
 	return count > 0, nil
 }
+
+func (r *repoPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, error) {
+	var drops []Drop
+	if err := r.db.
+		Preload("CreatedBy").
+		Preload("Comments").
+		Preload("Comments.CreatedBy").
+		Preload("Comments.Responses").
+		Preload("Comments.Responses.CreatedBy").
+		Where("created_by_id = ? AND is_pinned = ?", userId, true).Find(&drops).Error; err != nil {
+		return nil, err
+	}
+	var result []model.DropModel
+	for _, drop := range drops {
+		result = append(result, &drop)
+	}
+	return result, nil
+}
+
+func (r *repoPrivate) GetUserLastDrop(userId uint) (model.DropModel, error) {
+	var drop Drop
+	if err := r.db.
+		Preload("CreatedBy").
+		Preload("Comments").
+		Preload("Comments.Responses").
+		Preload("Comments.Responses.CreatedBy").
+		Where("created_by_id = ?", userId).Order("created_at desc").First(&drop).Error; err != nil {
+		return nil, err
+	}
+
+	return &drop, nil
+}
