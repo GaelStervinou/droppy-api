@@ -16,6 +16,7 @@ type GetDropResponse struct {
 	CreatedAt           *time.Time
 	CreatedBy           GetUserResponseInterface    `json:",omitempty"`
 	Comments            []GetCommentResponseForDrop `json:",omitempty"`
+	TotalComments       int
 	TotalLikes          int
 	IsCurrentUserLiking bool `json:",omitempty"`
 }
@@ -44,6 +45,7 @@ func FormatGetDropResponse(drop model.DropModel, isCurrentUserLiking bool) GetDr
 		CreatedAt:           &createdAt,
 		CreatedBy:           FormatGetUserResponse(drop.GetCreatedBy()),
 		Comments:            FormatGetCommentResponsesForDrop(drop.GetComments()),
+		TotalComments:       len(drop.GetComments()),
 		TotalLikes:          drop.GetTotalLikes(),
 		IsCurrentUserLiking: isCurrentUserLiking,
 	}

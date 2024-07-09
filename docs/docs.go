@@ -205,6 +205,114 @@ const docTemplate = `{
                 }
             }
         },
+        "/comments/{id}/responses": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Respond to a comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "Respond to a comment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Comment content",
+                        "name": "content",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetCommentResponseResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{id}/responses/{responseId}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a comment response",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comment"
+                ],
+                "summary": "Delete a comment response",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Comment response ID",
+                        "name": "responseId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": ""
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    }
+                }
+            }
+        },
         "/drops": {
             "post": {
                 "security": [
@@ -323,6 +431,55 @@ const docTemplate = `{
                     "drop"
                 ],
                 "summary": "Like Drop",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Drop ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetDropResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/drops/{id}/unlike": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Unlike Drop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "drop"
+                ],
+                "summary": "Unlike Drop",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1294,6 +1451,44 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "responses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/drop.CommentResponse"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "drop.CommentResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "$ref": "#/definitions/drop.Comment"
+                },
+                "commentId": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "$ref": "#/definitions/go-api_internal_storage_postgres_user.User"
+                },
+                "createdById": {
+                    "type": "integer"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
@@ -1610,6 +1805,27 @@ const docTemplate = `{
                 "createdBy": {},
                 "id": {
                     "type": "integer"
+                },
+                "responses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response_models.GetCommentResponseResponse"
+                    }
+                }
+            }
+        },
+        "response_models.GetCommentResponseResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "integer"
+                },
+                "createdBy": {},
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1646,6 +1862,9 @@ const docTemplate = `{
                 },
                 "picturePath": {
                     "type": "string"
+                },
+                "totalComments": {
+                    "type": "integer"
                 },
                 "totalLikes": {
                     "type": "integer"

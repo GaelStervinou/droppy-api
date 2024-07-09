@@ -10,11 +10,12 @@ var _ model.CommentModel = (*Comment)(nil)
 
 type Comment struct {
 	gorm.Model
-	Content     string    `gorm:"not null"`
-	CreatedById uint      `gorm:"not null"`
-	DropId      uint      `gorm:"not null"`
-	CreatedBy   user.User `gorm:"foreignKey:CreatedById;references:ID"`
-	Drop        Drop      `gorm:"foreignKey:DropId;references:ID"`
+	Content     string            `gorm:"not null"`
+	CreatedById uint              `gorm:"not null"`
+	DropId      uint              `gorm:"not null"`
+	CreatedBy   user.User         `gorm:"foreignKey:CreatedById;references:ID"`
+	Drop        Drop              `gorm:"foreignKey:DropId;references:ID"`
+	Responses   []CommentResponse `gorm:"foreignKey:CommentId;references:ID"`
 }
 
 func (c *Comment) GetID() uint {
@@ -35,6 +36,14 @@ func (c *Comment) GetCreatedBy() model.UserModel {
 
 func (c *Comment) GetDrop() model.DropModel {
 	return &c.Drop
+}
+
+func (c *Comment) GetResponses() []model.CommentResponseModel {
+	var result []model.CommentResponseModel
+	for _, response := range c.Responses {
+		result = append(result, &response)
+	}
+	return result
 }
 
 type repoCommentPrivate struct {

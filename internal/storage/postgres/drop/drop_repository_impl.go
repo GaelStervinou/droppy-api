@@ -157,7 +157,12 @@ func (r *repoPrivate) DropExists(dropId uint) (bool, error) {
 
 func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
 	var drops []Drop
-	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
+	if err := r.db.
+		Preload("CreatedBy").
+		Preload("Comments").
+		Preload("Comments.Responses").
+		Preload("Comments.Responses.CreatedBy").
+		Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
 		return nil, err
 	}
 
