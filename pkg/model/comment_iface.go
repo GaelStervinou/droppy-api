@@ -6,6 +6,7 @@ type CommentModel interface {
 	GetCreatedAt() int
 	GetCreatedBy() UserModel
 	GetDrop() DropModel
+	GetResponses() []CommentResponseModel
 }
 
 type CommentRepository interface {

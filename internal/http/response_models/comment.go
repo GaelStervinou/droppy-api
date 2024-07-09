@@ -15,6 +15,7 @@ type GetCommentResponseForDrop struct {
 	Content   string
 	CreatedAt int
 	CreatedBy GetUserResponseInterface
+	Responses []GetCommentResponseResponse
 }
 
 func FormatGetCommentResponse(comment model.CommentModel) GetCommentResponse {
@@ -33,6 +34,7 @@ func FormatGetCommentResponseForDrop(comment model.CommentModel) GetCommentRespo
 		Content:   comment.GetContent(),
 		CreatedAt: comment.GetCreatedAt(),
 		CreatedBy: FormatGetUserResponse(comment.GetCreatedBy()),
+		Responses: FormatGetCommentResponsesResponse(comment.GetResponses()),
 	}
 }
 

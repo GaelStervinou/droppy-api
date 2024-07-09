@@ -93,6 +93,12 @@ func main() {
 			group.DELETE("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.DeleteGroupMember)
 		}
 
+		comment := v1.Group("/comments")
+		{
+			comment.POST("/:id/responses", middlewares.CurrentUserMiddleware(true), controllers.RespondToComment)
+			comment.DELETE("/:id/responses/:responseId", middlewares.CurrentUserMiddleware(true), controllers.DeleteCommentResponse)
+		}
+
 		fixtures := v1.Group("/fixtures")
 		{
 			fixtures.GET("/users", controllers.PopulateUsers)

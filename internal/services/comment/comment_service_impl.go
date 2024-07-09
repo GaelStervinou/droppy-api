@@ -75,5 +75,19 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 		return false, errors.New("you must drop before posting comments")
 	}
 
+	isFollowing, err := s.Repo.FollowRepository.IsFollowing(userID, drop.GetCreatedBy().GetID())
+
+	if err != nil {
+		return false, err
+	}
+
+	if !isFollowing {
+		return false, errors.New("you must follow the drop creator before posting comments")
+	}
+
 	return true, nil
+}
+
+func (s *CommentService) DeleteComment(commentId uint) error {
+	return s.Repo.CommentRepository.DeleteComment(commentId)
 }
