@@ -165,3 +165,57 @@ func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterf
 		CreatedAt:   &createdAt,
 	}
 }
+
+type GetOneUserResponse struct {
+	ID             uint
+	Username       string
+	Bio            *string
+	Avatar         *string
+	IsPrivate      bool
+	CreatedAt      *time.Time
+	LastDrop       GetDropResponse
+	PinnedDrops    []GetDropResponse
+	TotalFollowers int
+	TotalFollowed  int
+}
+
+func FormatGetOneUserResponse(
+	user model.UserModel,
+	lastDrop model.DropModel,
+	isLastDropLiked bool,
+	pinnedDrops []model.DropModel,
+	totalFollowers int,
+	totalFollowed int,
+) GetOneUserResponse {
+	bio := user.GetBio()
+	bioPointer := &bio
+	if "" == bio {
+		bioPointer = nil
+	}
+
+	avatar := user.GetAvatar()
+	avatarPointer := &avatar
+	if "" == avatar {
+		avatarPointer = nil
+	}
+
+	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
+
+	formattedPinnedDrops := make([]GetDropResponse, 0)
+	for _, drop := range pinnedDrops {
+		formattedPinnedDrops = append(formattedPinnedDrops, FormatGetDropResponse(drop, false))
+	}
+
+	return GetOneUserResponse{
+		ID:             user.GetID(),
+		Username:       user.GetUsername(),
+		Bio:            bioPointer,
+		Avatar:         avatarPointer,
+		IsPrivate:      user.IsPrivateUser(),
+		CreatedAt:      &createdAt,
+		LastDrop:       FormatGetDropResponse(lastDrop, isLastDropLiked),
+		PinnedDrops:    formattedPinnedDrops,
+		TotalFollowers: totalFollowers,
+		TotalFollowed:  totalFollowed,
+	}
+}

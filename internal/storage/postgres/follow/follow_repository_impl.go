@@ -141,3 +141,21 @@ func (r *repoPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
 	}
 	return true, nil
 }
+
+func (r *repoPrivate) CountFollowers(userID uint) int {
+	var count int64
+	result := r.db.Model(&Follow{}).Where("followed_id = ?", userID).Count(&count)
+	if result.Error != nil {
+		return 0
+	}
+	return int(count)
+}
+
+func (r *repoPrivate) CountFollowed(userID uint) int {
+	var count int64
+	result := r.db.Model(&Follow{}).Where("follower_id = ?", userID).Count(&count)
+	if result.Error != nil {
+		return 0
+	}
+	return int(count)
+}

@@ -32,6 +32,8 @@ type DropRepository interface {
 	HasUserDropped(dropNotificationId uint, userId uint) (bool, error)
 	GetDropById(dropId uint) (DropModel, error)
 	DropExists(dropId uint) (bool, error)
+	GetUserPinnedDrops(userId uint) ([]DropModel, error)
+	GetUserLastDrop(userId uint) (DropModel, error)
 }
 
 type DropService interface {

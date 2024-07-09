@@ -6,6 +6,8 @@ import (
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
+	"go-api/internal/storage/postgres/drop"
+	"go-api/internal/storage/postgres/follow"
 	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
@@ -63,7 +65,41 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	userResponse := response_models.FormatGetUserResponse(requestedUser)
+	dr := drop.NewRepo(sqlDB)
+
+	pinnedDrops, err := dr.GetUserPinnedDrops(requestedUser.GetID())
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	userLastDrop, err := dr.GetUserLastDrop(requestedUser.GetID())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	lr := drop.NewLikeRepo(sqlDB)
+	isLastDropLiking, err := lr.LikeExists(userLastDrop.GetID(), requestedUser.GetID())
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	fr := follow.NewRepo(sqlDB)
+
+	totalFollowers := fr.CountFollowers(requestedUser.GetID())
+	totalFollowing := fr.CountFollowed(requestedUser.GetID())
+
+	userResponse := response_models.FormatGetOneUserResponse(
+		requestedUser,
+		userLastDrop,
+		isLastDropLiking,
+		pinnedDrops,
+		totalFollowers,
+		totalFollowing,
+	)
 
 	c.JSON(http.StatusOK, userResponse)
 }
