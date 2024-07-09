@@ -76,15 +76,20 @@ func GetUserById(c *gin.Context) {
 
 	userLastDrop, err := dr.GetUserLastDrop(requestedUser.GetID())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		if err.Error() != "record not found" {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		userLastDrop = nil
 	}
-	lr := drop.NewLikeRepo(sqlDB)
-	isLastDropLiking, err := lr.LikeExists(userLastDrop.GetID(), requestedUser.GetID())
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	isLastDropLiking := false
+	if nil != userLastDrop {
+		lr := drop.NewLikeRepo(sqlDB)
+		isLastDropLiking, err = lr.LikeExists(userLastDrop.GetID(), requestedUser.GetID())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	fr := follow.NewRepo(sqlDB)

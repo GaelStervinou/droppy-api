@@ -173,7 +173,7 @@ type GetOneUserResponse struct {
 	Avatar         *string
 	IsPrivate      bool
 	CreatedAt      *time.Time
-	LastDrop       GetDropResponse
+	LastDrop       *GetDropResponse
 	PinnedDrops    []GetDropResponse
 	TotalFollowers int
 	TotalFollowed  int
@@ -206,6 +206,12 @@ func FormatGetOneUserResponse(
 		formattedPinnedDrops = append(formattedPinnedDrops, FormatGetDropResponse(drop, false))
 	}
 
+	var lastDropPointer *GetDropResponse
+	if nil == lastDrop {
+	} else {
+		res := FormatGetDropResponse(lastDrop, isLastDropLiked)
+		lastDropPointer = &res
+	}
 	return GetOneUserResponse{
 		ID:             user.GetID(),
 		Username:       user.GetUsername(),
@@ -213,7 +219,7 @@ func FormatGetOneUserResponse(
 		Avatar:         avatarPointer,
 		IsPrivate:      user.IsPrivateUser(),
 		CreatedAt:      &createdAt,
-		LastDrop:       FormatGetDropResponse(lastDrop, isLastDropLiked),
+		LastDrop:       lastDropPointer,
 		PinnedDrops:    formattedPinnedDrops,
 		TotalFollowers: totalFollowers,
 		TotalFollowed:  totalFollowed,
