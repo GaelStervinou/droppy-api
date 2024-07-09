@@ -43,6 +43,7 @@ func AutoMigrate() {
 		&drop_notification.DropNotification{},
 		&group.Group{},
 		&group.GroupMember{},
+		&drop.Comment{},
 	)
 	fmt.Println("Migrations done")
 }
