@@ -21,6 +21,7 @@ type Drop struct {
 	Lng                float64
 	PicturePath        string
 	Comments           []Comment `gorm:"foreignKey:DropId;references:ID"`
+	TotalLikes         int       `gorm:"-"`
 }
 
 func (d *Drop) GetID() uint { return d.ID }
@@ -58,6 +59,8 @@ func (d *Drop) GetComments() []model.CommentModel {
 	}
 	return result
 }
+
+func (d *Drop) GetTotalLikes() int { return d.TotalLikes }
 
 type DropStatusActive struct{}
 
@@ -144,11 +147,28 @@ func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, 
 	return &drop, nil
 }
 
+func (r *repoPrivate) DropExists(dropId uint) (bool, error) {
+	var count int64
+	if err := r.db.Model(&Drop{}).Where("id = ?", dropId).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
 	var drops []Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
 		return nil, err
 	}
+
+	for i := range drops {
+		var totalLikes int64
+		if err := r.db.Model(&Like{}).Where("drop_id = ?", drops[i].ID).Count(&totalLikes).Error; err != nil {
+			return nil, err
+		}
+		drops[i].TotalLikes = int(totalLikes)
+	}
+
 	var result []model.DropModel
 	for _, drop := range drops {
 		result = append(result, &drop)

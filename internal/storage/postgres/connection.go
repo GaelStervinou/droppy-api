@@ -44,6 +44,7 @@ func AutoMigrate() {
 		&group.Group{},
 		&group.GroupMember{},
 		&drop.Comment{},
+		&drop.Like{},
 	)
 	fmt.Println("Migrations done")
 }

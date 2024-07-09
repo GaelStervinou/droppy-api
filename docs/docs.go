@@ -305,6 +305,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/drops/{id}/like": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Like Drop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "drop"
+                ],
+                "summary": "Like Drop",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Drop ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetDropResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/follows": {
             "post": {
                 "security": [
@@ -1301,6 +1350,9 @@ const docTemplate = `{
                 "status": {
                     "type": "integer"
                 },
+                "totalLikes": {
+                    "type": "integer"
+                },
                 "type": {
                     "type": "string"
                 },
@@ -1583,6 +1635,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isCurrentUserLiking": {
+                    "type": "boolean"
+                },
                 "lat": {
                     "type": "number"
                 },
@@ -1591,6 +1646,9 @@ const docTemplate = `{
                 },
                 "picturePath": {
                     "type": "string"
+                },
+                "totalLikes": {
+                    "type": "integer"
                 },
                 "type": {
                     "type": "string"

@@ -23,7 +23,7 @@ func FormatGetCommentResponse(comment model.CommentModel) GetCommentResponse {
 		Content:   comment.GetContent(),
 		CreatedAt: comment.GetCreatedAt(),
 		CreatedBy: FormatGetUserResponse(comment.GetCreatedBy()),
-		Drop:      FormatGetDropResponse(comment.GetDrop()),
+		Drop:      FormatGetDropResponse(comment.GetDrop(), false),
 	}
 }
 

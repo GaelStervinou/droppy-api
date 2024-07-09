@@ -22,6 +22,7 @@ type Repositories struct {
 	GroupRepository            model.GroupRepository
 	GroupMemberRepository      model.GroupMemberRepository
 	CommentRepository          model.CommentRepository
+	LikeRepository             model.LikeRepository
 }
 
 func Setup() *Repositories {
@@ -40,6 +41,7 @@ func Setup() *Repositories {
 		GroupRepository:            group.NewRepo(sqlDB),
 		GroupMemberRepository:      group.NewGroupMemberRepo(sqlDB),
 		CommentRepository:          drop.NewCommentRepo(sqlDB),
+		LikeRepository:             drop.NewLikeRepo(sqlDB),
 	}
 }
 
