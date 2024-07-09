@@ -463,7 +463,7 @@ const docTemplate = `{
             }
         },
         "/drops/{id}/unlike": {
-            "post": {
+            "delete": {
                 "security": [
                     {
                         "BearerAuth": []
@@ -490,10 +490,10 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
-                            "$ref": "#/definitions/response_models.GetDropResponse"
+                            "type": "No"
                         }
                     },
                     "401": {

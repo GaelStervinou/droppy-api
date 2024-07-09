@@ -672,7 +672,7 @@ paths:
       tags:
       - drop
   /drops/{id}/unlike:
-    post:
+    delete:
       consumes:
       - application/json
       description: Unlike Drop
@@ -685,10 +685,10 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
-            $ref: '#/definitions/response_models.GetDropResponse'
+            type: "No"
         "401":
           description: Unauthorized
         "422":

@@ -78,11 +78,11 @@ func LikeDrop(c *gin.Context) {
 // @Security BearerAuth
 //
 //	@Param			id path int true "Drop ID"
-//	@Success		200	{object} response_models.GetDropResponse
+//	@Success		204	No Content
 //	@Failure		401
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
-//	@Router			/drops/{id}/unlike [post]
+//	@Router			/drops/{id}/unlike [delete]
 func UnlikeDrop(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
