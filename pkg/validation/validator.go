@@ -141,3 +141,15 @@ func ValidateGroupMemberCreation(args model.GroupMemberCreationParam) errors2.Mu
 
 	return finalErrors
 }
+
+func ValidateCommentCreation(args model.CommentCreationParam) errors2.MultiFieldsError {
+	finalErrors := errors2.MultiFieldsError{
+		Fields: map[string]string{},
+	}
+
+	if len(args.Content) < 1 || len(args.Content) > 255 {
+		finalErrors.Fields["content"] = "Content must be at least 1 character long and at most 255 characters long"
+	}
+
+	return finalErrors
+}

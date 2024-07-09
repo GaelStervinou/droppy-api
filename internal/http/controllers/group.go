@@ -309,7 +309,7 @@ func JoinGroup(c *gin.Context) {
 //	@Produce		json
 //	@Success		204
 //	@Failure		422 {object} errors2.MultiFieldsError
-//	@Failure		400 {object}
+//	@Failure		400
 //	@Failure		500
 //	@Router			/groups/members/{groupId}/{memberId} [delete]
 func DeleteGroupMember(c *gin.Context) {
@@ -376,7 +376,7 @@ func DeleteGroupMember(c *gin.Context) {
 //	@Param			group	body		model.GroupMemberPatchParam	true	"Group member patch object"
 //	@Success		200	{object} response_models.GetGroupMemberResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
-//	@Failure		400 {object}
+//	@Failure		400
 //	@Failure		500
 //	@Router			/groups/members/{groupId}/{memberId} [patch]
 func PatchGroupMember(c *gin.Context) {
@@ -463,7 +463,7 @@ func PatchGroupMember(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object} response_models.GetGroupMemberResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
-//	@Failure		400 {object}
+//	@Failure		400
 //	@Failure		500
 //	@Router			/group/{id}/{memberId}/accept [post]
 func AcceptGroupMemberRequest(c *gin.Context) {
@@ -537,7 +537,7 @@ func AcceptGroupMemberRequest(c *gin.Context) {
 //	@Produce		json
 //	@Success		204	{} No Content
 //	@Failure		422 {object} errors2.MultiFieldsError
-//	@Failure		400 {object}
+//	@Failure		400
 //	@Failure		500
 //	@Router			/groups/members/{id}/{memberId}/refuse/ [post]
 func RefuseGroupMemberRequest(c *gin.Context) {
@@ -604,7 +604,7 @@ func RefuseGroupMemberRequest(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object} []response_models.GetGroupMemberResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
-//	@Failure		400 {object}
+//	@Failure		400
 //	@Failure		500
 //	@Router			/groups/members/{id}/pending [get]
 func GetPendingGroupMemberRequests(c *gin.Context) {

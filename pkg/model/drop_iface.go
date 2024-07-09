@@ -19,6 +19,7 @@ type DropModel interface {
 	GetPicturePath() string
 	GetCreatedAt() int
 	GetCreatedBy() UserModel
+	GetComments() []CommentModel
 }
 
 type DropRepository interface {

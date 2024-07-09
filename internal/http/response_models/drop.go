@@ -14,7 +14,8 @@ type GetDropResponse struct {
 	Lng         *float64
 	PicturePath *string
 	CreatedAt   *time.Time
-	CreatedBy   GetUserResponseInterface `json:",omitempty"`
+	CreatedBy   GetUserResponseInterface    `json:",omitempty"`
+	Comments    []GetCommentResponseForDrop `json:",omitempty"`
 }
 
 func FormatGetDropResponse(drop model.DropModel) GetDropResponse {
@@ -40,5 +41,6 @@ func FormatGetDropResponse(drop model.DropModel) GetDropResponse {
 		PicturePath: picturePathPointer,
 		CreatedAt:   &createdAt,
 		CreatedBy:   FormatGetUserResponse(drop.GetCreatedBy()),
+		Comments:    FormatGetCommentResponsesForDrop(drop.GetComments()),
 	}
 }

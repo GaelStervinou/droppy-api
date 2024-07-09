@@ -20,6 +20,7 @@ type Drop struct {
 	Lat                float64
 	Lng                float64
 	PicturePath        string
+	Comments           []Comment `gorm:"foreignKey:DropId;references:ID"`
 }
 
 func (d *Drop) GetID() uint { return d.ID }
@@ -49,6 +50,14 @@ func (d *Drop) GetPicturePath() string { return d.PicturePath }
 func (d *Drop) GetCreatedAt() int { return int(d.CreatedAt.Unix()) }
 
 func (d *Drop) GetCreatedBy() model.UserModel { return &d.CreatedBy }
+
+func (d *Drop) GetComments() []model.CommentModel {
+	var result []model.CommentModel
+	for _, comment := range d.Comments {
+		result = append(result, &comment)
+	}
+	return result
+}
 
 type DropStatusActive struct{}
 
@@ -109,7 +118,7 @@ func (r *repoPrivate) Delete(dropId uint) error {
 
 func (r *repoPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	var drop Drop
-	if err := r.db.Preload("CreatedBy").First(&drop, dropId).Error; err != nil {
+	if err := r.db.Preload("CreatedBy").Preload("Comments").First(&drop, dropId).Error; err != nil {
 		return nil, err
 	}
 	return &drop, nil
@@ -117,7 +126,7 @@ func (r *repoPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 
 func (r *repoPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
 	var drops []Drop
-	if err := r.db.Where("created_by_id = ?", userId).Find(&drops).Error; err != nil {
+	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id = ?", userId).Find(&drops).Error; err != nil {
 		return nil, err
 	}
 	var result []model.DropModel
@@ -129,7 +138,7 @@ func (r *repoPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
 
 func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (model.DropModel, error) {
 	var drop Drop
-	if err := r.db.Where("drop_notification_id = ? AND created_by_id = ?", dropNotificationId, userId).First(&drop).Error; err != nil {
+	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("drop_notification_id = ? AND created_by_id = ?", dropNotificationId, userId).First(&drop).Error; err != nil {
 		return nil, err
 	}
 	return &drop, nil
@@ -137,7 +146,7 @@ func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, 
 
 func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
 	var drops []Drop
-	if err := r.db.Preload("CreatedBy").Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
+	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
 		return nil, err
 	}
 	var result []model.DropModel
