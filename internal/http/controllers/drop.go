@@ -63,7 +63,7 @@ func CreateDrop(c *gin.Context) {
 		return
 	}
 
-	response := response_models.FormatGetDropResponse(createdDrop)
+	response := response_models.FormatGetDropResponse(createdDrop, false)
 
 	c.JSON(http.StatusCreated, response)
 
@@ -109,17 +109,21 @@ func DropsByUserId(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 	var currentUser model.UserModel
 
-	if exists {
-		uintCurrentUserId, ok := currentUserId.(uint)
-		if ok {
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
-			targetedUser, err := repo.UserRepository.GetById(uintCurrentUserId)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-			currentUser = targetedUser
-		}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	currentUser, err := repo.UserRepository.GetById(uintCurrentUserId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	id := c.Param("id")
@@ -145,7 +149,14 @@ func DropsByUserId(c *gin.Context) {
 	var dropsResponse []response_models.GetDropResponse
 
 	for _, drop := range drops {
-		dropResponse := response_models.FormatGetDropResponse(drop)
+		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), uintCurrentUserId)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
 		dropsResponse = append(dropsResponse, dropResponse)
 	}
 
@@ -237,12 +248,12 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		Repo: repositories.Setup(),
 	}
 
-	//hasDropped, err := ds.HasUserDroppedToday(uintCurrentUserId)
+	/*hasDropped, err := ds.HasUserDroppedToday(uintCurrentUserId)
 
 	if err != nil {
 		log.Printf("Error checking if user has dropped today: %v", err)
 		return
-	}
+	}*/
 
 	availableDrops, err := ds.GetUserFeed(uintCurrentUserId)
 
@@ -255,7 +266,14 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		/*if !hasDropped {
 			//TODO ne pas envoyer la pic, le content et la description ( donc fair eun interface pour les 2 types de drop et déclarer une var au dessus de ce type là )
 		}*/
-		dropResponse := response_models.FormatGetDropResponse(drop)
+		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), uintCurrentUserId)
+
+		if err != nil {
+			log.Printf("Error checking if user is liking drop: %v", err)
+			return
+		}
+
+		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
 		err = wsConn.conn.WriteJSON(dropResponse)
 		if err != nil {
 			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)

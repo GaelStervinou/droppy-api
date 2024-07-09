@@ -3,17 +3,9 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.52">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G</Grants>
-      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
+      <IntrospectionStateNumber>178377</IntrospectionStateNumber>
       <ServerVersion>16.3</ServerVersion>
-      <StartupTime>1720465630</StartupTime>
+      <StartupTime>1720534795</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -1407,7 +1399,7 @@ true posixrules
 13212||10|C|G
 13212||-9223372036854775808|U|G
 13212||10|U|G</Grants>
-      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
+      <IntrospectionStateNumber>178377</IntrospectionStateNumber>
       <ObjectId>16384</ObjectId>
       <OwnerName>root</OwnerName>
     </database>
@@ -4831,8 +4823,8 @@ true posixrules
     <schema id="264" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>178337</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-07-08.19:43:25</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>178377</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-07-09.14:42:54</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4845,7 +4837,15 @@ true posixrules
       <StateNumber>131570</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="266" parent="264" name="drop_notifications_id_seq">
+    <sequence id="266" parent="264" name="comments_id_seq">
+      <DasType>bigint|0s</DasType>
+      <ObjectId>33100</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>178362</StateNumber>
+      <OwnerName>root</OwnerName>
+    </sequence>
+    <sequence id="267" parent="264" name="drop_notifications_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>33030</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4853,7 +4853,7 @@ true posixrules
       <StateNumber>131576</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="267" parent="264" name="drops_id_seq">
+    <sequence id="268" parent="264" name="drops_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>33019</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4861,7 +4861,7 @@ true posixrules
       <StateNumber>131574</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="268" parent="264" name="follows_id_seq">
+    <sequence id="269" parent="264" name="follows_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>33011</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4869,7 +4869,7 @@ true posixrules
       <StateNumber>131572</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="269" parent="264" name="group_members_id_seq">
+    <sequence id="270" parent="264" name="group_members_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>33074</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4877,7 +4877,7 @@ true posixrules
       <StateNumber>178264</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="270" parent="264" name="groups_id_seq">
+    <sequence id="271" parent="264" name="groups_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>33056</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4885,7 +4885,15 @@ true posixrules
       <StateNumber>178229</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <sequence id="271" parent="264" name="users_id_seq">
+    <sequence id="272" parent="264" name="likes_id_seq">
+      <DasType>bigint|0s</DasType>
+      <ObjectId>33125</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>178373</StateNumber>
+      <OwnerName>root</OwnerName>
+    </sequence>
+    <sequence id="273" parent="264" name="users_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>32984</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4893,49 +4901,61 @@ true posixrules
       <StateNumber>131568</StateNumber>
       <OwnerName>root</OwnerName>
     </sequence>
-    <table id="272" parent="264" name="auth_tokens">
+    <table id="274" parent="264" name="auth_tokens">
       <ObjectId>33002</ObjectId>
       <StateNumber>131570</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="273" parent="264" name="drop_notifications">
+    <table id="275" parent="264" name="comments">
+      <ObjectId>33101</ObjectId>
+      <StateNumber>178362</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>root</OwnerName>
+    </table>
+    <table id="276" parent="264" name="drop_notifications">
       <ObjectId>33031</ObjectId>
       <StateNumber>141136</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="274" parent="264" name="drops">
+    <table id="277" parent="264" name="drops">
       <ObjectId>33020</ObjectId>
-      <StateNumber>141134</StateNumber>
+      <StateNumber>178358</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="275" parent="264" name="follows">
+    <table id="278" parent="264" name="follows">
       <ObjectId>33012</ObjectId>
       <StateNumber>131572</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="276" parent="264" name="group_members">
+    <table id="279" parent="264" name="group_members">
       <ObjectId>33075</ObjectId>
       <StateNumber>178264</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="277" parent="264" name="groups">
+    <table id="280" parent="264" name="groups">
       <ObjectId>33057</ObjectId>
       <StateNumber>178229</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <table id="278" parent="264" name="users">
+    <table id="281" parent="264" name="likes">
+      <ObjectId>33126</ObjectId>
+      <StateNumber>178373</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>root</OwnerName>
+    </table>
+    <table id="282" parent="264" name="users">
       <ObjectId>32985</ObjectId>
       <StateNumber>178334</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>root</OwnerName>
     </table>
-    <column id="279" parent="272" name="id">
+    <column id="283" parent="274" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;auth_tokens_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -4944,43 +4964,43 @@ true posixrules
       <SequenceId>33001</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="280" parent="272" name="created_at">
+    <column id="284" parent="274" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="281" parent="272" name="updated_at">
+    <column id="285" parent="274" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="282" parent="272" name="deleted_at">
+    <column id="286" parent="274" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="283" parent="272" name="token">
+    <column id="287" parent="274" name="token">
       <DasType>text|0s</DasType>
       <Position>5</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="284" parent="272" name="user_id">
+    <column id="288" parent="274" name="user_id">
       <DasType>bigint|0s</DasType>
       <Position>6</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="285" parent="272" name="expiry">
+    <column id="289" parent="274" name="expiry">
       <DasType>bigint|0s</DasType>
       <Position>7</Position>
       <StateNumber>131570</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <index id="286" parent="272" name="auth_tokens_pkey">
+    <index id="290" parent="274" name="auth_tokens_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33008</ObjectId>
@@ -4989,20 +5009,111 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="287" parent="272" name="idx_auth_tokens_deleted_at">
+    <index id="291" parent="274" name="idx_auth_tokens_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33010</ObjectId>
       <StateNumber>131571</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="288" parent="272" name="auth_tokens_pkey">
+    <key id="292" parent="274" name="auth_tokens_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33009</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131570</StateNumber>
       <UnderlyingIndexId>33008</UnderlyingIndexId>
     </key>
-    <column id="289" parent="273" name="id">
+    <column id="293" parent="275" name="id">
+      <DasType>bigint|0s</DasType>
+      <DefaultExpression>nextval(&apos;comments_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>178362</StateNumber>
+      <SequenceId>33100</SequenceId>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="294" parent="275" name="created_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>2</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="295" parent="275" name="updated_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>3</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="296" parent="275" name="deleted_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="297" parent="275" name="content">
+      <DasType>text|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>25</TypeId>
+    </column>
+    <column id="298" parent="275" name="created_by_id">
+      <DasType>bigint|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="299" parent="275" name="drop_id">
+      <DasType>bigint|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StateNumber>178362</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <foreign-key id="300" parent="275" name="fk_comments_created_by">
+      <ColNames>created_by_id</ColNames>
+      <ObjectId>33109</ObjectId>
+      <StateNumber>178362</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>32985</RefTableId>
+    </foreign-key>
+    <foreign-key id="301" parent="275" name="fk_comments_drop">
+      <ColNames>drop_id</ColNames>
+      <ObjectId>33114</ObjectId>
+      <StateNumber>178362</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>33020</RefTableId>
+    </foreign-key>
+    <foreign-key id="302" parent="275" name="fk_drops_comments">
+      <ColNames>drop_id</ColNames>
+      <ObjectId>33120</ObjectId>
+      <StateNumber>178369</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>33020</RefTableId>
+    </foreign-key>
+    <index id="303" parent="275" name="comments_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>33107</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>178362</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <index id="304" parent="275" name="idx_comments_deleted_at">
+      <ColNames>deleted_at</ColNames>
+      <ObjectId>33119</ObjectId>
+      <StateNumber>178363</StateNumber>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="305" parent="275" name="comments_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>33108</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>178362</StateNumber>
+      <UnderlyingIndexId>33107</UnderlyingIndexId>
+    </key>
+    <column id="306" parent="276" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;drop_notifications_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5011,31 +5122,31 @@ true posixrules
       <SequenceId>33030</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="290" parent="273" name="created_at">
+    <column id="307" parent="276" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>131576</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="291" parent="273" name="updated_at">
+    <column id="308" parent="276" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>131576</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="292" parent="273" name="deleted_at">
+    <column id="309" parent="276" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>131576</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="293" parent="273" name="type">
+    <column id="310" parent="276" name="type">
       <DasType>text|0s</DasType>
       <Position>5</Position>
       <StateNumber>131576</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <index id="294" parent="273" name="drop_notifications_pkey">
+    <index id="311" parent="276" name="drop_notifications_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33037</ObjectId>
@@ -5044,20 +5155,20 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="295" parent="273" name="idx_drop_notifications_deleted_at">
+    <index id="312" parent="276" name="idx_drop_notifications_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33039</ObjectId>
       <StateNumber>141136</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="296" parent="273" name="drop_notifications_pkey">
+    <key id="313" parent="276" name="drop_notifications_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33038</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131576</StateNumber>
       <UnderlyingIndexId>33037</UnderlyingIndexId>
     </key>
-    <column id="297" parent="274" name="id">
+    <column id="314" parent="277" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;drops_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5066,97 +5177,104 @@ true posixrules
       <SequenceId>33019</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="298" parent="274" name="created_at">
+    <column id="315" parent="277" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="299" parent="274" name="updated_at">
+    <column id="316" parent="277" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="300" parent="274" name="deleted_at">
+    <column id="317" parent="277" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="301" parent="274" name="type">
+    <column id="318" parent="277" name="type">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="302" parent="274" name="content">
+    <column id="319" parent="277" name="content">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="303" parent="274" name="description">
+    <column id="320" parent="277" name="description">
       <DasType>text|0s</DasType>
       <Position>7</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="304" parent="274" name="created_by_id">
+    <column id="321" parent="277" name="created_by_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="305" parent="274" name="status">
+    <column id="322" parent="277" name="status">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>9</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="306" parent="274" name="deleted_by_id">
+    <column id="323" parent="277" name="deleted_by_id">
       <DasType>bigint|0s</DasType>
       <Position>10</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="307" parent="274" name="is_pinned">
+    <column id="324" parent="277" name="is_pinned">
       <DasType>boolean|0s</DasType>
       <DefaultExpression>false</DefaultExpression>
       <Position>11</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="308" parent="274" name="drop_notification_id">
+    <column id="325" parent="277" name="drop_notification_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>12</Position>
       <StateNumber>131574</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="309" parent="274" name="lat">
+    <column id="326" parent="277" name="lat">
       <DasType>numeric|0s</DasType>
       <Position>13</Position>
       <StateNumber>132581</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="310" parent="274" name="lng">
+    <column id="327" parent="277" name="lng">
       <DasType>numeric|0s</DasType>
       <Position>14</Position>
       <StateNumber>132582</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="311" parent="274" name="picture_path">
+    <column id="328" parent="277" name="picture_path">
       <DasType>text|0s</DasType>
       <Position>15</Position>
       <StateNumber>132583</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <index id="312" parent="274" name="drops_pkey">
+    <foreign-key id="329" parent="277" name="fk_drops_created_by">
+      <ColNames>created_by_id</ColNames>
+      <ObjectId>33095</ObjectId>
+      <StateNumber>178358</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>32985</RefTableId>
+    </foreign-key>
+    <index id="330" parent="277" name="drops_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33027</ObjectId>
@@ -5165,20 +5283,20 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="313" parent="274" name="idx_drops_deleted_at">
+    <index id="331" parent="277" name="idx_drops_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33029</ObjectId>
       <StateNumber>141134</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="314" parent="274" name="drops_pkey">
+    <key id="332" parent="277" name="drops_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33028</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131574</StateNumber>
       <UnderlyingIndexId>33027</UnderlyingIndexId>
     </key>
-    <column id="315" parent="275" name="id">
+    <column id="333" parent="278" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;follows_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5187,43 +5305,43 @@ true posixrules
       <SequenceId>33011</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="316" parent="275" name="created_at">
+    <column id="334" parent="278" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="317" parent="275" name="updated_at">
+    <column id="335" parent="278" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="318" parent="275" name="deleted_at">
+    <column id="336" parent="278" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="319" parent="275" name="follower_id">
+    <column id="337" parent="278" name="follower_id">
       <DasType>bigint|0s</DasType>
       <Position>5</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="320" parent="275" name="followed_id">
+    <column id="338" parent="278" name="followed_id">
       <DasType>bigint|0s</DasType>
       <Position>6</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="321" parent="275" name="status">
+    <column id="339" parent="278" name="status">
       <DasType>bigint|0s</DasType>
       <Position>7</Position>
       <StateNumber>131572</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <index id="322" parent="275" name="follows_pkey">
+    <index id="340" parent="278" name="follows_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33016</ObjectId>
@@ -5232,20 +5350,20 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="323" parent="275" name="idx_follows_deleted_at">
+    <index id="341" parent="278" name="idx_follows_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33018</ObjectId>
       <StateNumber>131573</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="324" parent="275" name="follows_pkey">
+    <key id="342" parent="278" name="follows_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33017</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131572</StateNumber>
       <UnderlyingIndexId>33016</UnderlyingIndexId>
     </key>
-    <column id="325" parent="276" name="id">
+    <column id="343" parent="279" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;group_members_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5254,67 +5372,67 @@ true posixrules
       <SequenceId>33074</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="326" parent="276" name="created_at">
+    <column id="344" parent="279" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="327" parent="276" name="updated_at">
+    <column id="345" parent="279" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="328" parent="276" name="deleted_at">
+    <column id="346" parent="279" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="329" parent="276" name="group_id">
+    <column id="347" parent="279" name="group_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="330" parent="276" name="member_id">
+    <column id="348" parent="279" name="member_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="331" parent="276" name="status">
+    <column id="349" parent="279" name="status">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="332" parent="276" name="role">
+    <column id="350" parent="279" name="role">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>178264</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <foreign-key id="333" parent="276" name="fk_group_members_group">
+    <foreign-key id="351" parent="279" name="fk_group_members_group">
       <ColNames>group_id</ColNames>
       <ObjectId>33083</ObjectId>
       <StateNumber>178264</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>33057</RefTableId>
     </foreign-key>
-    <foreign-key id="334" parent="276" name="fk_group_members_member">
+    <foreign-key id="352" parent="279" name="fk_group_members_member">
       <ColNames>member_id</ColNames>
       <ObjectId>33088</ObjectId>
       <StateNumber>178264</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>32985</RefTableId>
     </foreign-key>
-    <index id="335" parent="276" name="group_members_pkey">
+    <index id="353" parent="279" name="group_members_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33081</ObjectId>
@@ -5323,20 +5441,20 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="336" parent="276" name="idx_group_members_deleted_at">
+    <index id="354" parent="279" name="idx_group_members_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33093</ObjectId>
       <StateNumber>178265</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="337" parent="276" name="group_members_pkey">
+    <key id="355" parent="279" name="group_members_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33082</ObjectId>
       <Primary>1</Primary>
       <StateNumber>178264</StateNumber>
       <UnderlyingIndexId>33081</UnderlyingIndexId>
     </key>
-    <column id="338" parent="277" name="id">
+    <column id="356" parent="280" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;groups_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5345,46 +5463,46 @@ true posixrules
       <SequenceId>33056</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="339" parent="277" name="created_at">
+    <column id="357" parent="280" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="340" parent="277" name="updated_at">
+    <column id="358" parent="280" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="341" parent="277" name="deleted_at">
+    <column id="359" parent="280" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="342" parent="277" name="name">
+    <column id="360" parent="280" name="name">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="343" parent="277" name="description">
+    <column id="361" parent="280" name="description">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="344" parent="277" name="is_private">
+    <column id="362" parent="280" name="is_private">
       <DasType>boolean|0s</DasType>
       <DefaultExpression>false</DefaultExpression>
       <Position>7</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="345" parent="277" name="status">
+    <column id="363" parent="280" name="status">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>1</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5392,26 +5510,26 @@ true posixrules
       <StateNumber>178229</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="346" parent="277" name="created_by_id">
+    <column id="364" parent="280" name="created_by_id">
       <DasType>bigint|0s</DasType>
       <Position>9</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="347" parent="277" name="picture_path">
+    <column id="365" parent="280" name="picture_path">
       <DasType>text|0s</DasType>
       <Position>10</Position>
       <StateNumber>178229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <foreign-key id="348" parent="277" name="fk_groups_created_by">
+    <foreign-key id="366" parent="280" name="fk_groups_created_by">
       <ColNames>created_by_id</ColNames>
       <ObjectId>33067</ObjectId>
       <StateNumber>178229</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>32985</RefTableId>
     </foreign-key>
-    <index id="349" parent="277" name="groups_pkey">
+    <index id="367" parent="280" name="groups_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33065</ObjectId>
@@ -5420,20 +5538,97 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="350" parent="277" name="idx_groups_deleted_at">
+    <index id="368" parent="280" name="idx_groups_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33072</ObjectId>
       <StateNumber>178230</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="351" parent="277" name="groups_pkey">
+    <key id="369" parent="280" name="groups_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>33066</ObjectId>
       <Primary>1</Primary>
       <StateNumber>178229</StateNumber>
       <UnderlyingIndexId>33065</UnderlyingIndexId>
     </key>
-    <column id="352" parent="278" name="id">
+    <column id="370" parent="281" name="id">
+      <DasType>bigint|0s</DasType>
+      <DefaultExpression>nextval(&apos;likes_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>178373</StateNumber>
+      <SequenceId>33125</SequenceId>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="371" parent="281" name="created_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>2</Position>
+      <StateNumber>178373</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="372" parent="281" name="updated_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>3</Position>
+      <StateNumber>178373</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="373" parent="281" name="deleted_at">
+      <DasType>timestamp with time zone|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>178373</StateNumber>
+      <TypeId>1184</TypeId>
+    </column>
+    <column id="374" parent="281" name="drop_id">
+      <DasType>bigint|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StateNumber>178373</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="375" parent="281" name="user_id">
+      <DasType>bigint|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StateNumber>178373</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <foreign-key id="376" parent="281" name="fk_likes_drop">
+      <ColNames>drop_id</ColNames>
+      <ObjectId>33132</ObjectId>
+      <StateNumber>178373</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>33020</RefTableId>
+    </foreign-key>
+    <foreign-key id="377" parent="281" name="fk_likes_user">
+      <ColNames>user_id</ColNames>
+      <ObjectId>33137</ObjectId>
+      <StateNumber>178373</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>32985</RefTableId>
+    </foreign-key>
+    <index id="378" parent="281" name="likes_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>33130</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>178373</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <index id="379" parent="281" name="idx_likes_deleted_at">
+      <ColNames>deleted_at</ColNames>
+      <ObjectId>33142</ObjectId>
+      <StateNumber>178374</StateNumber>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="380" parent="281" name="likes_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>33131</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>178373</StateNumber>
+      <UnderlyingIndexId>33130</UnderlyingIndexId>
+    </key>
+    <column id="381" parent="282" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;users_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5442,111 +5637,111 @@ true posixrules
       <SequenceId>32984</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="353" parent="278" name="created_at">
+    <column id="382" parent="282" name="created_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>2</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="354" parent="278" name="updated_at">
+    <column id="383" parent="282" name="updated_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>3</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="355" parent="278" name="deleted_at">
+    <column id="384" parent="282" name="deleted_at">
       <DasType>timestamp with time zone|0s</DasType>
       <Position>4</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>1184</TypeId>
     </column>
-    <column id="356" parent="278" name="google_id">
+    <column id="385" parent="282" name="google_id">
       <DasType>text|0s</DasType>
       <Position>5</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="357" parent="278" name="email">
+    <column id="386" parent="282" name="email">
       <DasType>text|0s</DasType>
       <Position>6</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="358" parent="278" name="password">
+    <column id="387" parent="282" name="password">
       <DasType>varchar(255)|0s</DasType>
       <Position>7</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="359" parent="278" name="username">
+    <column id="388" parent="282" name="username">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="360" parent="278" name="phone_number">
+    <column id="389" parent="282" name="phone_number">
       <DasType>text|0s</DasType>
       <Position>9</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="361" parent="278" name="bio">
+    <column id="390" parent="282" name="bio">
       <DasType>varchar(1000)|0s</DasType>
       <Position>10</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="362" parent="278" name="avatar">
+    <column id="391" parent="282" name="avatar">
       <DasType>text|0s</DasType>
       <Position>11</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="363" parent="278" name="verify_token">
+    <column id="392" parent="282" name="verify_token">
       <DasType>text|0s</DasType>
       <Position>12</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="364" parent="278" name="status">
+    <column id="393" parent="282" name="status">
       <DasType>bigint|0s</DasType>
       <Position>13</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="365" parent="278" name="is_private">
+    <column id="394" parent="282" name="is_private">
       <DasType>boolean|0s</DasType>
       <DefaultExpression>false</DefaultExpression>
       <Position>14</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="366" parent="278" name="role">
+    <column id="395" parent="282" name="role">
       <DasType>text|0s</DasType>
       <Position>15</Position>
       <StateNumber>131568</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="367" parent="278" name="firstname">
+    <column id="396" parent="282" name="firstname">
       <DasType>text|0s</DasType>
       <Position>16</Position>
       <StateNumber>178332</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="368" parent="278" name="lastname">
+    <column id="397" parent="282" name="lastname">
       <DasType>text|0s</DasType>
       <Position>17</Position>
       <StateNumber>178333</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="369" parent="278" name="roles">
+    <column id="398" parent="282" name="roles">
       <DasType>varchar(255)|0s</DasType>
       <Position>18</Position>
       <StateNumber>178334</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="370" parent="278" name="users_pkey">
+    <index id="399" parent="282" name="users_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>32992</ObjectId>
@@ -5555,7 +5750,7 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="371" parent="278" name="uni_users_google_id">
+    <index id="400" parent="282" name="uni_users_google_id">
       <ColNames>google_id</ColNames>
       <ObjectId>32994</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5565,7 +5760,7 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="372" parent="278" name="uni_users_email">
+    <index id="401" parent="282" name="uni_users_email">
       <ColNames>email</ColNames>
       <ObjectId>32996</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5575,7 +5770,7 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="373" parent="278" name="uni_users_username">
+    <index id="402" parent="282" name="uni_users_username">
       <ColNames>username</ColNames>
       <ObjectId>32998</ObjectId>
       <StateNumber>131568</StateNumber>
@@ -5585,30 +5780,30 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="374" parent="278" name="idx_users_deleted_at">
+    <index id="403" parent="282" name="idx_users_deleted_at">
       <ColNames>deleted_at</ColNames>
       <ObjectId>33000</ObjectId>
       <StateNumber>131569</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="375" parent="278" name="users_pkey">
+    <key id="404" parent="282" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>32993</ObjectId>
       <Primary>1</Primary>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32992</UnderlyingIndexId>
     </key>
-    <key id="376" parent="278" name="uni_users_google_id">
+    <key id="405" parent="282" name="uni_users_google_id">
       <ObjectId>32995</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32994</UnderlyingIndexId>
     </key>
-    <key id="377" parent="278" name="uni_users_email">
+    <key id="406" parent="282" name="uni_users_email">
       <ObjectId>32997</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32996</UnderlyingIndexId>
     </key>
-    <key id="378" parent="278" name="uni_users_username">
+    <key id="407" parent="282" name="uni_users_username">
       <ObjectId>32999</ObjectId>
       <StateNumber>131568</StateNumber>
       <UnderlyingIndexId>32998</UnderlyingIndexId>

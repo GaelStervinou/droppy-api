@@ -200,3 +200,13 @@ func (s *DropService) HasUserDroppedToday(userId uint) (bool, error) {
 
 	return hasDropped, nil
 }
+
+func (s *DropService) IsCurrentUserLiking(dropId uint, userId uint) (bool, error) {
+	likeExists, err := s.Repo.LikeRepository.LikeExists(dropId, userId)
+
+	if err != nil {
+		return false, err
+	}
+
+	return likeExists, nil
+}

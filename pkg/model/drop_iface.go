@@ -20,6 +20,7 @@ type DropModel interface {
 	GetCreatedAt() int
 	GetCreatedBy() UserModel
 	GetComments() []CommentModel
+	GetTotalLikes() int
 }
 
 type DropRepository interface {
@@ -30,6 +31,7 @@ type DropRepository interface {
 	GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]DropModel, error)
 	HasUserDropped(dropNotificationId uint, userId uint) (bool, error)
 	GetDropById(dropId uint) (DropModel, error)
+	DropExists(dropId uint) (bool, error)
 }
 
 type DropService interface {
@@ -39,6 +41,7 @@ type DropService interface {
 	GetUserFeed(userId uint) ([]DropModel, error)
 	GetDropsByUserId(userId uint, currentUser UserModel) ([]DropModel, error)
 	HasUserDroppedToday(userId uint) (bool, error)
+	IsCurrentUserLiking(dropId uint, userId uint) (bool, error)
 }
 
 type DropCreationParam struct {

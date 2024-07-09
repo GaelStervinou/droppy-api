@@ -75,6 +75,8 @@ func main() {
 		{
 			drop.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateDrop)
 			drop.POST("/:id/comments", middlewares.CurrentUserMiddleware(true), controllers.CommentDrop)
+			drop.POST("/:id/like", middlewares.CurrentUserMiddleware(true), controllers.LikeDrop)
+			drop.DELETE("/:id/like", middlewares.CurrentUserMiddleware(true), controllers.UnlikeDrop)
 		}
 
 		group := v1.Group("/groups")
