@@ -7,13 +7,22 @@ import (
 )
 
 type GetGroupResponse struct {
-	ID          uint
-	Name        string
-	Description string
-	IsPrivate   bool
-	PicturePath custom_type.NullString
-	CreatedAt   *time.Time
-	CreatedBy   GetUserResponseInterface `json:",omitempty"`
+	ID           uint
+	Name         string
+	Description  string
+	IsPrivate    bool
+	PicturePath  custom_type.NullString
+	CreatedAt    *time.Time
+	CreatedBy    GetUserResponseInterface            `json:",omitempty"`
+	GroupMembers []GetGroupMemberForOneGroupResponse `json:",omitempty"`
+}
+
+type GetGroupMemberForOneGroupResponse struct {
+	ID        uint
+	Member    GetUserResponseInterface
+	Status    uint
+	Role      string
+	CreatedAt *time.Time
 }
 
 type GetSearchGroupResponse struct {
@@ -36,14 +45,20 @@ func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
 
+	groupMembers := make([]GetGroupMemberForOneGroupResponse, 0)
+	for _, groupMember := range group.GetGroupMembers() {
+		groupMembers = append(groupMembers, FormatGetGroupMemberResponseForOneGroup(groupMember))
+	}
+
 	return GetGroupResponse{
-		ID:          group.GetID(),
-		Name:        group.GetName(),
-		Description: group.GetDescription(),
-		IsPrivate:   group.IsPrivateGroup(),
-		PicturePath: picturePath,
-		CreatedAt:   &createdAt,
-		CreatedBy:   FormatGetUserResponse(group.GetCreatedBy()),
+		ID:           group.GetID(),
+		Name:         group.GetName(),
+		Description:  group.GetDescription(),
+		IsPrivate:    group.IsPrivateGroup(),
+		PicturePath:  picturePath,
+		CreatedAt:    &createdAt,
+		CreatedBy:    FormatGetUserResponse(group.GetCreatedBy()),
+		GroupMembers: groupMembers,
 	}
 }
 
@@ -88,6 +103,22 @@ func FormatGetGroupMemberResponse(groupMember model.GroupMemberModel) GetGroupMe
 		ID:        groupMember.GetID(),
 		Member:    FormatGetUserResponse(groupMember.GetMember()),
 		Group:     FormatGetGroupResponse(groupMember.GetGroup()),
+		Status:    groupMember.GetStatus(),
+		Role:      groupMember.GetRole(),
+		CreatedAt: &createdAt,
+	}
+}
+
+func FormatGetGroupMemberResponseForOneGroup(groupMember model.GroupMemberModel) GetGroupMemberForOneGroupResponse {
+	if nil == groupMember {
+		return GetGroupMemberForOneGroupResponse{}
+	}
+
+	createdAt := time.Unix(int64(groupMember.GetCreatedAt()), 0)
+
+	return GetGroupMemberForOneGroupResponse{
+		ID:        groupMember.GetID(),
+		Member:    FormatGetUserResponse(groupMember.GetMember()),
 		Status:    groupMember.GetStatus(),
 		Role:      groupMember.GetRole(),
 		CreatedAt: &createdAt,

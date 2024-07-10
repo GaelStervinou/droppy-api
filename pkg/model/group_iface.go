@@ -11,6 +11,7 @@ type GroupModel interface {
 	GetCreatedBy() UserModel
 	IsPrivateGroup() bool
 	GetPicturePath() sql.NullString
+	GetGroupMembers() []GroupMemberModel
 }
 
 type GroupRepository interface {

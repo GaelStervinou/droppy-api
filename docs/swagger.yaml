@@ -228,6 +228,10 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       description:
         type: string
+      groupMembers:
+        items:
+          $ref: '#/definitions/postgres.GroupMember'
+        type: array
       id:
         type: integer
       isPrivate:
@@ -236,6 +240,29 @@ definitions:
         type: string
       picturePath:
         $ref: '#/definitions/sql.NullString'
+      status:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  postgres.GroupMember:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      group:
+        $ref: '#/definitions/postgres.Group'
+      groupID:
+        type: integer
+      id:
+        type: integer
+      member:
+        $ref: '#/definitions/postgres.User'
+      memberID:
+        type: integer
+      role:
+        type: string
       status:
         type: integer
       updatedAt:
@@ -344,6 +371,18 @@ definitions:
       type:
         type: string
     type: object
+  response_models.GetGroupMemberForOneGroupResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      member: {}
+      role:
+        type: string
+      status:
+        type: integer
+    type: object
   response_models.GetGroupMemberResponse:
     properties:
       createdAt:
@@ -365,6 +404,10 @@ definitions:
       createdBy: {}
       description:
         type: string
+      groupMembers:
+        items:
+          $ref: '#/definitions/response_models.GetGroupMemberForOneGroupResponse'
+        type: array
       id:
         type: integer
       isPrivate:
@@ -842,31 +885,6 @@ paths:
       summary: Refuse follow request
       tags:
       - follow
-  /group/{id}/{memberId}/accept:
-    post:
-      consumes:
-      - application/json
-      description: Accept Group Member Request
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response_models.GetGroupMemberResponse'
-        "400":
-          description: Bad Request
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors2.MultiFieldsError'
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Accept Group Member Request
-      tags:
-      - group
   /groups:
     post:
       consumes:
@@ -898,6 +916,36 @@ paths:
       tags:
       - group
   /groups/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get One Group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response_models.GetGroupResponse'
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get One Group
+      tags:
+      - group
     patch:
       consumes:
       - application/json
@@ -986,31 +1034,6 @@ paths:
       summary: Patch Group Member
       tags:
       - group
-  /groups/members/{id}/{memberId}/refuse/:
-    post:
-      consumes:
-      - application/json
-      description: Refuse Group Member Request
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            type: ""
-        "400":
-          description: Bad Request
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors2.MultiFieldsError'
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Refuse Group Member Request
-      tags:
-      - group
   /groups/members/{id}/join:
     post:
       consumes:
@@ -1039,33 +1062,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Join Group
-      tags:
-      - group
-  /groups/members/{id}/pending:
-    get:
-      consumes:
-      - application/json
-      description: Get Pending Group Member Requests
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/response_models.GetGroupMemberResponse'
-            type: array
-        "400":
-          description: Bad Request
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors2.MultiFieldsError'
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Get Pending Group Member Requests
       tags:
       - group
   /groups/search:

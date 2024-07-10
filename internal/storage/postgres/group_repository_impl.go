@@ -9,13 +9,14 @@ import (
 
 type Group struct {
 	gorm.Model
-	Name        string `gorm:"not null"`
-	Description string `gorm:"not null"`
-	IsPrivate   bool   `gorm:"default:false"`
-	Status      uint   `gorm:"not null;default:1"`
-	CreatedByID uint   `json:"-"`
-	CreatedBy   User   `gorm:"foreignKey:CreatedByID;references:ID"`
-	PicturePath sql.NullString
+	Name         string        `gorm:"not null"`
+	Description  string        `gorm:"not null"`
+	IsPrivate    bool          `gorm:"default:false"`
+	Status       uint          `gorm:"not null;default:1"`
+	CreatedByID  uint          `json:"-"`
+	CreatedBy    User          `gorm:"foreignKey:CreatedByID;references:ID"`
+	GroupMembers []GroupMember `gorm:"foreignKey:GroupID;references:ID"`
+	PicturePath  sql.NullString
 }
 
 func (g *Group) GetID() uint {
@@ -52,6 +53,14 @@ func (g *Group) IsPrivateGroup() bool {
 func (g *Group) GetCreatedByID() uint {
 	return g.CreatedByID
 }
+func (g *Group) GetGroupMembers() []model.GroupMemberModel {
+	var members []model.GroupMemberModel
+	for _, v := range g.GroupMembers {
+		members = append(members, model.GroupMemberModel(&v))
+	}
+
+	return members
+}
 
 var _ model.GroupModel = (*Group)(nil)
 
@@ -83,7 +92,7 @@ func NewGroupRepo(db *gorm.DB) model.GroupRepository {
 func (r repoGroupPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupModel, error) {
 	var groups []*Group
 
-	result := r.db.Where("created_by_id = ?", userId).Find(&groups)
+	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Where("created_by_id = ?", userId).Find(&groups)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -119,7 +128,7 @@ func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 	object := Group{}
 	object.ID = id
 
-	result := r.db.Find(&object)
+	result := r.db.Preload("CreatedBy").Preload("GroupMembers").Preload("GroupMembers.Member").Find(&object)
 	if object.CreatedAt.IsZero() {
 		return nil, fmt.Errorf("group with id %d not found", id)
 	}
@@ -130,7 +139,7 @@ func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 func (r repoGroupPrivate) GetByName(name string) (model.GroupModel, error) {
 	object := Group{}
 
-	result := r.db.Where("name = ?", name).First(&object)
+	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Where("name = ?", name).First(&object)
 	if object.CreatedAt.IsZero() {
 		return nil, fmt.Errorf("group with name %s not found", name)
 	}
@@ -146,7 +155,7 @@ func (r repoGroupPrivate) Delete(id uint) error {
 func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
 	var groups []*Group
 
-	result := r.db.Where("name LIKE ?", "%"+query+"%").Find(&groups)
+	result := r.db.Where("LOWER(name) LIKE LOWER(?) AND is_private = false", "%"+query+"%").Find(&groups)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -161,7 +170,7 @@ func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
 
 func (r repoGroupPrivate) GetAllGroups() ([]model.GroupModel, error) {
 	var foundGroups []*Group
-	result := r.db.Find(&foundGroups)
+	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Find(&foundGroups)
 
 	models := make([]model.GroupModel, len(foundGroups))
 	for i, v := range foundGroups {

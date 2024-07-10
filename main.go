@@ -81,13 +81,12 @@ func main() {
 		group := v1.Group("/groups")
 		{
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
+			group.GET("/:id", middlewares.CurrentUserMiddleware(true), controllers.GetOneGroup)
 			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
 			group.GET("/search", middlewares.CurrentUserMiddleware(true), controllers.SearchGroups)
 
 			group.POST("/members/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
-			group.GET("/members/:id/pending", middlewares.CurrentUserMiddleware(true), controllers.GetPendingGroupMemberRequests)
-			group.POST("/members/:id/:memberId/accept", middlewares.CurrentUserMiddleware(true), controllers.AcceptGroupMemberRequest)
-			group.POST("/members/:id/:memberId/refuse", middlewares.CurrentUserMiddleware(true), controllers.RefuseGroupMemberRequest)
+			group.POST("/members/:id/:userId", middlewares.CurrentUserMiddleware(true), controllers.AddUserToGroup)
 			group.PATCH("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.PatchGroupMember)
 			group.DELETE("/members/:groupId/:memberId", middlewares.CurrentUserMiddleware(true), controllers.DeleteGroupMember)
 		}

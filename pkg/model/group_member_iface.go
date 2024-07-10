@@ -31,6 +31,7 @@ type GroupMemberService interface {
 	UpdateGroupMemberRole(requesterId uint, groupID uint, memberID uint, args GroupMemberPatchParam) (GroupMemberModel, error)
 	FindAllUserGroups(userId uint) ([]GroupModel, error)
 	GetPendingGroupMemberRequests(requesterId uint, groupID uint) ([]GroupMemberModel, error)
+	AddUserToGroup(userID uint, groupID uint, requesterID uint) (GroupMemberModel, error)
 }
 
 type GroupMemberCreationParam struct {

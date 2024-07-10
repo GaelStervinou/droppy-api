@@ -37,13 +37,12 @@ func (s *GroupMemberService) JoinGroup(currentUserId uint, userId uint, args mod
 	if targetedGroup == nil {
 		return nil, errors.New(fmt.Sprintf("Group with id %d not found", args.GroupID))
 	}
-
-	var status grouprepository.GroupMemberStatus
 	if targetedGroup.IsPrivateGroup() {
-		status = &grouprepository.GroupMemberStatusPending{}
-	} else {
-		status = &grouprepository.GroupMemberStatusActive{}
+		return nil, errors2.CannotJoinGroupError{Reason: "Group is private"}
 	}
+
+	status := &grouprepository.GroupMemberStatusActive{}
+
 	_, err = s.Repo.GroupMemberRepository.Create(args.GroupID, userId, args.Role, status.ToIntGroupMemberStatus())
 
 	if err != nil {
@@ -262,4 +261,37 @@ func (s *GroupMemberService) GetPendingGroupMemberRequests(requesterId uint, gro
 	}
 
 	return pendingGroupMembers, nil
+}
+
+func (s *GroupMemberService) AddUserToGroup(userID uint, groupID uint, requesterID uint) (model.GroupMemberModel, error) {
+	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if groupMember != nil {
+		return nil, errors2.CannotJoinGroupError{Reason: "User already joined this group"}
+	}
+
+	requester, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, requesterID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if requester == nil {
+		return nil, errors.New(fmt.Sprintf("Requester with id %d not found in group %d", requesterID, groupID))
+	}
+
+	if requester.GetRole() != grouprepository.GroupMemberRoleManager.ToString() {
+		return nil, errors2.NotAllowedError{Reason: "You are not a manager"}
+	}
+
+	status := &grouprepository.GroupMemberStatusActive{}
+	role := &grouprepository.GroupMemberRoleManager{}
+
+	groupMember, err = s.Repo.GroupMemberRepository.Create(groupID, userID, role.ToString(), status.ToIntGroupMemberStatus())
+
+	return groupMember, err
 }
