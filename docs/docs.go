@@ -599,46 +599,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/follows/my-followers": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all followers of the current user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "follow"
-                ],
-                "summary": "Get my followers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/postgres.User"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/follows/pending": {
             "get": {
                 "security": [
@@ -663,7 +623,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/postgres.User"
+                                "$ref": "#/definitions/postgres.Follow"
                             }
                         }
                     },

@@ -792,31 +792,6 @@ paths:
       summary: Accept request
       tags:
       - follow
-  /follows/my-followers:
-    get:
-      consumes:
-      - application/json
-      description: Get all followers of the current user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/postgres.User'
-            type: array
-        "401":
-          description: Unauthorized
-        "422":
-          description: Unprocessable Entity
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Get my followers
-      tags:
-      - follow
   /follows/pending:
     get:
       consumes:
@@ -829,7 +804,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/postgres.User'
+              $ref: '#/definitions/postgres.Follow'
             type: array
         "401":
           description: Unauthorized

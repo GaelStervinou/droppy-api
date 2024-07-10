@@ -65,7 +65,6 @@ func main() {
 		{
 			follow.POST("/", middlewares.CurrentUserMiddleware(true), controllers.FollowUser)
 			follow.GET("/pending", middlewares.CurrentUserMiddleware(true), controllers.GetMyPendingRequests)
-			follow.GET("/my-followers", middlewares.CurrentUserMiddleware(true), controllers.GetMyFollowers)
 			follow.POST("/accept/:id", middlewares.CurrentUserMiddleware(true), controllers.AcceptRequest)
 			follow.POST("/reject/:id", middlewares.CurrentUserMiddleware(true), controllers.RejectRequest)
 			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
