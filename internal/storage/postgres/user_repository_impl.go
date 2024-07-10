@@ -207,7 +207,7 @@ func (repo *repoUserPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel,
 func (repo *repoUserPrivate) Search(query string) ([]model.UserModel, error) {
 	var foundUsers []*User
 	searchParam := "%" + query + "%"
-	result := repo.db.Where("username LIKE @search", sql.Named("search", searchParam)).Find(&foundUsers)
+	result := repo.db.Where("LOWER(username) LIKE LOWER(@search)", sql.Named("search", searchParam)).Find(&foundUsers)
 	if result.Error != nil {
 		return nil, result.Error
 	}

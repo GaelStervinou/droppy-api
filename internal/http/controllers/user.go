@@ -172,7 +172,7 @@ func Create(c *gin.Context) {
 //
 // @Param			user	body		model.UserPatchParam	true	"User creation object"
 //
-// @Success		200	{object} user.User
+// @Success		200	{object} postgres.User
 // @Failure		400
 // @Failure		403
 // @Failure		404

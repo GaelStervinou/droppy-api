@@ -19,7 +19,7 @@ import (
 //
 //	@Param			user	body		model.FollowCreationParam	true	"Follow creation object"
 //
-// @Success		201	{object} follow.Follow
+// @Success		201	{object} postgres.Follow
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -106,7 +106,7 @@ func FollowUser(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		200	{object} []user.User
+// @Success		200	{object} []postgres.User
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -171,7 +171,7 @@ func GetMyFollowers(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		200	{object} []user.User
+// @Success		200	{object} []postgres.User
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -217,7 +217,7 @@ func GetMyPendingRequests(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []user.User
+// @Success		201	{object} []postgres.User
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -284,7 +284,7 @@ func AcceptRequest(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []user.User
+// @Success		201	{object} []postgres.User
 // @Failure		422
 // @Failure		401
 // @Failure		500

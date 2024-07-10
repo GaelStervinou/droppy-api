@@ -170,7 +170,7 @@ func DropsByUserId(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security BearerAuth
-//	@Success		200	{object} []drop.Drop
+//	@Success		200	{object} []postgres.Drop
 //	@Failure		500
 //	@Router			/users/my-feed [get]
 func GetCurrentUserFeed(c *gin.Context) {
