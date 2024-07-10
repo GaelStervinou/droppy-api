@@ -1,27 +1,26 @@
 package fixtures
 
 import (
-	"go-api/internal/storage/postgres/follow"
-	"go-api/internal/storage/postgres/user"
+	"go-api/internal/storage/postgres"
 	"gorm.io/gorm"
 	"math/rand/v2"
 )
 
 func PopulateFollows(db *gorm.DB) error {
-	var pvusers []user.User
+	var pvusers []postgres.User
 	db.Where("is_private = ?", true).Find(&pvusers)
 
-	var pubusers []user.User
+	var pubusers []postgres.User
 	db.Where("is_private = ?", false).Find(&pubusers)
 
 	for i := range pvusers {
 		iuint := uint64(uint(i))
 		s := rand.NewPCG(iuint, iuint*47329)
 		r := rand.New(s)
-		db.Create(&follow.Follow{
+		db.Create(&postgres.Follow{
 			FollowerID: pubusers[r.IntN(len(pubusers))].ID,
 			FollowedID: pvusers[i].ID,
-			Status:     new(follow.FollowPendingStatus).ToInt(),
+			Status:     new(postgres.FollowPendingStatus).ToInt(),
 		})
 	}
 
@@ -30,10 +29,10 @@ func PopulateFollows(db *gorm.DB) error {
 		for range 50 {
 			s := rand.NewPCG(iuint, iuint*47329)
 			r := rand.New(s)
-			db.Create(&follow.Follow{
+			db.Create(&postgres.Follow{
 				FollowerID: pubusers[i].ID,
 				FollowedID: pubusers[r.IntN(len(pubusers))].ID,
-				Status:     new(follow.FollowAcceptedStatus).ToInt(),
+				Status:     new(postgres.FollowAcceptedStatus).ToInt(),
 			})
 		}
 	}

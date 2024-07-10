@@ -1,4 +1,4 @@
-package user
+package postgres
 
 import (
 	"database/sql"
@@ -24,6 +24,7 @@ type User struct {
 	Status      int
 	IsPrivate   bool `gorm:"default:false"`
 	Role        string
+	Groups      []Group `gorm:"many2many:group_members;foreignKey:ID;joinForeignKey:MemberID;References:ID;JoinReferences:GroupID"`
 }
 
 func (u *User) GetID() uint {
@@ -49,21 +50,28 @@ func (u *User) IsPrivateUser() bool    { return u.IsPrivate }
 func (u *User) GetPhoneNumber() string { return u.PhoneNumber }
 func (u *User) GetBio() string         { return u.Bio }
 func (u *User) GetAvatar() string      { return u.Avatar }
+func (u *User) GetGroups() []model.GroupModel {
+	var result []model.GroupModel
+	for _, userGroup := range u.Groups {
+		result = append(result, &userGroup)
+	}
+	return result
+}
 
 var _ model.UserModel = (*User)(nil)
 
-type repoPrivate struct {
+type repoUserPrivate struct {
 	db *gorm.DB
 }
 
 // Safe checker to know if this file already implements the interface correctly or not
-var _ model.UserRepository = (*repoPrivate)(nil)
+var _ model.UserRepository = (*repoUserPrivate)(nil)
 
-func NewRepo(db *gorm.DB) model.UserRepository {
-	return &repoPrivate{db: db}
+func NewUserRepo(db *gorm.DB) model.UserRepository {
+	return &repoUserPrivate{db: db}
 }
 
-func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, error) {
+func (repo *repoUserPrivate) Create(args model.UserCreationParam) (model.UserModel, error) {
 	validationError := validation.ValidateUserCreation(args)
 
 	if len(validationError.Fields) > 0 {
@@ -95,7 +103,7 @@ func (repo *repoPrivate) Create(args model.UserCreationParam) (model.UserModel, 
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam) (model.UserModel, error) {
+func (repo *repoUserPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam) (model.UserModel, error) {
 	userObject := User{
 		Email:    args.Email,
 		GoogleID: &args.GoogleId,
@@ -108,7 +116,7 @@ func (repo *repoPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) Update(args model.UserPatchParam) (model.UserModel, error) {
+func (repo *repoUserPrivate) Update(args model.UserPatchParam) (model.UserModel, error) {
 	validationError := validation.ValidateUserPatch(args)
 
 	if len(validationError.Fields) > 0 {
@@ -126,11 +134,11 @@ func (repo *repoPrivate) Update(args model.UserPatchParam) (model.UserModel, err
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) Delete(id uint) error {
+func (repo *repoUserPrivate) Delete(id uint) error {
 	return repo.db.Delete(&User{}, id).Error
 }
 
-func (repo *repoPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, error) {
+func (repo *repoUserPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, error) {
 	userObject := User{GoogleID: &googleId}
 
 	result := repo.db.Find(&userObject)
@@ -141,7 +149,7 @@ func (repo *repoPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, er
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) GetByEmail(email string) (model.UserModel, error) {
+func (repo *repoUserPrivate) GetByEmail(email string) (model.UserModel, error) {
 	userObject := User{}
 	result := repo.db.Where("email = ?", email).First(&userObject)
 	if userObject.CreatedAt.IsZero() {
@@ -151,11 +159,11 @@ func (repo *repoPrivate) GetByEmail(email string) (model.UserModel, error) {
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) GetById(id uint) (model.UserModel, error) {
+func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 	userObject := User{}
 	userObject.ID = id
 
-	result := repo.db.Find(&userObject)
+	result := repo.db.Preload("Groups").Preload("Groups.CreatedBy").Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
 		return nil, nil
 	}
@@ -163,7 +171,7 @@ func (repo *repoPrivate) GetById(id uint) (model.UserModel, error) {
 	return &userObject, result.Error
 }
 
-func (repo *repoPrivate) GetAll() ([]model.UserModel, error) {
+func (repo *repoUserPrivate) GetAll() ([]model.UserModel, error) {
 	var foundStudents []*User
 	result := repo.db.Find(&foundStudents)
 
@@ -173,7 +181,7 @@ func (repo *repoPrivate) GetAll() ([]model.UserModel, error) {
 	}
 	return models, result.Error
 }
-func (repo *repoPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
+func (repo *repoUserPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
 	userObject := User{}
 	userObject.ID = followedId
 
@@ -185,7 +193,7 @@ func (repo *repoPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
 	return userObject.Status == 1, result.Error
 }
 
-func (repo *repoPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, error) {
+func (repo *repoUserPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, error) {
 	var foundStudents []*User
 	result := repo.db.Where("id IN ?", ids).Find(&foundStudents)
 
@@ -196,7 +204,7 @@ func (repo *repoPrivate) GetUsersFromUserIds(ids []uint) ([]model.UserModel, err
 	return models, result.Error
 }
 
-func (repo *repoPrivate) Search(query string) ([]model.UserModel, error) {
+func (repo *repoUserPrivate) Search(query string) ([]model.UserModel, error) {
 	var foundUsers []*User
 	searchParam := "%" + query + "%"
 	result := repo.db.Where("username LIKE @search", sql.Named("search", searchParam)).Find(&foundUsers)
@@ -210,7 +218,7 @@ func (repo *repoPrivate) Search(query string) ([]model.UserModel, error) {
 	return models, result.Error
 }
 
-func (repo *repoPrivate) IsActiveUser(userId uint) (bool, error) {
+func (repo *repoUserPrivate) IsActiveUser(userId uint) (bool, error) {
 	userObject := User{}
 	userObject.ID = userId
 

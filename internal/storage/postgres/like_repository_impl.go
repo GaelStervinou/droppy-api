@@ -1,7 +1,6 @@
-package drop
+package postgres
 
 import (
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -10,10 +9,10 @@ var _ model.LikeModel = (*Like)(nil)
 
 type Like struct {
 	gorm.Model
-	DropID uint      `gorm:"not null"`
-	UserID uint      `gorm:"not null"`
-	Drop   Drop      `gorm:"foreignKey:DropID;references:ID"`
-	User   user.User `gorm:"foreignKey:UserID;references:ID"`
+	DropID uint `gorm:"not null"`
+	UserID uint `gorm:"not null"`
+	Drop   Drop `gorm:"foreignKey:DropID;references:ID"`
+	User   User `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (l *Like) GetID() uint {

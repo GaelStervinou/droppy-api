@@ -1,4 +1,4 @@
-package follow
+package postgres
 
 import (
 	"go-api/pkg/model"
@@ -44,15 +44,15 @@ func (f *FollowAcceptedStatus) ToInt() uint {
 
 var _ model.FollowModel = (*Follow)(nil)
 
-type repoPrivate struct {
+type repoFollowPrivate struct {
 	db *gorm.DB
 }
 
-func NewRepo(db *gorm.DB) model.FollowRepository {
-	return &repoPrivate{db: db}
+func NewFollowRepo(db *gorm.DB) model.FollowRepository {
+	return &repoFollowPrivate{db: db}
 }
 
-func (r *repoPrivate) Create(followerID, followedID uint, isActive bool) (model.FollowModel, error) {
+func (r *repoFollowPrivate) Create(followerID, followedID uint, isActive bool) (model.FollowModel, error) {
 	var status uint
 	if isActive {
 		status = new(FollowAcceptedStatus).ToInt()
@@ -71,21 +71,21 @@ func (r *repoPrivate) Create(followerID, followedID uint, isActive bool) (model.
 	return follow, nil
 }
 
-func (r *repoPrivate) AcceptRequest(followId uint) error {
+func (r *repoFollowPrivate) AcceptRequest(followId uint) error {
 	result := r.db.Model(&Follow{}).Where("id = ?", followId).Update("status", new(FollowAcceptedStatus).ToInt())
 	return result.Error
 }
 
-func (r *repoPrivate) RejectRequest(followId uint) error {
+func (r *repoFollowPrivate) RejectRequest(followId uint) error {
 	return r.Delete(followId)
 }
 
-func (r *repoPrivate) Delete(followId uint) error {
+func (r *repoFollowPrivate) Delete(followId uint) error {
 	result := r.db.Delete(&Follow{}, followId)
 	return result.Error
 }
 
-func (r *repoPrivate) GetPendingRequests(userID uint) ([]model.FollowModel, error) {
+func (r *repoFollowPrivate) GetPendingRequests(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
 	result := r.db.Where("followed_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
@@ -98,7 +98,7 @@ func (r *repoPrivate) GetPendingRequests(userID uint) ([]model.FollowModel, erro
 	return models, nil
 }
 
-func (r *repoPrivate) GetFollowers(userID uint) ([]model.FollowModel, error) {
+func (r *repoFollowPrivate) GetFollowers(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
 	result := r.db.Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
@@ -111,7 +111,7 @@ func (r *repoPrivate) GetFollowers(userID uint) ([]model.FollowModel, error) {
 	return models, nil
 }
 
-func (r *repoPrivate) GetFollowing(userID uint) ([]model.FollowModel, error) {
+func (r *repoFollowPrivate) GetFollowing(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
 	result := r.db.Where("follower_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
@@ -124,7 +124,7 @@ func (r *repoPrivate) GetFollowing(userID uint) ([]model.FollowModel, error) {
 	return models, nil
 }
 
-func (r *repoPrivate) AreAlreadyFollowing(followerID, followedID uint) (bool, error) {
+func (r *repoFollowPrivate) AreAlreadyFollowing(followerID, followedID uint) (bool, error) {
 	var follow Follow
 	result := r.db.Where("follower_id = ? AND followed_id = ?", followerID, followedID).First(&follow)
 	if result.Error != nil {
@@ -133,7 +133,7 @@ func (r *repoPrivate) AreAlreadyFollowing(followerID, followedID uint) (bool, er
 	return true, nil
 }
 
-func (r *repoPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
+func (r *repoFollowPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
 	var follow Follow
 	result := r.db.Where("follower_id = ? AND followed_id = ?", followerID, followedID).Find(&follow)
 	if result.Error != nil {
@@ -142,7 +142,7 @@ func (r *repoPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
 	return true, nil
 }
 
-func (r *repoPrivate) CountFollowers(userID uint) int {
+func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 	var count int64
 	result := r.db.Model(&Follow{}).Where("followed_id = ?", userID).Count(&count)
 	if result.Error != nil {
@@ -151,7 +151,7 @@ func (r *repoPrivate) CountFollowers(userID uint) int {
 	return int(count)
 }
 
-func (r *repoPrivate) CountFollowed(userID uint) int {
+func (r *repoFollowPrivate) CountFollowed(userID uint) int {
 	var count int64
 	result := r.db.Model(&Follow{}).Where("follower_id = ?", userID).Count(&count)
 	if result.Error != nil {

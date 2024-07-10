@@ -13,6 +13,7 @@ type UserModel interface {
 	IsPrivateUser() bool
 	GetCreatedAt() int
 	GetUpdatedAt() int
+	GetGroups() []GroupModel
 }
 
 type UserRepository interface {

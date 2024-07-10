@@ -2,7 +2,7 @@ package group
 
 import (
 	"go-api/internal/repositories"
-	"go-api/internal/storage/postgres/group"
+	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
@@ -54,8 +54,8 @@ func (s *GroupService) CreateGroup(userId uint, args model.GroupCreationParam) (
 		return nil, err
 	}
 
-	role := &group.GroupMemberRoleManager{}
-	status := &group.GroupMemberStatusActive{}
+	role := &postgres.GroupMemberRoleManager{}
+	status := &postgres.GroupMemberStatusActive{}
 	_, err = s.Repo.GroupMemberRepository.Create(createdGroup.GetID(), user.GetID(), role.ToString(), status.ToIntGroupMemberStatus())
 	if err != nil {
 		return nil, err

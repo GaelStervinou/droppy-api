@@ -1,4 +1,4 @@
-package token
+package postgres
 
 import (
 	"context"
@@ -30,20 +30,20 @@ func (s *AuthToken) GetExpiry() int {
 // Safe checker to know if this file already implements the model interface correctly or not
 var _ model.AuthTokenModel = (*AuthToken)(nil)
 
-type repoPrivate struct {
+type repoTokenPrivate struct {
 	db *gorm.DB
 }
 
 // Safe checker to know if this file already implements the interface correctly or not
-var _ model.AuthTokenRepository = (*repoPrivate)(nil)
+var _ model.AuthTokenRepository = (*repoTokenPrivate)(nil)
 
-func NewRepo(db *gorm.DB) model.AuthTokenRepository {
-	return &repoPrivate{
+func NewTokenRepo(db *gorm.DB) model.AuthTokenRepository {
+	return &repoTokenPrivate{
 		db: db,
 	}
 }
 
-func (repo *repoPrivate) Create(ctx context.Context, args model.TokenCreationParam) (model.AuthTokenModel, error) {
+func (repo *repoTokenPrivate) Create(ctx context.Context, args model.TokenCreationParam) (model.AuthTokenModel, error) {
 	tokenObject := AuthToken{
 		Token:  args.Token,
 		UserID: args.UserID,
@@ -55,7 +55,7 @@ func (repo *repoPrivate) Create(ctx context.Context, args model.TokenCreationPar
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) FindByRefreshToken(token string) (model.AuthTokenModel, error) {
+func (repo *repoTokenPrivate) FindByRefreshToken(token string) (model.AuthTokenModel, error) {
 	tokenObject := AuthToken{}
 	result := repo.db.Where("token = ?", token).First(&tokenObject)
 	if result.Error != nil {
@@ -64,7 +64,7 @@ func (repo *repoPrivate) FindByRefreshToken(token string) (model.AuthTokenModel,
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) FindByUserId(userId uint) (model.AuthTokenModel, error) {
+func (repo *repoTokenPrivate) FindByUserId(userId uint) (model.AuthTokenModel, error) {
 	tokenObject := AuthToken{}
 	result := repo.db.Where("user_id = ?", userId).First(&tokenObject)
 	if result.Error != nil {
@@ -73,6 +73,6 @@ func (repo *repoPrivate) FindByUserId(userId uint) (model.AuthTokenModel, error)
 	return &tokenObject, result.Error
 }
 
-func (repo *repoPrivate) Delete(recordId uint) error {
+func (repo *repoTokenPrivate) Delete(recordId uint) error {
 	return repo.db.Delete(&AuthToken{}, recordId).Error
 }

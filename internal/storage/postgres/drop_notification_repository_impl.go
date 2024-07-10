@@ -1,4 +1,4 @@
-package drop_notification
+package postgres
 
 import (
 	"go-api/pkg/model"
@@ -16,15 +16,15 @@ func (d *DropNotification) GetType() string { return d.Type }
 
 func (d *DropNotification) GetCreatedAt() string { return d.CreatedAt.String() }
 
-type repoPrivate struct {
+type repoDropNotifPrivate struct {
 	db *gorm.DB
 }
 
-func NewRepo(db *gorm.DB) model.DropNotificationRepository {
-	return &repoPrivate{db: db}
+func NewDropNotifRepo(db *gorm.DB) model.DropNotificationRepository {
+	return &repoDropNotifPrivate{db: db}
 }
 
-func (r *repoPrivate) Create(dropId, createdById uint, notificationType string) (model.DropNotificationModel, error) {
+func (r *repoDropNotifPrivate) Create(dropId, createdById uint, notificationType string) (model.DropNotificationModel, error) {
 	notification := &DropNotification{
 		Type: notificationType,
 	}
@@ -32,13 +32,13 @@ func (r *repoPrivate) Create(dropId, createdById uint, notificationType string) 
 	return notification, nil
 }
 
-func (r *repoPrivate) GetNotificationByID(notificationId uint) (model.DropNotificationModel, error) {
+func (r *repoDropNotifPrivate) GetNotificationByID(notificationId uint) (model.DropNotificationModel, error) {
 	var notification DropNotification
 	r.db.First(&notification, notificationId)
 	return &notification, nil
 }
 
-func (r *repoPrivate) GetCurrentDropNotification() (model.DropNotificationModel, error) {
+func (r *repoDropNotifPrivate) GetCurrentDropNotification() (model.DropNotificationModel, error) {
 	var notification DropNotification
 	r.db.Last(&notification)
 	return &notification, nil

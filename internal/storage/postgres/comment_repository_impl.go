@@ -1,7 +1,6 @@
-package drop
+package postgres
 
 import (
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -13,7 +12,7 @@ type Comment struct {
 	Content     string            `gorm:"not null"`
 	CreatedById uint              `gorm:"not null"`
 	DropId      uint              `gorm:"not null"`
-	CreatedBy   user.User         `gorm:"foreignKey:CreatedById;references:ID"`
+	CreatedBy   User              `gorm:"foreignKey:CreatedById;references:ID"`
 	Drop        Drop              `gorm:"foreignKey:DropId;references:ID"`
 	Responses   []CommentResponse `gorm:"foreignKey:CommentId;references:ID"`
 }

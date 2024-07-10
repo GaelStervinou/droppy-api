@@ -3,8 +3,6 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/follow"
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/converters"
 	"go-api/pkg/model"
 	"net/http"
@@ -51,7 +49,7 @@ func FollowUser(c *gin.Context) {
 		return
 	}
 
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 
 	requestedUser, err := us.GetById(followCreationParam.UserToFollowID)
 
@@ -77,7 +75,7 @@ func FollowUser(c *gin.Context) {
 		return
 	}
 
-	followRepo := follow.NewRepo(sqlDB)
+	followRepo := postgres.NewFollowRepo(sqlDB)
 
 	if alreadyFollowing, _ := followRepo.AreAlreadyFollowing(uintCurrentUserId, followCreationParam.UserToFollowID); alreadyFollowing {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "You are already following this user"})
@@ -133,7 +131,7 @@ func GetMyFollowers(c *gin.Context) {
 		return
 	}
 
-	followRepo := follow.NewRepo(sqlDB)
+	followRepo := postgres.NewFollowRepo(sqlDB)
 
 	followers, err := followRepo.GetFollowers(uintCurrentUserId)
 
@@ -147,7 +145,7 @@ func GetMyFollowers(c *gin.Context) {
 		return
 	}
 
-	userRepo := user.NewRepo(sqlDB)
+	userRepo := postgres.NewUserRepo(sqlDB)
 
 	users, err := userRepo.GetUsersFromUserIds(followerIds)
 
@@ -198,7 +196,7 @@ func GetMyPendingRequests(c *gin.Context) {
 		return
 	}
 
-	followRepo := follow.NewRepo(sqlDB)
+	followRepo := postgres.NewFollowRepo(sqlDB)
 
 	pendingRequests, err := followRepo.GetPendingRequests(uintCurrentUserId)
 
@@ -258,7 +256,7 @@ func AcceptRequest(c *gin.Context) {
 		return
 	}
 
-	followRepo := follow.NewRepo(sqlDB)
+	followRepo := postgres.NewFollowRepo(sqlDB)
 
 	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
 
@@ -325,7 +323,7 @@ func RejectRequest(c *gin.Context) {
 		return
 	}
 
-	followRepo := follow.NewRepo(sqlDB)
+	followRepo := postgres.NewFollowRepo(sqlDB)
 
 	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
 

@@ -175,6 +175,7 @@ type GetOneUserResponse struct {
 	CreatedAt      *time.Time
 	LastDrop       *GetDropResponse
 	PinnedDrops    []GetDropResponse
+	Groups         []GetGroupResponse
 	TotalFollowers int
 	TotalFollowed  int
 }
@@ -187,6 +188,11 @@ func FormatGetOneUserResponse(
 	totalFollowers int,
 	totalFollowed int,
 ) GetOneUserResponse {
+	userGroups := user.GetGroups()
+	formattedGroups := make([]GetGroupResponse, 0)
+	for _, userGroup := range userGroups {
+		formattedGroups = append(formattedGroups, FormatGetGroupResponse(userGroup))
+	}
 	bio := user.GetBio()
 	bioPointer := &bio
 	if "" == bio {
@@ -221,6 +227,7 @@ func FormatGetOneUserResponse(
 		CreatedAt:      &createdAt,
 		LastDrop:       lastDropPointer,
 		PinnedDrops:    formattedPinnedDrops,
+		Groups:         formattedGroups,
 		TotalFollowers: totalFollowers,
 		TotalFollowed:  totalFollowed,
 	}

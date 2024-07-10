@@ -6,9 +6,6 @@ import (
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/drop"
-	"go-api/internal/storage/postgres/follow"
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/http"
@@ -38,7 +35,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 
 	id := strings.TrimSpace(c.Param("id"))
 
@@ -65,7 +62,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	dr := drop.NewRepo(sqlDB)
+	dr := postgres.NewDropRepo(sqlDB)
 
 	pinnedDrops, err := dr.GetUserPinnedDrops(requestedUser.GetID())
 
@@ -84,7 +81,7 @@ func GetUserById(c *gin.Context) {
 	}
 	isLastDropLiking := false
 	if nil != userLastDrop {
-		lr := drop.NewLikeRepo(sqlDB)
+		lr := postgres.NewLikeRepo(sqlDB)
 		isLastDropLiking, err = lr.LikeExists(userLastDrop.GetID(), requestedUser.GetID())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -92,7 +89,7 @@ func GetUserById(c *gin.Context) {
 		}
 	}
 
-	fr := follow.NewRepo(sqlDB)
+	fr := postgres.NewFollowRepo(sqlDB)
 
 	totalFollowers := fr.CountFollowers(requestedUser.GetID())
 	totalFollowing := fr.CountFollowed(requestedUser.GetID())
@@ -137,7 +134,7 @@ func Create(c *gin.Context) {
 	}
 
 	userToCreate.Role = "user"
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 	createdUser, err := us.Create(userToCreate)
 
 	if err != nil {
@@ -195,7 +192,7 @@ func PatchUserById(c *gin.Context) {
 		return
 	}
 
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 
 	id := strings.TrimSpace(c.Param("id"))
 
@@ -271,7 +268,7 @@ func SearchUsers(c *gin.Context) {
 		return
 	}
 
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 
 	query := strings.TrimSpace(c.Query("search"))
 

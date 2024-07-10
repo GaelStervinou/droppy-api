@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"go-api/internal/repositories"
-	grouprepository "go-api/internal/storage/postgres/group"
+	grouprepository "go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"

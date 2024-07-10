@@ -1,7 +1,6 @@
-package group
+package postgres
 
 import (
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -13,7 +12,7 @@ type GroupMember struct {
 	Status   uint   `gorm:"not null"`
 	Role     string `gorm:"not null"`
 	Group    Group
-	Member   user.User
+	Member   User
 }
 
 type GroupMemberStatus interface {

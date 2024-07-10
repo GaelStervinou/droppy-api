@@ -1,7 +1,7 @@
 package database
 
 import (
-	"go-api/internal/storage/postgres/user"
+	postgres2 "go-api/internal/storage/postgres"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ func Init() *gorm.DB {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&postgres2.User{})
 
 	return db
 }

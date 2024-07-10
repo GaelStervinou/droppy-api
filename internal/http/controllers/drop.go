@@ -8,7 +8,6 @@ import (
 	"go-api/internal/repositories"
 	dropservice "go-api/internal/services/drop"
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/follow"
 	"go-api/pkg/converters"
 	"go-api/pkg/model"
 	"log"
@@ -73,7 +72,7 @@ func CreateDrop(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fr := follow.NewRepo(sqlDB)
+	fr := postgres.NewFollowRepo(sqlDB)
 
 	fmt.Println("The current user id is ", uintCurrentUserId)
 	userFollowers, err := fr.GetFollowers(uintCurrentUserId)

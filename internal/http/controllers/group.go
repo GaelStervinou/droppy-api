@@ -7,8 +7,6 @@ import (
 	"go-api/internal/repositories"
 	groupservice "go-api/internal/services/group"
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/group"
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/converters"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
@@ -159,7 +157,7 @@ func SearchGroups(c *gin.Context) {
 		return
 	}
 
-	gr := group.NewRepo(sqlDB)
+	gr := postgres.NewGroupRepo(sqlDB)
 
 	query := strings.TrimSpace(c.Query("search"))
 
@@ -187,7 +185,7 @@ func SearchGroups(c *gin.Context) {
 	if exists {
 		uintCurrentUserId, ok := currentUserId.(uint)
 		if ok {
-			us := user.NewRepo(sqlDB)
+			us := postgres.NewUserRepo(sqlDB)
 			targetedUser, err := us.GetById(uintCurrentUserId)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

@@ -2,12 +2,6 @@ package repositories
 
 import (
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/drop"
-	"go-api/internal/storage/postgres/drop_notification"
-	"go-api/internal/storage/postgres/follow"
-	"go-api/internal/storage/postgres/group"
-	"go-api/internal/storage/postgres/token"
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"os"
 )
@@ -34,16 +28,16 @@ func Setup() *Repositories {
 
 	return &Repositories{
 		//wg:              wg,
-		UserRepository:             user.NewRepo(sqlDB),
-		TokenRepository:            token.NewRepo(sqlDB),
-		DropRepository:             drop.NewRepo(sqlDB),
-		DropNotificationRepository: drop_notification.NewRepo(sqlDB),
-		FollowRepository:           follow.NewRepo(sqlDB),
-		GroupRepository:            group.NewRepo(sqlDB),
-		GroupMemberRepository:      group.NewGroupMemberRepo(sqlDB),
-		CommentRepository:          drop.NewCommentRepo(sqlDB),
-		CommentResponseRepository:  drop.NewCommentResponseRepo(sqlDB),
-		LikeRepository:             drop.NewLikeRepo(sqlDB),
+		UserRepository:             postgres.NewUserRepo(sqlDB),
+		TokenRepository:            postgres.NewTokenRepo(sqlDB),
+		DropRepository:             postgres.NewDropRepo(sqlDB),
+		DropNotificationRepository: postgres.NewDropNotifRepo(sqlDB),
+		FollowRepository:           postgres.NewFollowRepo(sqlDB),
+		GroupRepository:            postgres.NewGroupRepo(sqlDB),
+		GroupMemberRepository:      postgres.NewGroupMemberRepo(sqlDB),
+		CommentRepository:          postgres.NewCommentRepo(sqlDB),
+		CommentResponseRepository:  postgres.NewCommentResponseRepo(sqlDB),
+		LikeRepository:             postgres.NewLikeRepo(sqlDB),
 	}
 }
 

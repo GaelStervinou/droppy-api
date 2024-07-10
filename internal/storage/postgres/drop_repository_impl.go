@@ -1,7 +1,6 @@
-package drop
+package postgres
 
 import (
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -11,9 +10,9 @@ type Drop struct {
 	Type               string `gorm:"not null"`
 	Content            string `gorm:"not null"`
 	Description        string
-	CreatedById        uint      `gorm:"not null"`
-	CreatedBy          user.User `gorm:"foreignKey:CreatedById;references:ID"`
-	Status             uint      `gorm:"not null"`
+	CreatedById        uint `gorm:"not null"`
+	CreatedBy          User `gorm:"foreignKey:CreatedById;references:ID"`
+	Status             uint `gorm:"not null"`
 	DeletedById        uint
 	IsPinned           bool `gorm:"default:false"`
 	DropNotificationID uint `gorm:"not null"`
@@ -76,15 +75,15 @@ func (d *DropStatusBanned) ToInt() int { return -2 }
 
 var _ model.DropModel = (*Drop)(nil)
 
-type repoPrivate struct {
+type repoDropPrivate struct {
 	db *gorm.DB
 }
 
-func NewRepo(db *gorm.DB) model.DropRepository {
-	return &repoPrivate{db: db}
+func NewDropRepo(db *gorm.DB) model.DropRepository {
+	return &repoDropPrivate{db: db}
 }
 
-func (r *repoPrivate) Create(
+func (r *repoDropPrivate) Create(
 	dropNotificationId uint,
 	contentType string,
 	content string,
@@ -115,11 +114,11 @@ func (r *repoPrivate) Create(
 	return drop, nil
 }
 
-func (r *repoPrivate) Delete(dropId uint) error {
+func (r *repoDropPrivate) Delete(dropId uint) error {
 	return r.db.Delete(&Drop{}, dropId).Error
 }
 
-func (r *repoPrivate) GetDropById(dropId uint) (model.DropModel, error) {
+func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").First(&drop, dropId).Error; err != nil {
 		return nil, err
@@ -127,7 +126,7 @@ func (r *repoPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	return &drop, nil
 }
 
-func (r *repoPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
+func (r *repoDropPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
 	var drops []Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id = ?", userId).Find(&drops).Error; err != nil {
 		return nil, err
@@ -139,7 +138,7 @@ func (r *repoPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
 	return result, nil
 }
 
-func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (model.DropModel, error) {
+func (r *repoDropPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("drop_notification_id = ? AND created_by_id = ?", dropNotificationId, userId).First(&drop).Error; err != nil {
 		return nil, err
@@ -147,7 +146,7 @@ func (r *repoPrivate) GetDropByDropNotificationAndUser(dropNotificationId uint, 
 	return &drop, nil
 }
 
-func (r *repoPrivate) DropExists(dropId uint) (bool, error) {
+func (r *repoDropPrivate) DropExists(dropId uint) (bool, error) {
 	var count int64
 	if err := r.db.Model(&Drop{}).Where("id = ?", dropId).Count(&count).Error; err != nil {
 		return false, err
@@ -155,7 +154,7 @@ func (r *repoPrivate) DropExists(dropId uint) (bool, error) {
 	return count > 0, nil
 }
 
-func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
+func (r *repoDropPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dropNotifId uint) ([]model.DropModel, error) {
 	var drops []Drop
 	if err := r.db.
 		Preload("CreatedBy").
@@ -181,7 +180,7 @@ func (r *repoPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint, dro
 	return result, nil
 }
 
-func (r *repoPrivate) HasUserDropped(dropNotificationId uint, userId uint) (bool, error) {
+func (r *repoDropPrivate) HasUserDropped(dropNotificationId uint, userId uint) (bool, error) {
 	var count int64
 	if err := r.db.Model(&Drop{}).Where("drop_notification_id = ? AND created_by_id = ?", dropNotificationId, userId).Count(&count).Error; err != nil {
 		return false, err
@@ -189,7 +188,7 @@ func (r *repoPrivate) HasUserDropped(dropNotificationId uint, userId uint) (bool
 	return count > 0, nil
 }
 
-func (r *repoPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, error) {
+func (r *repoDropPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, error) {
 	var drops []Drop
 	if err := r.db.
 		Preload("CreatedBy").
@@ -207,7 +206,7 @@ func (r *repoPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, error)
 	return result, nil
 }
 
-func (r *repoPrivate) GetUserLastDrop(userId uint) (model.DropModel, error) {
+func (r *repoDropPrivate) GetUserLastDrop(userId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.
 		Preload("CreatedBy").

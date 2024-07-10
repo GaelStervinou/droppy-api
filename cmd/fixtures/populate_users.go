@@ -2,7 +2,7 @@ package fixtures
 
 import (
 	"github.com/go-faker/faker/v4"
-	"go-api/internal/storage/postgres/user"
+	"go-api/internal/storage/postgres"
 	"gorm.io/gorm"
 	"math/rand/v2"
 )
@@ -24,7 +24,7 @@ func PopulateUsers(db *gorm.DB) error {
 			avatar = avatars[r.IntN(len(avatars))]
 		}
 		role := roles[r.IntN(len(roles))]
-		db.Create(&user.User{
+		db.Create(&postgres.User{
 			Email:       faker.Email(),
 			Password:    faker.Password(),
 			Username:    faker.FirstName(),

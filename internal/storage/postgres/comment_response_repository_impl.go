@@ -1,7 +1,6 @@
-package drop
+package postgres
 
 import (
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -10,11 +9,11 @@ var _ model.CommentResponseModel = (*CommentResponse)(nil)
 
 type CommentResponse struct {
 	gorm.Model
-	Content     string    `gorm:"not null"`
-	CreatedById uint      `gorm:"not null"`
-	CommentId   uint      `gorm:"not null"`
-	CreatedBy   user.User `gorm:"foreignKey:CreatedById;references:ID"`
-	Comment     Comment   `gorm:"foreignKey:CommentId;references:ID"`
+	Content     string  `gorm:"not null"`
+	CreatedById uint    `gorm:"not null"`
+	CommentId   uint    `gorm:"not null"`
+	CreatedBy   User    `gorm:"foreignKey:CreatedById;references:ID"`
+	Comment     Comment `gorm:"foreignKey:CommentId;references:ID"`
 }
 
 func (c *CommentResponse) GetID() uint {

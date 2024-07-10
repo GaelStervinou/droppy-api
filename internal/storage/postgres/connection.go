@@ -2,12 +2,6 @@ package postgres
 
 import (
 	"fmt"
-	"go-api/internal/storage/postgres/drop"
-	"go-api/internal/storage/postgres/drop_notification"
-	"go-api/internal/storage/postgres/follow"
-	"go-api/internal/storage/postgres/group"
-	"go-api/internal/storage/postgres/token"
-	"go-api/internal/storage/postgres/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -36,16 +30,16 @@ func AutoMigrate() {
 		panic(err)
 	}
 	sqlDB.AutoMigrate(
-		&user.User{},
-		&token.AuthToken{},
-		&follow.Follow{},
-		&drop.Drop{},
-		&drop_notification.DropNotification{},
-		&group.Group{},
-		&group.GroupMember{},
-		&drop.Comment{},
-		&drop.CommentResponse{},
-		&drop.Like{},
+		&User{},
+		&AuthToken{},
+		&Follow{},
+		&Drop{},
+		&DropNotification{},
+		&Group{},
+		&GroupMember{},
+		&Comment{},
+		&CommentResponse{},
+		&Like{},
 	)
 	fmt.Println("Migrations done")
 }

@@ -1,21 +1,20 @@
-package group
+package postgres
 
 import (
 	"database/sql"
 	"fmt"
-	"go-api/internal/storage/postgres/user"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
 
 type Group struct {
 	gorm.Model
-	Name        string    `gorm:"not null"`
-	Description string    `gorm:"not null"`
-	IsPrivate   bool      `gorm:"default:false"`
-	Status      uint      `gorm:"not null;default:1"`
-	CreatedByID uint      `json:"-"`
-	CreatedBy   user.User `gorm:"foreignKey:CreatedByID;references:ID"`
+	Name        string `gorm:"not null"`
+	Description string `gorm:"not null"`
+	IsPrivate   bool   `gorm:"default:false"`
+	Status      uint   `gorm:"not null;default:1"`
+	CreatedByID uint   `json:"-"`
+	CreatedBy   User   `gorm:"foreignKey:CreatedByID;references:ID"`
 	PicturePath sql.NullString
 }
 
@@ -56,19 +55,19 @@ func (g *Group) GetCreatedByID() uint {
 
 var _ model.GroupModel = (*Group)(nil)
 
-type repoPrivate struct {
+type repoGroupPrivate struct {
 	db *gorm.DB
 }
 
-var _ model.GroupRepository = (*repoPrivate)(nil)
+var _ model.GroupRepository = (*repoGroupPrivate)(nil)
 
-func (r repoPrivate) Create(name string, description string, isPrivate bool, picturePath string, createdBy model.UserModel) (model.GroupModel, error) {
+func (r repoGroupPrivate) Create(name string, description string, isPrivate bool, picturePath string, createdBy model.UserModel) (model.GroupModel, error) {
 	group := &Group{
 		Name:        name,
 		Description: description,
 		IsPrivate:   isPrivate,
 		PicturePath: sql.NullString{String: picturePath, Valid: "" != picturePath},
-		CreatedBy:   *createdBy.(*user.User),
+		CreatedBy:   *createdBy.(*User),
 	}
 
 	if err := r.db.Create(group).Error; err != nil {
@@ -77,11 +76,11 @@ func (r repoPrivate) Create(name string, description string, isPrivate bool, pic
 
 	return group, nil
 }
-func NewRepo(db *gorm.DB) model.GroupRepository {
-	return &repoPrivate{db: db}
+func NewGroupRepo(db *gorm.DB) model.GroupRepository {
+	return &repoGroupPrivate{db: db}
 }
 
-func (r repoPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupModel, error) {
+func (r repoGroupPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupModel, error) {
 	var groups []*Group
 
 	result := r.db.Where("created_by_id = ?", userId).Find(&groups)
@@ -95,7 +94,7 @@ func (r repoPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupModel,
 	return models, nil
 }
 
-func (r repoPrivate) Update(args model.FilledGroupPatchParam) (model.GroupModel, error) {
+func (r repoGroupPrivate) Update(args model.FilledGroupPatchParam) (model.GroupModel, error) {
 	object := Group{}
 
 	r.db.Where("id = ?", args.ID).First(&object)
@@ -116,7 +115,7 @@ func (r repoPrivate) Update(args model.FilledGroupPatchParam) (model.GroupModel,
 	return &object, result.Error
 }
 
-func (r repoPrivate) GetById(id uint) (model.GroupModel, error) {
+func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 	object := Group{}
 	object.ID = id
 
@@ -128,7 +127,7 @@ func (r repoPrivate) GetById(id uint) (model.GroupModel, error) {
 	return &object, result.Error
 }
 
-func (r repoPrivate) GetByName(name string) (model.GroupModel, error) {
+func (r repoGroupPrivate) GetByName(name string) (model.GroupModel, error) {
 	object := Group{}
 
 	result := r.db.Where("name = ?", name).First(&object)
@@ -139,12 +138,12 @@ func (r repoPrivate) GetByName(name string) (model.GroupModel, error) {
 	return &object, result.Error
 }
 
-func (r repoPrivate) Delete(id uint) error {
+func (r repoGroupPrivate) Delete(id uint) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (r repoPrivate) Search(query string) ([]model.GroupModel, error) {
+func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
 	var groups []*Group
 
 	result := r.db.Where("name LIKE ?", "%"+query+"%").Find(&groups)
@@ -160,7 +159,7 @@ func (r repoPrivate) Search(query string) ([]model.GroupModel, error) {
 	return models, nil
 }
 
-func (r repoPrivate) GetAllGroups() ([]model.GroupModel, error) {
+func (r repoGroupPrivate) GetAllGroups() ([]model.GroupModel, error) {
 	var foundGroups []*Group
 	result := r.db.Find(&foundGroups)
 

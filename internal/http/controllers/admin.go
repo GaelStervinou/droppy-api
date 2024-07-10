@@ -1,13 +1,11 @@
 package controllers
 
 import (
-	"go-api/internal/storage/postgres/group"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/storage/postgres"
-	"go-api/internal/storage/postgres/user"
 )
 
 // GetAllUsers godoc
@@ -28,7 +26,7 @@ func GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	us := user.NewRepo(sqlDB)
+	us := postgres.NewUserRepo(sqlDB)
 
 	users, err := us.GetAll()
 	if err != nil {
@@ -67,7 +65,7 @@ func GetAllGroups(c *gin.Context) {
 		return
 	}
 
-	gr := group.NewRepo(sqlDB)
+	gr := postgres.NewGroupRepo(sqlDB)
 
 	groups, err := gr.GetAllGroups()
 	if err != nil {

@@ -3,7 +3,7 @@ package drop
 import (
 	"errors"
 	"go-api/internal/repositories"
-	"go-api/internal/storage/postgres/drop"
+	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
@@ -72,7 +72,7 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		Lng:                args.Lng,
 	}
 
-	statusActive := drop.DropStatusActive{}
+	statusActive := postgres.DropStatusActive{}
 
 	createdDrop, err := s.Repo.DropRepository.Create(
 		filledDrop.DropNotificationId,
