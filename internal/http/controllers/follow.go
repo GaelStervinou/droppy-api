@@ -219,11 +219,11 @@ func AcceptRequest(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []postgres.Follow
+// @Success		200
 // @Failure		422
 // @Failure		401
 // @Failure		500
-// @Router			/follows/refuse/{id} [post]
+// @Router			/follows/refuse/{id} [delete]
 func RejectRequest(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
