@@ -152,7 +152,7 @@ func GetMyPendingRequests(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []postgres.User
+// @Success		201	{object} []postgres.Follow
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -219,7 +219,7 @@ func AcceptRequest(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		201	{object} []postgres.User
+// @Success		201	{object} []postgres.Follow
 // @Failure		422
 // @Failure		401
 // @Failure		500

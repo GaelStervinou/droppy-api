@@ -52,9 +52,9 @@ func NewFollowRepo(db *gorm.DB) model.FollowRepository {
 	return &repoFollowPrivate{db: db}
 }
 
-func (r *repoFollowPrivate) Create(followerID, followedID uint, isActive bool) (model.FollowModel, error) {
+func (r *repoFollowPrivate) Create(followerID, followedID uint, isPublic bool) (model.FollowModel, error) {
 	var status uint
-	if isActive {
+	if isPublic {
 		status = new(FollowAcceptedStatus).ToInt()
 	} else {
 		status = new(FollowPendingStatus).ToInt()
