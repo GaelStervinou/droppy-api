@@ -11,12 +11,14 @@ type GroupModel interface {
 	GetCreatedBy() UserModel
 	IsPrivateGroup() bool
 	GetPicturePath() sql.NullString
+	GetGroupMembers() []GroupMemberModel
 }
 
 type GroupRepository interface {
 	Create(name string, description string, isPrivate bool, picturePath string, createdBy UserModel) (GroupModel, error)
 	FindAllGroupOwnedByUserId(userId uint) ([]GroupModel, error)
 	GetById(id uint) (GroupModel, error)
+	GetGroupMinimalById(id uint) (GroupModel, error)
 	GetByName(name string) (GroupModel, error)
 	Update(args FilledGroupPatchParam) (GroupModel, error)
 	Delete(id uint) error
@@ -31,6 +33,7 @@ type GroupService interface {
 	CanUpdateGroup(groupId uint, userId uint) (bool, error)
 	IsValidGroupUpdate(groupId uint, args GroupPatchParam) (bool, error)
 	PatchGroup(groupId uint, userId uint, args GroupPatchParam) (GroupModel, error)
+	GetGroupDrops(groupId uint, requesterID uint) ([]DropModel, error)
 }
 
 type GroupCreationParam struct {
@@ -38,6 +41,7 @@ type GroupCreationParam struct {
 	Description string `json:"description"`
 	IsPrivate   bool   `json:"isPrivate"`
 	Picture     string `json:"picture"`
+	Members     []uint `json:"members"`
 }
 
 type GroupPatchParam struct {

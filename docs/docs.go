@@ -679,46 +679,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/group/{id}/{memberId}/accept": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Accept Group Member Request",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "group"
-                ],
-                "summary": "Accept Group Member Request",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response_models.GetGroupMemberResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/errors2.MultiFieldsError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/groups": {
             "post": {
                 "security": [
@@ -901,89 +861,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/groups/members/{id}/pending": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get Pending Group Member Requests",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "group"
-                ],
-                "summary": "Get Pending Group Member Requests",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response_models.GetGroupMemberResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/errors2.MultiFieldsError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/groups/members/{id}/{memberId}/refuse/": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Refuse Group Member Request",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "group"
-                ],
-                "summary": "Refuse Group Member Request",
-                "responses": {
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "type": ""
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/errors2.MultiFieldsError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/groups/search": {
             "get": {
                 "security": [
@@ -1031,6 +908,53 @@ const docTemplate = `{
             }
         },
         "/groups/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get One Group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "group"
+                ],
+                "summary": "Get One Group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetGroupResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "patch": {
                 "security": [
                     {
@@ -1700,6 +1624,12 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "groupMembers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.GroupMember"
+                    }
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1711,6 +1641,41 @@ const docTemplate = `{
                 },
                 "picturePath": {
                     "$ref": "#/definitions/sql.NullString"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "postgres.GroupMember": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "group": {
+                    "$ref": "#/definitions/postgres.Group"
+                },
+                "groupID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "member": {
+                    "$ref": "#/definitions/postgres.User"
+                },
+                "memberID": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"
@@ -1875,6 +1840,24 @@ const docTemplate = `{
                 }
             }
         },
+        "response_models.GetGroupMemberForOneGroupResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "member": {},
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "response_models.GetGroupMemberResponse": {
             "type": "object",
             "properties": {
@@ -1905,6 +1888,12 @@ const docTemplate = `{
                 "createdBy": {},
                 "description": {
                     "type": "string"
+                },
+                "groupMembers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response_models.GetGroupMemberForOneGroupResponse"
+                    }
                 },
                 "id": {
                     "type": "integer"
