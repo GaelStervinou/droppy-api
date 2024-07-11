@@ -37,6 +37,7 @@ func AutoMigrate() {
 		&DropNotification{},
 		&Group{},
 		&GroupMember{},
+		&GroupDrop{},
 		&Comment{},
 		&CommentResponse{},
 		&Like{},

@@ -74,7 +74,6 @@ func CreateDrop(c *gin.Context) {
 	}
 	fr := postgres.NewFollowRepo(sqlDB)
 
-	fmt.Println("The current user id is ", uintCurrentUserId)
 	userFollowers, err := fr.GetFollowers(uintCurrentUserId)
 
 	if err != nil {

@@ -1,6 +1,7 @@
 package group
 
 import (
+	"errors"
 	"go-api/internal/repositories"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
@@ -118,4 +119,47 @@ func (s *GroupService) IsValidGroupUpdate(groupId uint, args model.GroupPatchPar
 	}
 
 	return true, nil
+}
+
+func (s *GroupService) GetGroupDrops(groupId uint, requesterID uint) ([]model.DropModel, error) {
+	targetedGroup, err := s.Repo.GroupRepository.GetById(groupId)
+	if err != nil {
+		return nil, err
+	}
+
+	if targetedGroup == nil {
+		return nil, errors.New("Group not found")
+	}
+
+	if targetedGroup.IsPrivateGroup() {
+		requester, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupId, requesterID)
+		if err != nil {
+			return nil, err
+		}
+
+		if requester == nil {
+			return nil, errors2.NotAllowedError{Reason: "You are not a member of this group"}
+		}
+	}
+
+	lastNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
+	if err != nil {
+		return nil, err
+	}
+
+	if lastNotification == nil {
+		return nil, errors.New("no drop notifications found")
+	}
+	groupDrops, err := s.Repo.GroupDropRepository.GetByGroupIdAndLastNotificationId(groupId, lastNotification.GetID())
+
+	if err != nil {
+		return nil, err
+	}
+
+	var drops []model.DropModel
+	for _, gd := range groupDrops {
+		drops = append(drops, gd.GetDrop())
+	}
+
+	return drops, nil
 }

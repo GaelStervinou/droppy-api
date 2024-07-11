@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
+	dropservice "go-api/internal/services/drop"
 	groupservice "go-api/internal/services/group"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/converters"
@@ -586,4 +587,82 @@ func GetOneGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, groupResponse)
 }
 
-//TODO ajouter une route /groups/feed
+func GetGroupFeed(c *gin.Context) {
+	requesterID, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := requesterID.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	groupId := c.Param("id")
+
+	if "" == groupId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	groupIdUint, err := converters.StringToUint(groupId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	sqlDB, err := postgres.Connect()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	gr := postgres.NewGroupRepo(sqlDB)
+
+	group, err := gr.GetById(groupIdUint)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == group {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Group not found"})
+		return
+	}
+
+	gs := &groupservice.GroupService{
+		Repo: repositories.Setup(),
+	}
+
+	groupDrops, err := gs.GetGroupDrops(groupIdUint, uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	var groupDropResponses []response_models.GetDropResponse
+
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+
+	for _, drop := range groupDrops {
+		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), uintCurrentUserId)
+
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+
+		groupDropResponses = append(groupDropResponses, response_models.FormatGetDropResponse(drop, isCurrentUserLiking))
+	}
+
+	groupResponse := response_models.FormatGetOneGroupWithFeed(group, groupDropResponses)
+
+	c.JSON(http.StatusOK, groupResponse)
+}

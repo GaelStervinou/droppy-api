@@ -17,6 +17,17 @@ type GetGroupResponse struct {
 	GroupMembers []GetGroupMemberForOneGroupResponse `json:",omitempty"`
 }
 
+type GetOneGroupFeedResponse struct {
+	ID          uint
+	Name        string
+	Description string
+	IsPrivate   bool
+	PicturePath custom_type.NullString
+	CreatedAt   *time.Time
+	CreatedBy   GetUserResponseInterface `json:",omitempty"`
+	GroupDrops  []GetDropResponse
+}
+
 type GetGroupMemberForOneGroupResponse struct {
 	ID        uint
 	Member    GetUserResponseInterface
@@ -34,6 +45,27 @@ type GetSearchGroupResponse struct {
 	CreatedAt   *time.Time
 	CreatedBy   GetUserResponseInterface `json:",omitempty"`
 	IsMember    bool
+}
+
+func FormatGetOneGroupWithFeed(group model.GroupModel, groupDrops []GetDropResponse) GetOneGroupFeedResponse {
+	if nil == group {
+		return GetOneGroupFeedResponse{}
+	}
+
+	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
+
+	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+
+	return GetOneGroupFeedResponse{
+		ID:          group.GetID(),
+		Name:        group.GetName(),
+		Description: group.GetDescription(),
+		IsPrivate:   group.IsPrivateGroup(),
+		PicturePath: picturePath,
+		CreatedAt:   &createdAt,
+		CreatedBy:   FormatGetUserResponse(group.GetCreatedBy()),
+		GroupDrops:  groupDrops,
+	}
 }
 
 func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {

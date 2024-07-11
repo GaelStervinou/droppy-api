@@ -15,6 +15,7 @@ type Repositories struct {
 	FollowRepository           model.FollowRepository
 	GroupRepository            model.GroupRepository
 	GroupMemberRepository      model.GroupMemberRepository
+	GroupDropRepository        model.GroupDropRepository
 	CommentRepository          model.CommentRepository
 	CommentResponseRepository  model.CommentResponseRepository
 	LikeRepository             model.LikeRepository
@@ -35,6 +36,7 @@ func Setup() *Repositories {
 		FollowRepository:           postgres.NewFollowRepo(sqlDB),
 		GroupRepository:            postgres.NewGroupRepo(sqlDB),
 		GroupMemberRepository:      postgres.NewGroupMemberRepo(sqlDB),
+		GroupDropRepository:        postgres.NewGroupDropRepo(sqlDB),
 		CommentRepository:          postgres.NewCommentRepo(sqlDB),
 		CommentResponseRepository:  postgres.NewCommentResponseRepo(sqlDB),
 		LikeRepository:             postgres.NewLikeRepo(sqlDB),
