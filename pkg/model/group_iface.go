@@ -39,6 +39,7 @@ type GroupCreationParam struct {
 	Description string `json:"description"`
 	IsPrivate   bool   `json:"isPrivate"`
 	Picture     string `json:"picture"`
+	Members     []uint `json:"members"`
 }
 
 type GroupPatchParam struct {

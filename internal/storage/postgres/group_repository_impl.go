@@ -76,7 +76,7 @@ func (r repoGroupPrivate) Create(name string, description string, isPrivate bool
 		Description: description,
 		IsPrivate:   isPrivate,
 		PicturePath: sql.NullString{String: picturePath, Valid: "" != picturePath},
-		CreatedBy:   *createdBy.(*User),
+		CreatedByID: createdBy.GetID(),
 	}
 
 	if err := r.db.Create(group).Error; err != nil {

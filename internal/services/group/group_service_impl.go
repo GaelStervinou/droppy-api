@@ -19,8 +19,8 @@ func (s *GroupService) CanCreateGroup(userId uint) (bool, error) {
 		return false, err
 	}
 
-	if len(userGroupsOwned) >= 5 {
-		return false, errors2.CannotCreateGroupError{Reason: "You can only create 5 groups"}
+	if len(userGroupsOwned) >= 200 {
+		return false, errors2.CannotCreateGroupError{Reason: "You can only create 200 groups"}
 	}
 	return true, nil
 }
@@ -61,7 +61,7 @@ func (s *GroupService) CreateGroup(userId uint, args model.GroupCreationParam) (
 		return nil, err
 	}
 
-	return createdGroup, nil
+	return s.Repo.GroupRepository.GetById(createdGroup.GetID())
 }
 
 func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPatchParam) (model.GroupModel, error) {

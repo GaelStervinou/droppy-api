@@ -66,7 +66,26 @@ func CreateGroup(c *gin.Context) {
 		return
 	}
 
-	groupResponse := response_models.FormatGetGroupResponse(createdGroup)
+	gms := &groupservice.GroupMemberService{
+		Repo: repositories.Setup(),
+	}
+
+	for _, memberId := range groupToCreate.Members {
+		_, err = gms.AddUserToGroup(memberId, createdGroup.GetID(), uintCurrentUserId)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	newGroup, err := gs.Repo.GroupRepository.GetById(createdGroup.GetID())
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	groupResponse := response_models.FormatGetGroupResponse(newGroup)
 
 	c.JSON(http.StatusCreated, groupResponse)
 }

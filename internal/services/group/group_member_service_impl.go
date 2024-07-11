@@ -266,10 +266,6 @@ func (s *GroupMemberService) GetPendingGroupMemberRequests(requesterId uint, gro
 func (s *GroupMemberService) AddUserToGroup(userID uint, groupID uint, requesterID uint) (model.GroupMemberModel, error) {
 	groupMember, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupID, userID)
 
-	if err != nil {
-		return nil, err
-	}
-
 	if groupMember != nil {
 		return nil, errors2.CannotJoinGroupError{Reason: "User already joined this group"}
 	}
@@ -284,14 +280,15 @@ func (s *GroupMemberService) AddUserToGroup(userID uint, groupID uint, requester
 		return nil, errors.New(fmt.Sprintf("Requester with id %d not found in group %d", requesterID, groupID))
 	}
 
-	if requester.GetRole() != grouprepository.GroupMemberRoleManager.ToString() {
+	managerRole := &grouprepository.GroupMemberRoleManager{}
+	if requester.GetRole() != managerRole.ToString() {
 		return nil, errors2.NotAllowedError{Reason: "You are not a manager"}
 	}
 
 	status := &grouprepository.GroupMemberStatusActive{}
-	role := &grouprepository.GroupMemberRoleManager{}
+	memberRole := &grouprepository.GroupMemberRoleMember{}
 
-	groupMember, err = s.Repo.GroupMemberRepository.Create(groupID, userID, role.ToString(), status.ToIntGroupMemberStatus())
+	groupMember, err = s.Repo.GroupMemberRepository.Create(groupID, userID, memberRole.ToString(), status.ToIntGroupMemberStatus())
 
 	return groupMember, err
 }
