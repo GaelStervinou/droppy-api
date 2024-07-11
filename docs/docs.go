@@ -583,7 +583,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/postgres.User"
+                                "$ref": "#/definitions/postgres.Follow"
                             }
                         }
                     },
@@ -640,7 +640,7 @@ const docTemplate = `{
             }
         },
         "/follows/refuse/{id}": {
-            "post": {
+            "delete": {
                 "security": [
                     {
                         "BearerAuth": []
@@ -658,14 +658,8 @@ const docTemplate = `{
                 ],
                 "summary": "Refuse follow request",
                 "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/postgres.User"
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -996,6 +990,55 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/response_models.GetGroupResponse"
                         }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/groups/{id}/feed": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Group Feed",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "group"
+                ],
+                "summary": "Get Group Feed",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetOneGroupFeedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "422": {
                         "description": "Unprocessable Entity",
@@ -1367,6 +1410,12 @@ const docTemplate = `{
                 },
                 "isPrivate": {
                     "type": "boolean"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "name": {
                     "type": "string"
@@ -1893,6 +1942,36 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response_models.GetGroupMemberForOneGroupResponse"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isPrivate": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "picturePath": {
+                    "$ref": "#/definitions/custom_type.NullString"
+                }
+            }
+        },
+        "response_models.GetOneGroupFeedResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {},
+                "description": {
+                    "type": "string"
+                },
+                "groupDrops": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response_models.GetDropResponse"
                     }
                 },
                 "id": {

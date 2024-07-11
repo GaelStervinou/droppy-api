@@ -587,6 +587,23 @@ func GetOneGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, groupResponse)
 }
 
+// GetGroupFeed godoc
+//
+//	@Summary		Get Group Feed
+//	@Description	Get Group Feed
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Param			id path int true "Group ID"
+//
+//	@Success		200	{object} response_models.GetOneGroupFeedResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400
+//	@Failure		500
+//	@Router			/groups/{id}/feed [get]
 func GetGroupFeed(c *gin.Context) {
 	requesterID, exists := c.Get("userId")
 
