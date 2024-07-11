@@ -21,7 +21,7 @@ import (
 // @Security BearerAuth
 //
 //	@Param			id path int true "Drop ID"
-//	@Param			content body string true "Comment content"
+//	@Param			comment	body		model.CommentCreationParam	true	"Comment creation object"
 //	@Success		201	{object} response_models.GetCommentResponse
 //	@Failure		401
 //	@Failure		422 {object} errors2.MultiFieldsError

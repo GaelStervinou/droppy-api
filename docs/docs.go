@@ -220,7 +220,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "comment"
+                    "comment response"
                 ],
                 "summary": "Respond to a comment",
                 "parameters": [
@@ -232,12 +232,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Comment content",
-                        "name": "content",
+                        "description": "Comment creation object",
+                        "name": "response",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.CommentCreationParam"
                         }
                     }
                 ],
@@ -275,7 +275,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "comment"
+                    "comment response"
                 ],
                 "summary": "Delete a comment response",
                 "parameters": [
@@ -385,12 +385,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Comment content",
-                        "name": "content",
+                        "description": "Comment creation object",
+                        "name": "comment",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.CommentCreationParam"
                         }
                     }
                 ],
@@ -1371,6 +1371,14 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "model.CommentCreationParam": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
                 }
             }
         },

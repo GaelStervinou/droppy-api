@@ -37,6 +37,11 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  model.CommentCreationParam:
+    properties:
+      content:
+        type: string
+    type: object
   model.DropCreationParam:
     properties:
       content:
@@ -621,12 +626,12 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Comment content
+      - description: Comment creation object
         in: body
-        name: content
+        name: response
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/model.CommentCreationParam'
       produces:
       - application/json
       responses:
@@ -644,7 +649,7 @@ paths:
       - BearerAuth: []
       summary: Respond to a comment
       tags:
-      - comment
+      - comment response
   /comments/{id}/responses/{responseId}:
     delete:
       consumes:
@@ -678,7 +683,7 @@ paths:
       - BearerAuth: []
       summary: Delete a comment response
       tags:
-      - comment
+      - comment response
   /drops:
     post:
       consumes:
@@ -718,12 +723,12 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Comment content
+      - description: Comment creation object
         in: body
-        name: content
+        name: comment
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/model.CommentCreationParam'
       produces:
       - application/json
       responses:

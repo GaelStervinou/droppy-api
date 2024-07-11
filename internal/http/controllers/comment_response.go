@@ -14,14 +14,14 @@ import (
 //
 //	@Summary		Respond to a comment
 //	@Description	Respond to a comment
-//	@Tags			comment
+//	@Tags			comment response
 //	@Accept			json
 //	@Produce		json
 //
 // @Security BearerAuth
 //
 //	@Param			id path int true "Comment ID"
-//	@Param			content body string true "Comment content"
+//	@Param			response	body		model.CommentCreationParam	true	"Comment creation object"
 //	@Success		201	{object} response_models.GetCommentResponseResponse
 //	@Failure		401
 //	@Failure		422 {object} errors2.MultiFieldsError
@@ -81,7 +81,7 @@ func RespondToComment(c *gin.Context) {
 //
 //	@Summary		Delete a comment response
 //	@Description	Delete a comment response
-//	@Tags			comment
+//	@Tags			comment response
 //	@Accept			json
 //	@Produce		json
 //
