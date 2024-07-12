@@ -216,6 +216,7 @@ var userConnections = make(map[string]*WebSocketConnection)
 var mu sync.Mutex
 
 func GetCurrentUserFeedWS(c *gin.Context) {
+	//TODO renvoyer toute la liste dès que : nouveau drop, nouveau comment, nouveau like / dislike, nouveau comment response
 	currentUserId, exists := c.Get("userId")
 
 	if !exists {
@@ -260,6 +261,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		return
 	}
 
+	var dropResponses []response_models.GetDropResponse
 	for _, drop := range availableDrops {
 		/*if !hasDropped {
 			//TODO ne pas envoyer la pic, le content et la description ( donc fair eun interface pour les 2 types de drop et déclarer une var au dessus de ce type là )
@@ -272,11 +274,13 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		}
 
 		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
-		err = wsConn.conn.WriteJSON(dropResponse)
-		if err != nil {
-			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
-			break
-		}
+		dropResponses = append(dropResponses, dropResponse)
+	}
+
+	err = wsConn.conn.WriteJSON(dropResponses)
+	if err != nil {
+		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		return
 	}
 
 	defer func() {

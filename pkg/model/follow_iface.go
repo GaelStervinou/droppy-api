@@ -9,6 +9,9 @@ type FollowModel interface {
 	GetFollowerID() uint
 	GetFollowedID() uint
 	GetStatus() uint
+	GetCreatedAt() uint
+	GetFollower() UserModel
+	GetFollowed() UserModel
 }
 
 type FollowRepository interface {
@@ -20,9 +23,15 @@ type FollowRepository interface {
 	GetFollowers(userID uint) ([]FollowModel, error)
 	GetFollowing(userID uint) ([]FollowModel, error)
 	AreAlreadyFollowing(followerID, followedID uint) (bool, error)
-	IsFollowing(followerID, followedID uint) (bool, error)
+	IsActiveFollowing(followerID, followedID uint) (bool, error)
+	IsPendingFollowing(followerID, followedID uint) (bool, error)
 	CountFollowers(userID uint) int
 	CountFollowed(userID uint) int
+}
+
+type FollowService interface {
+	GetUserFollowing(userID uint, requesterID uint) ([]FollowModel, error)
+	GetUserFollowers(userID uint, requesterID uint) ([]FollowModel, error)
 }
 
 type FollowCreationParam struct {

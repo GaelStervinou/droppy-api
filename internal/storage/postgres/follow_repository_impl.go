@@ -8,7 +8,9 @@ import (
 type Follow struct {
 	gorm.Model
 	FollowerID uint
+	Follower   User `gorm:"foreignKey:FollowerID"`
 	FollowedID uint
+	Followed   User `gorm:"foreignKey:FollowedID"`
 	Status     uint
 }
 
@@ -26,6 +28,18 @@ func (f *Follow) GetFollowedID() uint {
 
 func (f *Follow) GetStatus() uint {
 	return f.Status
+}
+
+func (f *Follow) GetCreatedAt() uint {
+	return uint(f.CreatedAt.Unix())
+}
+
+func (f *Follow) GetFollower() model.UserModel {
+	return &f.Follower
+}
+
+func (f *Follow) GetFollowed() model.UserModel {
+	return &f.Followed
 }
 
 type FollowPendingStatus struct {
@@ -87,7 +101,9 @@ func (r *repoFollowPrivate) Delete(followId uint) error {
 
 func (r *repoFollowPrivate) GetPendingRequests(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
-	result := r.db.Where("followed_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
+	result := r.db.
+		Preload("Follower").
+		Where("followed_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -100,7 +116,10 @@ func (r *repoFollowPrivate) GetPendingRequests(userID uint) ([]model.FollowModel
 
 func (r *repoFollowPrivate) GetFollowers(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
-	result := r.db.Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
+	result := r.db.
+		Preload("Followed").
+		Preload("Follower").
+		Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -113,7 +132,10 @@ func (r *repoFollowPrivate) GetFollowers(userID uint) ([]model.FollowModel, erro
 
 func (r *repoFollowPrivate) GetFollowing(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
-	result := r.db.Where("follower_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
+	result := r.db.
+		Preload("Followed").
+		Preload("Follower").
+		Where("follower_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -133,11 +155,26 @@ func (r *repoFollowPrivate) AreAlreadyFollowing(followerID, followedID uint) (bo
 	return true, nil
 }
 
-func (r *repoFollowPrivate) IsFollowing(followerID, followedID uint) (bool, error) {
+func (r *repoFollowPrivate) IsActiveFollowing(followerID, followedID uint) (bool, error) {
 	var follow Follow
-	result := r.db.Where("follower_id = ? AND followed_id = ?", followerID, followedID).Find(&follow)
+	result := r.db.Where("follower_id = ? AND followed_id = ? AND status = ?", followerID, followedID, new(FollowAcceptedStatus).ToInt()).Find(&follow)
 	if result.Error != nil {
 		return false, result.Error
+	}
+	if follow.CreatedAt.IsZero() {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (r *repoFollowPrivate) IsPendingFollowing(followerID, followedID uint) (bool, error) {
+	var follow Follow
+	result := r.db.Where("follower_id = ? AND followed_id = ? AND status = ?", followerID, followedID, new(FollowPendingStatus).ToInt()).Find(&follow)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	if follow.CreatedAt.IsZero() {
+		return false, nil
 	}
 	return true, nil
 }
