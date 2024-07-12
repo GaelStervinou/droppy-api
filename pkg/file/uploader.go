@@ -40,5 +40,5 @@ func UploadFile(file *multipart.FileHeader) (string, error) {
 		return "", fmt.Errorf("unable to save file: %v", err)
 	}
 
-	return targetFilePath, nil
+	return os.Getenv("BASE_URL") + "/" + targetFilePath, nil
 }
