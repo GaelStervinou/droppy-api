@@ -144,9 +144,20 @@ func PatchGroup(c *gin.Context) {
 
 	var groupPatch model.GroupPatchParam
 
-	if err := c.ShouldBindJSON(&groupPatch); err != nil {
+	if err := c.MustBindWith(&groupPatch, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
+	}
+
+	if groupPatch.Picture != nil {
+		filePath, err := file.UploadFile(groupPatch.Picture)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		groupPatch.PicturePath = filePath
+	} else {
+		groupPatch.PicturePath = ""
 	}
 
 	gs := &groupservice.GroupService{

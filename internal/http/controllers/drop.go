@@ -216,7 +216,6 @@ var userConnections = make(map[string]*WebSocketConnection)
 var mu sync.Mutex
 
 func GetCurrentUserFeedWS(c *gin.Context) {
-	//TODO renvoyer toute la liste dès que : nouveau drop, nouveau comment, nouveau like / dislike, nouveau comment response
 	currentUserId, exists := c.Get("userId")
 
 	if !exists {

@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
+	"go-api/pkg/file"
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
@@ -226,9 +228,20 @@ func PatchUserById(c *gin.Context) {
 
 	var userToPatch model.UserPatchParam
 
-	if err := c.ShouldBindJSON(&userToPatch); err != nil {
+	if err := c.MustBindWith(&userToPatch, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
+	}
+
+	if userToPatch.Picture != nil {
+		filePath, err := file.UploadFile(userToPatch.Picture)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		userToPatch.PicturePath = filePath
+	} else {
+		userToPatch.PicturePath = ""
 	}
 	userToPatch.Email = requestedUser.GetEmail()
 
