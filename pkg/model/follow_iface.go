@@ -9,6 +9,8 @@ type FollowModel interface {
 	GetFollowerID() uint
 	GetFollowedID() uint
 	GetStatus() uint
+	GetCreatedAt() uint
+	GetFollower() UserModel
 }
 
 type FollowRepository interface {

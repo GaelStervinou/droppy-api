@@ -8,6 +8,7 @@ import (
 type Follow struct {
 	gorm.Model
 	FollowerID uint
+	Follower   User `gorm:"foreignKey:FollowerID"`
 	FollowedID uint
 	Status     uint
 }
@@ -26,6 +27,14 @@ func (f *Follow) GetFollowedID() uint {
 
 func (f *Follow) GetStatus() uint {
 	return f.Status
+}
+
+func (f *Follow) GetCreatedAt() uint {
+	return uint(f.CreatedAt.Unix())
+}
+
+func (f *Follow) GetFollower() model.UserModel {
+	return &f.Follower
 }
 
 type FollowPendingStatus struct {
@@ -87,7 +96,9 @@ func (r *repoFollowPrivate) Delete(followId uint) error {
 
 func (r *repoFollowPrivate) GetPendingRequests(userID uint) ([]model.FollowModel, error) {
 	var follows []Follow
-	result := r.db.Where("followed_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
+	result := r.db.
+		Preload("Follower").
+		Where("followed_id = ? AND status = ?", userID, new(FollowPendingStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
