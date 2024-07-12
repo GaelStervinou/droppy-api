@@ -337,7 +337,7 @@ func RejectRequest(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		200	{object} []response_models.GetOneFollowResponse
+// @Success		200	{object} []response_models.GetUserResponseInterface
 // @Failure		422
 // @Failure		403
 // @Failure		401
@@ -401,7 +401,7 @@ func GetUserFollowing(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		200	{object} []response_models.GetOneFollowResponse
+// @Success		200	{object} []response_models.GetUserResponseInterface
 // @Failure		422
 // @Failure		403
 // @Failure		401

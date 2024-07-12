@@ -1291,9 +1291,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response_models.GetOneFollowResponse"
-                            }
+                            "items": {}
                         }
                     },
                     "401": {
@@ -1334,9 +1332,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response_models.GetOneFollowResponse"
-                            }
+                            "items": {}
                         }
                     },
                     "401": {
@@ -1423,7 +1419,14 @@
         },
         "model.DropCreationParam": {
             "type": "object",
+            "required": [
+                "content",
+                "description"
+            ],
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "content": {
                     "type": "string"
                 },
@@ -1437,7 +1440,7 @@
                     "type": "number"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
                 }
             }
         },
@@ -1468,7 +1471,7 @@
                 "members": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "name": {
@@ -1476,12 +1479,6 @@
                 },
                 "picture": {
                     "$ref": "#/definitions/multipart.FileHeader"
-                },
-                "tt": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 }
             }
         },
@@ -1552,8 +1549,14 @@
         "model.UserPatchParam": {
             "type": "object",
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
+                },
+                "picture": {
+                    "$ref": "#/definitions/multipart.FileHeader"
                 },
                 "username": {
                     "type": "string"
@@ -2035,22 +2038,6 @@
                 },
                 "picturePath": {
                     "$ref": "#/definitions/custom_type.NullString"
-                }
-            }
-        },
-        "response_models.GetOneFollowResponse": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "followed": {},
-                "follower": {},
-                "id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "integer"
                 }
             }
         },

@@ -1298,9 +1298,7 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response_models.GetOneFollowResponse"
-                            }
+                            "items": {}
                         }
                     },
                     "401": {
@@ -1341,9 +1339,7 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response_models.GetOneFollowResponse"
-                            }
+                            "items": {}
                         }
                     },
                     "401": {
@@ -1430,7 +1426,14 @@ const docTemplate = `{
         },
         "model.DropCreationParam": {
             "type": "object",
+            "required": [
+                "content",
+                "description"
+            ],
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "content": {
                     "type": "string"
                 },
@@ -1444,7 +1447,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
                 }
             }
         },
@@ -1475,7 +1478,7 @@ const docTemplate = `{
                 "members": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "name": {
@@ -1483,12 +1486,6 @@ const docTemplate = `{
                 },
                 "picture": {
                     "$ref": "#/definitions/multipart.FileHeader"
-                },
-                "tt": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 }
             }
         },
@@ -1559,8 +1556,14 @@ const docTemplate = `{
         "model.UserPatchParam": {
             "type": "object",
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
+                },
+                "picture": {
+                    "$ref": "#/definitions/multipart.FileHeader"
                 },
                 "username": {
                     "type": "string"
@@ -2042,22 +2045,6 @@ const docTemplate = `{
                 },
                 "picturePath": {
                     "$ref": "#/definitions/custom_type.NullString"
-                }
-            }
-        },
-        "response_models.GetOneFollowResponse": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "followed": {},
-                "follower": {},
-                "id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "integer"
                 }
             }
         },

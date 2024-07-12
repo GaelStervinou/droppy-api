@@ -44,6 +44,8 @@ definitions:
     type: object
   model.DropCreationParam:
     properties:
+      '-':
+        type: string
       content:
         type: string
       description:
@@ -53,7 +55,10 @@ definitions:
       lng:
         type: number
       picture:
-        type: string
+        $ref: '#/definitions/multipart.FileHeader'
+    required:
+    - content
+    - description
     type: object
   model.FollowCreationParam:
     properties:
@@ -70,16 +75,12 @@ definitions:
         type: boolean
       members:
         items:
-          type: string
+          type: integer
         type: array
       name:
         type: string
       picture:
         $ref: '#/definitions/multipart.FileHeader'
-      tt:
-        items:
-          type: integer
-        type: array
     required:
     - isPrivate
     - name
@@ -127,8 +128,12 @@ definitions:
     type: object
   model.UserPatchParam:
     properties:
+      '-':
+        type: string
       email:
         type: string
+      picture:
+        $ref: '#/definitions/multipart.FileHeader'
       username:
         type: string
     type: object
@@ -447,17 +452,6 @@ definitions:
         type: string
       picturePath:
         $ref: '#/definitions/custom_type.NullString'
-    type: object
-  response_models.GetOneFollowResponse:
-    properties:
-      createdAt:
-        type: string
-      followed: {}
-      follower: {}
-      id:
-        type: integer
-      status:
-        type: integer
     type: object
   response_models.GetOneGroupFeedResponse:
     properties:
@@ -1292,8 +1286,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/response_models.GetOneFollowResponse'
+            items: {}
             type: array
         "401":
           description: Unauthorized
@@ -1319,8 +1312,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/response_models.GetOneFollowResponse'
+            items: {}
             type: array
         "401":
           description: Unauthorized
