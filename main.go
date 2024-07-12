@@ -34,7 +34,6 @@ func main() {
 
 	postgres.AutoMigrate()
 	r := gin.Default()
-	r.RedirectTrailingSlash = false
 	r.Use(gin.Recovery())
 
 	v1 := r.Group("/")
