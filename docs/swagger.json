@@ -626,7 +626,7 @@
                 }
             }
         },
-        "/groups": {
+        "/groups/": {
             "post": {
                 "security": [
                     {
@@ -635,7 +635,7 @@
                 ],
                 "description": "Create group",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -1451,7 +1451,14 @@
         },
         "model.GroupCreationParam": {
             "type": "object",
+            "required": [
+                "isPrivate",
+                "name"
+            ],
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1461,14 +1468,20 @@
                 "members": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "name": {
                     "type": "string"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
+                },
+                "tt": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1504,7 +1517,7 @@
                     "type": "string"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
                 }
             }
         },
@@ -1544,6 +1557,20 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "multipart.FileHeader": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "header": {
+                    "$ref": "#/definitions/textproto.MIMEHeader"
+                },
+                "size": {
+                    "type": "integer"
                 }
             }
         },
@@ -2116,6 +2143,15 @@
                 "valid": {
                     "description": "Valid is true if String is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "textproto.MIMEHeader": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "string"
                 }
             }
         }

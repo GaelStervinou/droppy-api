@@ -50,7 +50,7 @@ func (s *GroupService) CreateGroup(userId uint, args model.GroupCreationParam) (
 		return nil, err
 	}
 
-	createdGroup, err := s.Repo.GroupRepository.Create(args.Name, args.Description, args.IsPrivate, args.Picture, user)
+	createdGroup, err := s.Repo.GroupRepository.Create(args.Name, args.Description, args.IsPrivate, args.PicturePath, user)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPat
 		Name:        args.Name,
 		Description: args.Description,
 		IsPrivate:   args.IsPrivate,
-		Picture:     args.Picture,
+		PicturePath: args.PicturePath,
 	})
 
 	if err != nil {

@@ -118,7 +118,7 @@ func (r repoGroupPrivate) Update(args model.FilledGroupPatchParam) (model.GroupM
 		object.Description = args.Description
 	}
 	object.IsPrivate = args.IsPrivate
-	object.PicturePath = sql.NullString{String: args.Picture, Valid: args.Picture != ""}
+	object.PicturePath = sql.NullString{String: args.PicturePath, Valid: args.PicturePath != ""}
 
 	result := r.db.Save(&object)
 	return &object, result.Error

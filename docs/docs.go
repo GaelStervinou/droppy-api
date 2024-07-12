@@ -633,7 +633,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/groups": {
+        "/groups/": {
             "post": {
                 "security": [
                     {
@@ -642,7 +642,7 @@ const docTemplate = `{
                 ],
                 "description": "Create group",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -1458,7 +1458,14 @@ const docTemplate = `{
         },
         "model.GroupCreationParam": {
             "type": "object",
+            "required": [
+                "isPrivate",
+                "name"
+            ],
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1468,14 +1475,20 @@ const docTemplate = `{
                 "members": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "name": {
                     "type": "string"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
+                },
+                "tt": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1511,7 +1524,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "picture": {
-                    "type": "string"
+                    "$ref": "#/definitions/multipart.FileHeader"
                 }
             }
         },
@@ -1551,6 +1564,20 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "multipart.FileHeader": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "header": {
+                    "$ref": "#/definitions/textproto.MIMEHeader"
+                },
+                "size": {
+                    "type": "integer"
                 }
             }
         },
@@ -2123,6 +2150,15 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if String is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "textproto.MIMEHeader": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "string"
                 }
             }
         }

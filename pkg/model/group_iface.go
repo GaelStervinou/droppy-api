@@ -1,6 +1,9 @@
 package model
 
-import "database/sql"
+import (
+	"database/sql"
+	"mime/multipart"
+)
 
 type GroupModel interface {
 	GetID() uint
@@ -37,24 +40,27 @@ type GroupService interface {
 }
 
 type GroupCreationParam struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IsPrivate   bool   `json:"isPrivate"`
-	Picture     string `json:"picture"`
-	Members     []uint `json:"members"`
+	Name        string                `form:"name" binding:"required"`
+	Description string                `form:"description"`
+	IsPrivate   bool                  `form:"isPrivate" binding:"required"`
+	Picture     *multipart.FileHeader `form:"picture"`
+	PicturePath string                `form:"-"`
+	Members     []uint                `form:"members"`
 }
 
 type GroupPatchParam struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IsPrivate   bool   `json:"isPrivate"`
-	Picture     string `json:"picture"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	IsPrivate   bool                  `json:"isPrivate"`
+	Picture     *multipart.FileHeader `json:"picture"`
+	PicturePath string                `json:"-"`
 }
 
 type FilledGroupPatchParam struct {
 	ID          uint
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IsPrivate   bool   `json:"isPrivate"`
-	Picture     string `json:"picture"`
+	Name        string                `form:"name" binding:"required"`
+	Description string                `form:"description" binding:"required"`
+	IsPrivate   bool                  `form:"isPrivate" binding:"required"`
+	Picture     *multipart.FileHeader `form:"picture"`
+	PicturePath string                `form:"-"`
 }

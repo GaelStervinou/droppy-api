@@ -62,18 +62,27 @@ definitions:
     type: object
   model.GroupCreationParam:
     properties:
+      '-':
+        type: string
       description:
         type: string
       isPrivate:
         type: boolean
       members:
         items:
-          type: integer
+          type: string
         type: array
       name:
         type: string
       picture:
-        type: string
+        $ref: '#/definitions/multipart.FileHeader'
+      tt:
+        items:
+          type: integer
+        type: array
+    required:
+    - isPrivate
+    - name
     type: object
   model.GroupMemberCreationParam:
     properties:
@@ -96,7 +105,7 @@ definitions:
       name:
         type: string
       picture:
-        type: string
+        $ref: '#/definitions/multipart.FileHeader'
     type: object
   model.LoginParam:
     properties:
@@ -122,6 +131,15 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  multipart.FileHeader:
+    properties:
+      filename:
+        type: string
+      header:
+        $ref: '#/definitions/textproto.MIMEHeader'
+      size:
+        type: integer
     type: object
   postgres.Comment:
     properties:
@@ -501,6 +519,12 @@ definitions:
       valid:
         description: Valid is true if String is not NULL
         type: boolean
+    type: object
+  textproto.MIMEHeader:
+    additionalProperties:
+      items:
+        type: string
+      type: array
     type: object
 host: localhost:3000
 info:
@@ -900,10 +924,10 @@ paths:
       summary: Refuse follow request
       tags:
       - follow
-  /groups:
+  /groups/:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Create group
       parameters:
       - description: Group creation object
