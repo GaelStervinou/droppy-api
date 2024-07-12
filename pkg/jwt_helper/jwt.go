@@ -10,7 +10,7 @@ import (
 var secretKey = []byte(os.Getenv("JWT_SECRET"))
 
 func GenerateToken(userId uint, role string) (string, string, int, error) {
-	expiry := time.Now().Add(time.Minute * 5).Unix()
+	expiry := time.Now().Add(time.Hour * 6).Unix()
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"sub":  userId,
@@ -25,7 +25,7 @@ func GenerateToken(userId uint, role string) (string, string, int, error) {
 	}
 
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
-	refreshTokenExpiry := time.Now().AddDate(0, 0, 7).Unix()
+	refreshTokenExpiry := time.Now().AddDate(0, 0, 60).Unix()
 	rtClaims := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["sub"] = userId
 	rtClaims["exp"] = refreshTokenExpiry
