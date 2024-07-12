@@ -111,8 +111,9 @@ func main() {
 		{
 			admin.GET("/users", middlewares.AdminRequired(), controllers.GetAllUsers)
 			admin.GET("/groups", middlewares.AdminRequired(), controllers.GetAllGroups)
-			//admin.GET("/drops", controllers.GetAllDrops)
-			//admin.GET("/follows", controllers.GetAllFollows)
+			admin.GET("/drops", middlewares.AdminRequired(), controllers.GetAllDrops)
+			admin.GET("/comments", middlewares.AdminRequired(), controllers.GetAllComments)
+			// admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

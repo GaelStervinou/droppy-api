@@ -90,3 +90,15 @@ func (r *repoCommentPrivate) GetById(commentId uint) (model.CommentModel, error)
 
 	return &comment, nil
 }
+
+func (r *repoCommentPrivate) GetAllComments() ([]model.CommentModel, error) {
+	var comments []Comment
+	if err := r.db.Preload("CreatedBy").Preload("Drop").Preload("Drop.CreatedBy").Find(&comments).Error; err != nil {
+		return nil, err
+	}
+	var result []model.CommentModel
+	for _, comment := range comments {
+		result = append(result, &comment)
+	}
+	return result, nil
+}

@@ -14,6 +14,7 @@ type CommentRepository interface {
 	DeleteComment(commentId uint) error
 	GetCommentsByDropId(dropId uint) ([]CommentModel, error)
 	GetById(commentId uint) (CommentModel, error)
+	GetAllComments() ([]CommentModel, error)
 }
 
 type CommentService interface {

@@ -37,6 +37,7 @@ type DropRepository interface {
 	GetUserPinnedDrops(userId uint) ([]DropModel, error)
 	GetUserLastDrop(userId uint) (DropModel, error)
 	CountUserDrops(userId uint) int
+	GetAllDrops() ([]DropModel, error)
 }
 
 type DropService interface {

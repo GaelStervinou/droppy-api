@@ -225,3 +225,30 @@ func (r *repoDropPrivate) GetUserLastDrop(userId uint) (model.DropModel, error) 
 
 	return &drop, nil
 }
+
+func (r *repoDropPrivate) GetAllDrops() ([]model.DropModel, error) {
+	var drops []Drop
+	if err := r.db.
+		Preload("CreatedBy").
+		Preload("Comments").
+		Preload("Comments.CreatedBy").
+		Preload("Comments.Responses").
+		Preload("Comments.Responses.CreatedBy").
+		Find(&drops).Error; err != nil {
+		return nil, err
+	}
+
+	for i := range drops {
+		var totalLikes int64
+		if err := r.db.Model(&Like{}).Where("drop_id = ?", drops[i].ID).Count(&totalLikes).Error; err != nil {
+			return nil, err
+		}
+		drops[i].TotalLikes = int(totalLikes)
+	}
+
+	var result []model.DropModel
+	for _, drop := range drops {
+		result = append(result, &drop)
+	}
+	return result, nil
+}
