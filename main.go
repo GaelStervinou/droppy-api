@@ -59,6 +59,9 @@ func main() {
 			user.GET("/my-feed/ws", middlewares.CurrentUserMiddleware(true), controllers.GetCurrentUserFeedWS)
 			user.GET("/my-feed", middlewares.CurrentUserMiddleware(true), controllers.GetCurrentUserFeed)
 			user.GET("/:id/drops", middlewares.CurrentUserMiddleware(true), controllers.DropsByUserId)
+
+			user.GET("/:id/following", middlewares.CurrentUserMiddleware(true), controllers.GetUserFollowing)
+			user.GET("/:id/followers", middlewares.CurrentUserMiddleware(true), controllers.GetUserFollowers)
 		}
 
 		follow := v1.Group("/follows")

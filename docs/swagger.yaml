@@ -216,8 +216,12 @@ definitions:
         type: string
       deletedAt:
         $ref: '#/definitions/gorm.DeletedAt'
+      followed:
+        $ref: '#/definitions/postgres.User'
       followedID:
         type: integer
+      follower:
+        $ref: '#/definitions/postgres.User'
       followerID:
         type: integer
       id:
@@ -425,6 +429,17 @@ definitions:
         type: string
       picturePath:
         $ref: '#/definitions/custom_type.NullString'
+    type: object
+  response_models.GetOneFollowResponse:
+    properties:
+      createdAt:
+        type: string
+      followed: {}
+      follower: {}
+      id:
+        type: integer
+      status:
+        type: integer
     type: object
   response_models.GetOneGroupFeedResponse:
     properties:
@@ -864,31 +879,6 @@ paths:
       summary: Accept request
       tags:
       - follow
-  /follows/pending:
-    get:
-      consumes:
-      - application/json
-      description: Get all pending requests of the current user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/postgres.Follow'
-            type: array
-        "401":
-          description: Unauthorized
-        "422":
-          description: Unprocessable Entity
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Get my pending requests
-      tags:
-      - follow
   /follows/refuse/{id}:
     delete:
       consumes:
@@ -1265,6 +1255,60 @@ paths:
       security:
       - BearerAuth: []
       summary: Patch user by ID
+      tags:
+      - user
+  /users/{id}/followers:
+    get:
+      consumes:
+      - application/json
+      description: Get user followers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.GetOneFollowResponse'
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get user followers
+      tags:
+      - user
+  /users/{id}/following:
+    get:
+      consumes:
+      - application/json
+      description: Get user following
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.GetOneFollowResponse'
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get user following
       tags:
       - user
   /users/my-feed:

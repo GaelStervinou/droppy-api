@@ -25,3 +25,26 @@ func FormatGetOnePendingFollowResponse(follow model.FollowModel) GetOnePendingFo
 		Status:    follow.GetStatus(),
 	}
 }
+
+type GetOneFollowResponse struct {
+	ID        uint                     `json:"id"`
+	Follower  GetUserResponseInterface `json:"follower"`
+	Followed  GetUserResponseInterface `json:"followed"`
+	CreatedAt *time.Time               `json:"createdAt"`
+	Status    uint                     `json:"status"`
+}
+
+func FormatGetOneFollowResponse(follow model.FollowModel) GetOneFollowResponse {
+	if nil == follow {
+		return GetOneFollowResponse{}
+	}
+
+	createdAt := time.Unix(int64(follow.GetCreatedAt()), 0)
+	return GetOneFollowResponse{
+		ID:        follow.GetID(),
+		Follower:  FormatGetUserResponse(follow.GetFollower()),
+		Followed:  FormatGetUserResponse(follow.GetFollowed()),
+		CreatedAt: &createdAt,
+		Status:    follow.GetStatus(),
+	}
+}

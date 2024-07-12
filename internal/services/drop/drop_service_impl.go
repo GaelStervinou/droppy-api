@@ -161,7 +161,7 @@ func (s *DropService) GetDropsByUserId(userId uint, currentUser model.UserModel)
 			return nil, nil
 		}
 
-		currentUserIsFollowing, err := s.Repo.FollowRepository.IsFollowing(currentUser.GetID(), userId)
+		currentUserIsFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(currentUser.GetID(), userId)
 
 		if err != nil {
 			return nil, err

@@ -75,7 +75,7 @@ func (s *CommentResponseService) CanCommentResponse(commentId uint, userID uint)
 		return false, errors.New("you must drop before posting comments")
 	}
 
-	isFollowing, err := s.Repo.FollowRepository.IsFollowing(userID, comment.GetDrop().GetCreatedBy().GetID())
+	isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, comment.GetDrop().GetCreatedBy().GetID())
 
 	if err != nil {
 		return false, err

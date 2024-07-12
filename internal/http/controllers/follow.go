@@ -1,12 +1,16 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go-api/internal/http/response_models"
+	"go-api/internal/repositories"
+	"go-api/internal/services/follow"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/converters"
+	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"log"
 	"net/http"
@@ -231,7 +235,7 @@ func AcceptRequest(c *gin.Context) {
 
 	followRepo := postgres.NewFollowRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
+	IsMyFollow, err := followRepo.IsPendingFollowing(uintCurrentUserId, followId)
 
 	if IsMyFollow == false {
 		c.JSON(403, gin.H{"error": "Forbidden"})
@@ -303,7 +307,7 @@ func RejectRequest(c *gin.Context) {
 
 	followRepo := postgres.NewFollowRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsFollowing(uintCurrentUserId, followId)
+	IsMyFollow, err := followRepo.IsPendingFollowing(uintCurrentUserId, followId)
 
 	if IsMyFollow == false {
 		c.JSON(403, gin.H{"error": "Forbidden"})
@@ -322,6 +326,134 @@ func RejectRequest(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Follow request refused"})
+}
+
+// GetUserFollowing godoc
+//
+// @Summary		Get user following
+// @Description	Get user following
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+//
+// @Success		200	{object} []response_models.GetOneFollowResponse
+// @Failure		422
+// @Failure		403
+// @Failure		401
+// @Failure		500
+// @Router			/users/{id}/following [get]
+func GetUserFollowing(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID := c.Param("id")
+	if "" == userID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	userIDuint, err := converters.StringToUint(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fs := &follow.FollowService{
+		Repo: repositories.Setup(),
+	}
+
+	following, err := fs.GetUserFollowing(userIDuint, uintCurrentUserId)
+
+	if err != nil {
+		var notAllowedErr errors2.NotAllowedError
+		if errors.As(err, &notAllowedErr) {
+			c.JSON(http.StatusForbidden, gin.H{"error": notAllowedErr.Reason})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var followingResponse []response_models.GetOneFollowResponse
+	for _, followResp := range following {
+		followingResponse = append(followingResponse, response_models.FormatGetOneFollowResponse(followResp))
+	}
+
+	c.JSON(http.StatusOK, followingResponse)
+}
+
+// GetUserFollowers godoc
+//
+// @Summary		Get user followers
+// @Description	Get user followers
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+//
+// @Success		200	{object} []response_models.GetOneFollowResponse
+// @Failure		422
+// @Failure		403
+// @Failure		401
+// @Failure		500
+// @Router			/users/{id}/followers [get]
+func GetUserFollowers(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID := c.Param("id")
+	if "" == userID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	userIDuint, err := converters.StringToUint(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fs := &follow.FollowService{
+		Repo: repositories.Setup(),
+	}
+
+	followers, err := fs.GetUserFollowers(userIDuint, uintCurrentUserId)
+
+	if err != nil {
+		var notAllowedErr errors2.NotAllowedError
+		if errors.As(err, &notAllowedErr) {
+			c.JSON(http.StatusForbidden, gin.H{"error": notAllowedErr.Reason})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var followersResponse []response_models.GetOneFollowResponse
+	for _, followResp := range followers {
+		followersResponse = append(followersResponse, response_models.FormatGetOneFollowResponse(followResp))
+	}
+
+	c.JSON(http.StatusOK, followersResponse)
 }
 
 func SendPendingFollowsWS(userID uint, followRepo model.FollowRepository) error {
