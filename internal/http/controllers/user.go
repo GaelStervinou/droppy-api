@@ -95,6 +95,7 @@ func GetUserById(c *gin.Context) {
 
 	totalFollowers := fr.CountFollowers(requestedUser.GetID())
 	totalFollowing := fr.CountFollowed(requestedUser.GetID())
+	totalDrops := dr.CountUserDrops(requestedUser.GetID())
 
 	userResponse := response_models.FormatGetOneUserResponse(
 		requestedUser,
@@ -103,6 +104,7 @@ func GetUserById(c *gin.Context) {
 		pinnedDrops,
 		totalFollowers,
 		totalFollowing,
+		totalDrops,
 	)
 
 	c.JSON(http.StatusOK, userResponse)

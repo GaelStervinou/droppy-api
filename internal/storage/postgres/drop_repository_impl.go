@@ -118,6 +118,12 @@ func (r *repoDropPrivate) Delete(dropId uint) error {
 	return r.db.Delete(&Drop{}, dropId).Error
 }
 
+func (r *repoDropPrivate) CountUserDrops(userId uint) int {
+	var count int64
+	r.db.Model(&Drop{}).Where("created_by_id = ?", userId).Count(&count)
+	return int(count)
+}
+
 func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").First(&drop, dropId).Error; err != nil {

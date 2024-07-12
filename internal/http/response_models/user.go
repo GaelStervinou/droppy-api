@@ -178,6 +178,7 @@ type GetOneUserResponse struct {
 	Groups         []GetGroupResponse
 	TotalFollowers int
 	TotalFollowed  int
+	TotalDrops     int
 }
 
 func FormatGetOneUserResponse(
@@ -187,6 +188,7 @@ func FormatGetOneUserResponse(
 	pinnedDrops []model.DropModel,
 	totalFollowers int,
 	totalFollowed int,
+	totalDrops int,
 ) GetOneUserResponse {
 	userGroups := user.GetGroups()
 	formattedGroups := make([]GetGroupResponse, 0)
@@ -230,5 +232,6 @@ func FormatGetOneUserResponse(
 		Groups:         formattedGroups,
 		TotalFollowers: totalFollowers,
 		TotalFollowed:  totalFollowed,
+		TotalDrops:     totalDrops,
 	}
 }
