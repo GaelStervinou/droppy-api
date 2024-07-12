@@ -86,6 +86,59 @@ func CreateDrop(c *gin.Context) {
 	}
 }
 
+func GetOneDrop(c *gin.Context) {
+	repo := repositories.Setup()
+
+	ds := &dropservice.DropService{
+		Repo: repo,
+	}
+
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	dropId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	drop, err := ds.GetDropById(dropId, uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
+
+	c.JSON(200, dropResponse)
+}
+
 // DropsByUserId godoc
 //
 //	@Summary		List drops by user ID

@@ -128,6 +128,10 @@ func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
 	return drops, nil
 }
 
+func (s *DropService) GetDropById(dropID uint, requesterID uint) (model.DropModel, error) {
+	return s.Repo.DropRepository.GetDropById(dropID)
+}
+
 func (s *DropService) GetDropsByUserId(userId uint, currentUser model.UserModel) ([]model.DropModel, error) {
 	isActiveUser, err := s.Repo.UserRepository.IsActiveUser(userId)
 
