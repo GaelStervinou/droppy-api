@@ -384,9 +384,9 @@ func GetUserFollowing(c *gin.Context) {
 		return
 	}
 
-	var followingResponse []response_models.GetOneFollowResponse
+	var followingResponse []response_models.GetUserResponseInterface
 	for _, followResp := range following {
-		followingResponse = append(followingResponse, response_models.FormatGetOneFollowResponse(followResp))
+		followingResponse = append(followingResponse, response_models.FormatGetUserResponse(followResp.GetFollowed()))
 	}
 
 	c.JSON(http.StatusOK, followingResponse)
@@ -448,9 +448,9 @@ func GetUserFollowers(c *gin.Context) {
 		return
 	}
 
-	var followersResponse []response_models.GetOneFollowResponse
+	var followersResponse []response_models.GetUserResponseInterface
 	for _, followResp := range followers {
-		followersResponse = append(followersResponse, response_models.FormatGetOneFollowResponse(followResp))
+		followersResponse = append(followersResponse, response_models.FormatGetUserResponse(followResp.GetFollower()))
 	}
 
 	c.JSON(http.StatusOK, followersResponse)
