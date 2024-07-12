@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	dropservice "go-api/internal/services/drop"
@@ -10,6 +11,7 @@ import (
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/converters"
 	"go-api/pkg/errors2"
+	"go-api/pkg/file"
 	"go-api/pkg/model"
 	"net/http"
 	"strings"
@@ -20,7 +22,8 @@ import (
 //	@Summary		Create group
 //	@Description	Create group
 //	@Tags			group
-//	@Accept			json
+//	@Accept			mpfd
+//
 //	@Produce		json
 //	@Param			group	body		model.GroupCreationParam	true	"Group creation object"
 //
@@ -29,7 +32,7 @@ import (
 //	@Success		201	{object} response_models.GetGroupResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
-//	@Router			/groups [post]
+//	@Router			/groups/ [post]
 func CreateGroup(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
@@ -43,12 +46,22 @@ func CreateGroup(c *gin.Context) {
 		return
 	}
 
-	//TODO rajouter une liste de user à ajouter automatiquement au groupe
 	var groupToCreate model.GroupCreationParam
 
-	if err := c.ShouldBindJSON(&groupToCreate); err != nil {
+	if err := c.MustBindWith(&groupToCreate, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
+	}
+
+	if groupToCreate.Picture != nil {
+		filePath, err := file.UploadFile(groupToCreate.Picture)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		groupToCreate.PicturePath = filePath
+	} else {
+		groupToCreate.PicturePath = ""
 	}
 
 	gs := &groupservice.GroupService{
@@ -131,9 +144,20 @@ func PatchGroup(c *gin.Context) {
 
 	var groupPatch model.GroupPatchParam
 
-	if err := c.ShouldBindJSON(&groupPatch); err != nil {
+	if err := c.MustBindWith(&groupPatch, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
+	}
+
+	if groupPatch.Picture != nil {
+		filePath, err := file.UploadFile(groupPatch.Picture)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		groupPatch.PicturePath = filePath
+	} else {
+		groupPatch.PicturePath = ""
 	}
 
 	gs := &groupservice.GroupService{

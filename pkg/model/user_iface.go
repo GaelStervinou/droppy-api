@@ -1,5 +1,7 @@
 package model
 
+import "mime/multipart"
+
 type UserModel interface {
 	GetID() uint
 	GetPassword() string
@@ -46,8 +48,10 @@ type UserCreationWithGoogleParam struct {
 }
 
 type UserPatchParam struct {
-	Email    string
-	Username string
+	Email       string                `form:"email"`
+	Username    string                `form:"username"`
+	Picture     *multipart.FileHeader `form:"picture"`
+	PicturePath string                `form:"-"`
 }
 
 type LoginParam struct {

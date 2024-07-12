@@ -103,12 +103,8 @@ func ValidateGroupCreation(args model.GroupCreationParam) errors2.MultiFieldsErr
 		Fields: map[string]string{},
 	}
 
-	if len(args.Name) < 2 && len(args.Name) > 255 {
+	if len(args.Name) < 2 || len(args.Name) > 255 {
 		finalErrors.Fields["name"] = "Name must be at least 2 character long and at most 255 characters long"
-	}
-
-	if len(args.Description) < 1 && len(args.Description) > 255 {
-		finalErrors.Fields["description"] = "Description must be at least 1 character long and at most 255 characters long"
 	}
 
 	return finalErrors
@@ -119,11 +115,11 @@ func ValidateGroupPatch(args model.GroupPatchParam) errors2.MultiFieldsError {
 		Fields: map[string]string{},
 	}
 
-	if len(args.Name) < 2 && len(args.Name) > 255 {
+	if len(args.Name) < 2 || len(args.Name) > 255 {
 		finalErrors.Fields["name"] = "Name must be at least 2 character long and at most 255 characters long"
 	}
 
-	if len(args.Description) < 1 && len(args.Description) > 255 {
+	if len(args.Description) < 1 || len(args.Description) > 255 {
 		finalErrors.Fields["description"] = "Description must be at least 1 character long and at most 255 characters long"
 	}
 

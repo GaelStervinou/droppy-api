@@ -1,5 +1,7 @@
 package model
 
+import "mime/multipart"
+
 type DropStatus interface {
 	ToInt() int
 }
@@ -47,11 +49,12 @@ type DropService interface {
 }
 
 type DropCreationParam struct {
-	Content     string  `json:"content"`
-	Description string  `json:"description"`
-	Lat         float64 `json:"lat"`
-	Lng         float64 `json:"lng"`
-	Picture     string  `json:"picture"`
+	Content     string                `form:"content" binding:"required"`
+	Description string                `form:"description" binding:"required"`
+	Lat         float64               `form:"lat"`
+	Lng         float64               `form:"lng"`
+	Picture     *multipart.FileHeader `form:"picture"`
+	PicturePath string                `form:"-"`
 }
 
 type FilledDropCreation struct {

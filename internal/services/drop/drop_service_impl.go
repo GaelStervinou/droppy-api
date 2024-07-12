@@ -55,19 +55,12 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		return nil, err
 	}
 
-	var picturePath string
-	if args.Picture != "" {
-		// Upload picture to storage
-		// Save picture path to DB
-		picturePath = "https://example.com/picture.jpg"
-	}
-
 	filledDrop := model.FilledDropCreation{
 		Type:               currentDropNotification.GetType(),
 		Content:            args.Content,
 		Description:        args.Description,
 		DropNotificationId: currentDropNotification.GetID(),
-		PicturePath:        picturePath,
+		PicturePath:        args.PicturePath,
 		Lat:                args.Lat,
 		Lng:                args.Lng,
 	}

@@ -3,12 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	log2 "github.com/google/martian/v3/log"
 	"github.com/joho/godotenv"
-	"github.com/robfig/cron/v3"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"go-api/cmd/drop_notif"
 	_ "go-api/docs"
 	"go-api/internal/http/controllers"
 	"go-api/internal/http/middlewares"
@@ -83,6 +80,7 @@ func main() {
 
 		group := v1.Group("/groups")
 		{
+			group.POST("", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
 			group.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
 			group.GET("/:id", middlewares.CurrentUserMiddleware(true), controllers.GetOneGroup)
 			group.GET("/:id/feed", middlewares.CurrentUserMiddleware(true), controllers.GetGroupFeed)
@@ -118,7 +116,9 @@ func main() {
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	c := cron.New()
+	r.Static("/assets", "./assets")
+
+	/*c := cron.New()
 	_, err = c.AddFunc("0 0 * * *", drop_notif.GenerateRandomNotification)
 
 	if err != nil {
@@ -126,7 +126,7 @@ func main() {
 	}
 
 	c.Start()
-	fmt.Println("Scheduler started...")
+	fmt.Println("Scheduler started...")*/
 
 	err = r.Run(":3000")
 
