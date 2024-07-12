@@ -53,12 +53,16 @@ func CreateGroup(c *gin.Context) {
 		return
 	}
 
-	filePath, err := file.UploadFile(groupToCreate.Picture)
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-		return
+	if groupToCreate.Picture != nil {
+		filePath, err := file.UploadFile(groupToCreate.Picture)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		groupToCreate.PicturePath = filePath
+	} else {
+		groupToCreate.PicturePath = ""
 	}
-	groupToCreate.PicturePath = filePath
 
 	gs := &groupservice.GroupService{
 		Repo: repositories.Setup(),
