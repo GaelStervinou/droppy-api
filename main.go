@@ -43,6 +43,7 @@ func main() {
 		{
 			auth.POST("/refresh", controllers.RefreshToken)
 			auth.POST("/", controllers.Login)
+			auth.POST("", controllers.Login)
 			auth.POST("/oauth_token", controllers.FirebaseLogin)
 		}
 

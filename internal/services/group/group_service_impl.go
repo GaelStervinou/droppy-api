@@ -90,7 +90,7 @@ func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPat
 		return nil, errors2.CannotUpdateGroupError{Reason: "Group not found"}
 	}
 
-	return updatedGroup, nil
+	return s.Repo.GroupRepository.GetById(updatedGroup.GetID())
 }
 
 func (s *GroupService) CanUpdateGroup(groupId uint, userId uint) (bool, error) {
