@@ -207,3 +207,21 @@ func (s *DropService) IsCurrentUserLiking(dropId uint, userId uint) (bool, error
 
 	return likeExists, nil
 }
+
+func (s *DropService) DeleteDrop(dropID uint, requesterID uint) error {
+	drop, err := s.Repo.DropRepository.GetDropById(dropID)
+
+	if err != nil {
+		return err
+	}
+
+	if drop == nil {
+		return errors.New("drop not found")
+	}
+
+	if drop.GetCreatedById() != requesterID {
+		return errors2.NotAllowedError{Reason: "This drop is not yours"}
+	}
+
+	return s.Repo.DropRepository.Delete(dropID)
+}

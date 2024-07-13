@@ -50,6 +50,7 @@ type DropService interface {
 	HasUserDroppedToday(userId uint) (bool, error)
 	IsCurrentUserLiking(dropId uint, userId uint) (bool, error)
 	GetDropById(dropID uint, requesterID uint) (DropModel, error)
+	DeleteDrop(dropID uint, requesterID uint) error
 }
 
 type DropCreationParam struct {

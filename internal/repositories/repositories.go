@@ -24,7 +24,6 @@ func Setup() *Repositories {
 	sqlDB := postgres.Connect()
 
 	return &Repositories{
-		//wg:              wg,
 		UserRepository:             postgres.NewUserRepo(sqlDB),
 		TokenRepository:            postgres.NewTokenRepo(sqlDB),
 		DropRepository:             postgres.NewDropRepo(sqlDB),

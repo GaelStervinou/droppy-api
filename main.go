@@ -76,6 +76,7 @@ func main() {
 		{
 			drop.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateDrop)
 			drop.GET("/:id", middlewares.CurrentUserMiddleware(true), controllers.GetOneDrop)
+			drop.DELETE("/:id", middlewares.CurrentUserMiddleware(true), controllers.DeleteDrop)
 			drop.POST("/:id/comments", middlewares.CurrentUserMiddleware(true), controllers.CommentDrop)
 			drop.POST("/:id/like", middlewares.CurrentUserMiddleware(true), controllers.LikeDrop)
 			drop.DELETE("/:id/like", middlewares.CurrentUserMiddleware(true), controllers.UnlikeDrop)
