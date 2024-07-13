@@ -9,7 +9,7 @@ import (
 type GetGroupResponse struct {
 	ID           uint
 	Name         string
-	Description  string
+	Description  *string
 	IsPrivate    bool
 	PicturePath  custom_type.NullString
 	CreatedAt    *time.Time
@@ -20,7 +20,7 @@ type GetGroupResponse struct {
 type GetOneGroupResponse struct {
 	ID           uint
 	Name         string
-	Description  string
+	Description  *string
 	IsPrivate    bool
 	PicturePath  custom_type.NullString
 	CreatedAt    *time.Time
@@ -32,7 +32,7 @@ type GetOneGroupResponse struct {
 type GetOneGroupFeedResponse struct {
 	ID          uint
 	Name        string
-	Description string
+	Description *string
 	IsPrivate   bool
 	PicturePath custom_type.NullString
 	CreatedAt   *time.Time
@@ -51,7 +51,7 @@ type GetGroupMemberForOneGroupResponse struct {
 type GetSearchGroupResponse struct {
 	ID          uint
 	Name        string
-	Description string
+	Description *string
 	IsPrivate   bool
 	PicturePath custom_type.NullString
 	CreatedAt   *time.Time
@@ -67,11 +67,16 @@ func FormatGetOneGroupWithFeed(group model.GroupModel, groupDrops []GetDropRespo
 	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+	description := group.GetDescription()
+	descriptionPointer := &description
+	if "" == description {
+		descriptionPointer = nil
+	}
 
 	return GetOneGroupFeedResponse{
 		ID:          group.GetID(),
 		Name:        group.GetName(),
-		Description: group.GetDescription(),
+		Description: descriptionPointer,
 		IsPrivate:   group.IsPrivateGroup(),
 		PicturePath: picturePath,
 		CreatedAt:   &createdAt,
@@ -88,6 +93,11 @@ func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+	description := group.GetDescription()
+	descriptionPointer := &description
+	if "" == description {
+		descriptionPointer = nil
+	}
 
 	groupMembers := make([]GetGroupMemberForOneGroupResponse, 0)
 	for _, groupMember := range group.GetGroupMembers() {
@@ -97,7 +107,7 @@ func FormatGetGroupResponse(group model.GroupModel) GetGroupResponse {
 	return GetGroupResponse{
 		ID:           group.GetID(),
 		Name:         group.GetName(),
-		Description:  group.GetDescription(),
+		Description:  descriptionPointer,
 		IsPrivate:    group.IsPrivateGroup(),
 		PicturePath:  picturePath,
 		CreatedAt:    &createdAt,
@@ -114,6 +124,11 @@ func FormatGetOneGroupResponse(group model.GroupModel, totalDrops int) GetOneGro
 	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+	description := group.GetDescription()
+	descriptionPointer := &description
+	if "" == description {
+		descriptionPointer = nil
+	}
 
 	groupMembers := make([]GetGroupMemberForOneGroupResponse, 0)
 	for _, groupMember := range group.GetGroupMembers() {
@@ -123,7 +138,7 @@ func FormatGetOneGroupResponse(group model.GroupModel, totalDrops int) GetOneGro
 	return GetOneGroupResponse{
 		ID:           group.GetID(),
 		Name:         group.GetName(),
-		Description:  group.GetDescription(),
+		Description:  descriptionPointer,
 		IsPrivate:    group.IsPrivateGroup(),
 		PicturePath:  picturePath,
 		CreatedAt:    &createdAt,
@@ -141,11 +156,16 @@ func FormatGetSearchGroupResponse(group model.GroupModel, isMember bool) GetSear
 	createdAt := time.Unix(int64(group.GetCreatedAt()), 0)
 
 	picturePath := custom_type.NullString{NullString: group.GetPicturePath()}
+	description := group.GetDescription()
+	descriptionPointer := &description
+	if "" == description {
+		descriptionPointer = nil
+	}
 
 	return GetSearchGroupResponse{
 		ID:          group.GetID(),
 		Name:        group.GetName(),
-		Description: group.GetDescription(),
+		Description: descriptionPointer,
 		IsPrivate:   group.IsPrivateGroup(),
 		PicturePath: picturePath,
 		CreatedAt:   &createdAt,
