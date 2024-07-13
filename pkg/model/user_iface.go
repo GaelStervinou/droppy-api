@@ -53,7 +53,7 @@ type UserCreationWithGoogleParam struct {
 type UserPatchParam struct {
 	Bio         string                `form:"bio"`
 	Username    string                `form:"username"`
-	IsPrivate   bool                  `form:"isPrivate"`
+	IsPrivate   *bool                 `form:"isPrivate"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 }

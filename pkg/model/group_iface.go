@@ -44,7 +44,7 @@ type GroupService interface {
 type GroupCreationParam struct {
 	Name        string                `form:"name" binding:"required"`
 	Description string                `form:"description"`
-	IsPrivate   bool                  `form:"isPrivate"`
+	IsPrivate   *bool                 `form:"isPrivate"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 	Members     []uint                `form:"members"`
@@ -53,7 +53,7 @@ type GroupCreationParam struct {
 type GroupPatchParam struct {
 	Name        string                `form:"name"  binding:"required"`
 	Description string                `form:"description"`
-	IsPrivate   bool                  `form:"isPrivate"`
+	IsPrivate   *bool                 `form:"isPrivate"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 }
@@ -62,7 +62,7 @@ type FilledGroupPatchParam struct {
 	ID          uint
 	Name        string                `form:"name" binding:"required"`
 	Description string                `form:"description" binding:"required"`
-	IsPrivate   bool                  `form:"isPrivate" binding:"required"`
+	IsPrivate   *bool                 `form:"isPrivate" binding:"required"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 }

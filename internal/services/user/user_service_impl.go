@@ -41,10 +41,12 @@ func (s *UserService) UpdateUser(userId uint, userToPatch model.UserPatchParam) 
 		userToPatch.PicturePath = filePath
 	}
 
-	if userToPatch.IsPrivate {
-		updates["IsPrivate"] = userToPatch.IsPrivate
-	} else {
-		updates["IsPrivate"] = false
+	if userToPatch.IsPrivate != nil {
+		if *userToPatch.IsPrivate {
+			updates["IsPrivate"] = true
+		} else {
+			updates["IsPrivate"] = false
+		}
 	}
 
 	updatedUser, err := s.Repo.UserRepository.Update(userId, updates)

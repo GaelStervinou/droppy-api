@@ -50,8 +50,12 @@ func (s *GroupService) CreateGroup(userId uint, args model.GroupCreationParam) (
 	if err != nil {
 		return nil, err
 	}
+	isPrivate := false
+	if args.IsPrivate != nil && *args.IsPrivate {
+		isPrivate = true
+	}
 
-	createdGroup, err := s.Repo.GroupRepository.Create(args.Name, args.Description, args.IsPrivate, args.PicturePath, user)
+	createdGroup, err := s.Repo.GroupRepository.Create(args.Name, args.Description, isPrivate, args.PicturePath, user)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +89,12 @@ func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPat
 		updates["Description"] = args.Description
 	}
 
-	if args.IsPrivate {
-		updates["IsPrivate"] = args.IsPrivate
-	} else {
-		updates["IsPrivate"] = false
+	if args.IsPrivate != nil {
+		if *args.IsPrivate {
+			updates["IsPrivate"] = true
+		} else {
+			updates["IsPrivate"] = false
+		}
 	}
 
 	if args.Picture != nil {
