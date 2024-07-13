@@ -45,6 +45,7 @@ func AutoMigrate() {
 		&Comment{},
 		&CommentResponse{},
 		&Like{},
+		&Report{},
 	)
 	fmt.Println("Migrations done")
 }

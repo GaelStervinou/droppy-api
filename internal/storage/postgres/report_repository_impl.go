@@ -7,12 +7,16 @@ import (
 
 type Report struct {
 	gorm.Model
-	Description      string          `gorm:"not null"`
-	Status           uint            `gorm:"not null"`
-	CreatedBy        User            `gorm:"foreignKey:CreatedById;references:ID"`
-	ReportedDrop     Drop            `gorm:"foreignKey:ReportedDropId;references:ID"`
-	ReportedComment  Comment         `gorm:"foreignKey:ReportedCommentId;references:ID"`
-	ReportedResponse CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
+	Description        string `gorm:"not null"`
+	Status             uint   `gorm:"not null"`
+	CreatedById        uint   `gorm:"not null"`
+	ReportedDropId     uint
+	ReportedCommentId  uint
+	ReportedResponseId uint
+	CreatedBy          User            `gorm:"foreignKey:CreatedById;references:ID"`
+	ReportedDrop       Drop            `gorm:"foreignKey:ReportedDropId;references:ID"`
+	ReportedComment    Comment         `gorm:"foreignKey:ReportedCommentId;references:ID"`
+	ReportedResponse   CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
 }
 
 func (r *Report) GetID() uint {
