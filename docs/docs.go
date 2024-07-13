@@ -815,6 +815,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/groups/members/{id}/{userId}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add User to Group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "group"
+                ],
+                "summary": "Add User to Group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetGroupMemberResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/groups/search": {
             "get": {
                 "security": [
@@ -892,7 +948,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response_models.GetGroupResponse"
+                            "$ref": "#/definitions/response_models.GetOneGroupResponse"
                         }
                     },
                     "400": {
@@ -2075,6 +2131,39 @@ const docTemplate = `{
                 },
                 "picturePath": {
                     "$ref": "#/definitions/custom_type.NullString"
+                }
+            }
+        },
+        "response_models.GetOneGroupResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {},
+                "description": {
+                    "type": "string"
+                },
+                "groupMembers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response_models.GetGroupMemberForOneGroupResponse"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isPrivate": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "picturePath": {
+                    "$ref": "#/definitions/custom_type.NullString"
+                },
+                "totalDrops": {
+                    "type": "integer"
                 }
             }
         },

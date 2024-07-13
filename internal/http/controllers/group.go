@@ -494,8 +494,25 @@ func PatchGroupMember(c *gin.Context) {
 	c.JSON(http.StatusOK, groupMemberResponse)
 }
 
+// AddUserToGroup godoc
+//
+//	@Summary		Add User to Group
+//	@Description	Add User to Group
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Param			id path int true "Group ID"
+//	@Param			userId path int true "User ID"
+//
+//	@Success		201	{object} response_models.GetGroupMemberResponse
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		400
+//	@Failure		500
+//	@Router			/groups/members/{id}/{userId} [post]
 func AddUserToGroup(c *gin.Context) {
-
 	requesterID, exists := c.Get("userId")
 
 	if !exists {
@@ -560,7 +577,7 @@ func AddUserToGroup(c *gin.Context) {
 //	@Produce		json
 //	@Param			id path int true "Group ID"
 //
-//	@Success		200	{object} response_models.GetGroupResponse
+//	@Success		200	{object} response_models.GetOneGroupResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		400
 //	@Failure		500
@@ -606,7 +623,9 @@ func GetOneGroup(c *gin.Context) {
 		return
 	}
 
-	groupResponse := response_models.FormatGetGroupResponse(group)
+	dr := postgres.NewDropRepo(sqlDB)
+	totalDrops := dr.CountUserDrops(group.GetID())
+	groupResponse := response_models.FormatGetOneGroupResponse(group, totalDrops)
 
 	c.JSON(http.StatusOK, groupResponse)
 }

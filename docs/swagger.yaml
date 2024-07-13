@@ -473,6 +473,28 @@ definitions:
       picturePath:
         $ref: '#/definitions/custom_type.NullString'
     type: object
+  response_models.GetOneGroupResponse:
+    properties:
+      createdAt:
+        type: string
+      createdBy: {}
+      description:
+        type: string
+      groupMembers:
+        items:
+          $ref: '#/definitions/response_models.GetGroupMemberForOneGroupResponse'
+        type: array
+      id:
+        type: integer
+      isPrivate:
+        type: boolean
+      name:
+        type: string
+      picturePath:
+        $ref: '#/definitions/custom_type.NullString'
+      totalDrops:
+        type: integer
+    type: object
   response_models.GetSearchGroupResponse:
     properties:
       createdAt:
@@ -965,7 +987,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response_models.GetGroupResponse'
+            $ref: '#/definitions/response_models.GetOneGroupResponse'
         "400":
           description: Bad Request
         "422":
@@ -1096,6 +1118,42 @@ paths:
       security:
       - BearerAuth: []
       summary: Patch Group Member
+      tags:
+      - group
+  /groups/members/{id}/{userId}:
+    post:
+      consumes:
+      - application/json
+      description: Add User to Group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response_models.GetGroupMemberResponse'
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors2.MultiFieldsError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Add User to Group
       tags:
       - group
   /groups/members/{id}/join:

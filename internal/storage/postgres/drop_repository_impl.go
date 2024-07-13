@@ -124,6 +124,12 @@ func (r *repoDropPrivate) CountUserDrops(userId uint) int {
 	return int(count)
 }
 
+func (r *repoDropPrivate) CountGroupDrops(groupId uint) int {
+	var count int64
+	r.db.Model(&Drop{}).Where("drop_notification_id = ?", groupId).Count(&count)
+	return int(count)
+}
+
 func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.Preload("CreatedBy").Preload("Comments").First(&drop, dropId).Error; err != nil {
