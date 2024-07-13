@@ -56,3 +56,20 @@ func (s *FollowService) GetUserFollowers(userID uint, requesterID uint) ([]model
 
 	return s.Repo.FollowRepository.GetFollowers(userID)
 }
+
+func (s *FollowService) DeleteFollow(requesterID uint, followID uint) error {
+	follow, err := s.Repo.FollowRepository.GetFollowByID(followID)
+	if err != nil {
+		return err
+	}
+
+	if follow == nil {
+		return errors2.NotAllowedError{Reason: "Follow not found"}
+	}
+
+	if follow.GetFollowerID() != requesterID && follow.GetFollowedID() != requesterID {
+		return errors2.NotAllowedError{Reason: "You are not allowed to delete this follow"}
+	}
+
+	return s.Repo.FollowRepository.Delete(follow.GetID())
+}

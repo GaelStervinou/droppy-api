@@ -67,6 +67,7 @@ func main() {
 			follow.GET("/pending", middlewares.CurrentUserMiddleware(true), controllers.GetMyPendingRequestsWS)
 			follow.POST("/accept/:id", middlewares.CurrentUserMiddleware(true), controllers.AcceptRequest)
 			follow.POST("/reject/:id", middlewares.CurrentUserMiddleware(true), controllers.RejectRequest)
+			follow.DELETE("/:id", middlewares.CurrentUserMiddleware(true), controllers.DeleteFollow)
 			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
 

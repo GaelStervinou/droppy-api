@@ -213,3 +213,17 @@ func (r *repoFollowPrivate) GetUserFollowedBy(followerID uint, followedID uint) 
 
 	return &follow, nil
 }
+
+func (r *repoFollowPrivate) GetFollowByID(followID uint) (model.FollowModel, error) {
+	var follow Follow
+	result := r.db.Where("id = ?", followID).First(&follow)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if follow.CreatedAt.IsZero() {
+		return nil, nil
+	}
+
+	return &follow, nil
+}

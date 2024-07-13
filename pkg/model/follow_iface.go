@@ -28,11 +28,13 @@ type FollowRepository interface {
 	CountFollowers(userID uint) int
 	CountFollowed(userID uint) int
 	GetUserFollowedBy(followerID uint, followedID uint) (FollowModel, error)
+	GetFollowByID(followID uint) (FollowModel, error)
 }
 
 type FollowService interface {
 	GetUserFollowing(userID uint, requesterID uint) ([]FollowModel, error)
 	GetUserFollowers(userID uint, requesterID uint) ([]FollowModel, error)
+	DeleteFollow(requesterID uint, followID uint) error
 }
 
 type FollowCreationParam struct {

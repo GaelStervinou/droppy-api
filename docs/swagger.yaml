@@ -82,7 +82,6 @@ definitions:
       picture:
         $ref: '#/definitions/multipart.FileHeader'
     required:
-    - isPrivate
     - name
     type: object
   model.GroupMemberCreationParam:
@@ -99,6 +98,8 @@ definitions:
     type: object
   model.GroupPatchParam:
     properties:
+      '-':
+        type: string
       description:
         type: string
       isPrivate:
@@ -107,6 +108,8 @@ definitions:
         type: string
       picture:
         $ref: '#/definitions/multipart.FileHeader'
+    required:
+    - name
     type: object
   model.LoginParam:
     properties:
@@ -951,6 +954,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Follow user
+      tags:
+      - follow
+  /follows/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete follow
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: "No"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete follow
       tags:
       - follow
   /follows/accept/{id}:

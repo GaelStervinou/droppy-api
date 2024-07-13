@@ -474,3 +474,65 @@ func SendPendingFollowsWS(userID uint, followRepo model.FollowRepository) error 
 
 	return userPendingFollowConnections[strconv.Itoa(int(userID))].conn.WriteJSON(pendingFollowResponses)
 }
+
+// DeleteFollow godoc
+//
+// @Summary		Delete follow
+// @Description	Delete follow
+// @Tags			follow
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+//
+// @Success		204 No Content
+// @Failure		422
+// @Failure		401
+// @Failure		403
+// @Failure		500
+// @Router			/follows/{id} [delete]
+func DeleteFollow(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(400, gin.H{"error": "id is required"})
+		return
+	}
+
+	followId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid follow ID"})
+		return
+	}
+
+	fs := &follow.FollowService{
+		Repo: repositories.Setup(),
+	}
+
+	err = fs.DeleteFollow(uintCurrentUserId, followId)
+
+	if err != nil {
+		var notAllowedErr errors2.NotAllowedError
+		if errors.As(err, &notAllowedErr) {
+			c.JSON(http.StatusForbidden, gin.H{"error": notAllowedErr.Reason})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+}

@@ -51,11 +51,11 @@ type GroupCreationParam struct {
 }
 
 type GroupPatchParam struct {
-	Name        string                `json:"name"`
-	Description string                `json:"description"`
-	IsPrivate   bool                  `json:"isPrivate"`
-	Picture     *multipart.FileHeader `json:"picture"`
-	PicturePath string                `json:"-"`
+	Name        string                `form:"name"  binding:"required"`
+	Description string                `form:"description"`
+	IsPrivate   bool                  `form:"isPrivate"`
+	Picture     *multipart.FileHeader `form:"picture"`
+	PicturePath string                `form:"-"`
 }
 
 type FilledGroupPatchParam struct {

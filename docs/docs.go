@@ -729,6 +729,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/follows/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete follow",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "follow"
+                ],
+                "summary": "Delete follow",
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "No"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/groups/": {
             "post": {
                 "security": [
@@ -1614,7 +1654,6 @@ const docTemplate = `{
         "model.GroupCreationParam": {
             "type": "object",
             "required": [
-                "isPrivate",
                 "name"
             ],
             "properties": {
@@ -1662,7 +1701,13 @@ const docTemplate = `{
         },
         "model.GroupPatchParam": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
+                "-": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
