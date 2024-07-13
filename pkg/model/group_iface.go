@@ -44,7 +44,7 @@ type GroupService interface {
 type GroupCreationParam struct {
 	Name        string                `form:"name" binding:"required"`
 	Description string                `form:"description"`
-	IsPrivate   bool                  `form:"isPrivate" binding:"required"`
+	IsPrivate   bool                  `form:"isPrivate"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 	Members     []uint                `form:"members"`

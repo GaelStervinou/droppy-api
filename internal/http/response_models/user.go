@@ -1,7 +1,6 @@
 package response_models
 
 import (
-	"fmt"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/model"
 	"time"
@@ -217,10 +216,6 @@ func FormatGetOneUserResponse(
 	formattedPinnedDrops := make([]GetDropResponse, 0)
 	var lastDropPointer *GetDropResponse
 
-	fmt.Printf("is user private : %v\n", user.IsPrivateUser())
-	fmt.Printf("user id : %v\n", user.GetID())
-	fmt.Printf("requester id : %v\n", requesterID)
-	fmt.Printf("current follow : %v\n", currentFollow)
 	if user.IsPrivateUser() &&
 		user.GetID() != requesterID &&
 		(nil == currentFollow || currentFollow.GetStatus() != new(postgres.FollowAcceptedStatus).ToInt()) {
