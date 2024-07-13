@@ -7,7 +7,7 @@ type UserModel interface {
 	GetPassword() string
 	GetRole() string
 	GetEmail() string
-	GetGoogleID() *string
+	GetGoogleID() string
 	GetUsername() string
 	GetPhoneNumber() string
 	GetBio() string

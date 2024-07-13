@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oov/gothic"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
 	"go-api/pkg/jwt_helper"
@@ -53,55 +52,6 @@ func RefreshToken(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, tokenInfo)
-}
-
-func GoogleAuth(c *gin.Context) {
-	err := gothic.BeginAuth(c.Param("provider"), c.Writer, c.Request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-}
-
-func GoogleAuthCallback(c *gin.Context) {
-	acc := &account.AccountService{
-		Repo: repositories.Setup(),
-	}
-
-	user, err := gothic.CompleteAuth(c.Param("provider"), c.Writer, c.Request)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if "" == user.Email {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "email is empty"})
-		return
-	}
-
-	isKnown, err := acc.EmailExists(user.Email)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if false == isKnown {
-		err := acc.CreateWithGoogle(user.Email, user.UserID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-	}
-
-	tokenInfo, err := acc.LoginWithGoogle(user.Email)
-
-	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

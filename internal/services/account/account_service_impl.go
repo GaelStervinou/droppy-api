@@ -41,12 +41,12 @@ func (a *AccountService) Create(email string, password string, username string) 
 	return err
 }
 
-func (a *AccountService) CreateWithGoogle(email string, googleId string) error {
+func (a *AccountService) CreateWithGoogle(email string, name string, googleId string) error {
 	_, err := a.Repo.UserRepository.CreateWithGoogle(
 		model.UserCreationWithGoogleParam{
 			Email:    email,
 			GoogleId: googleId,
-			Username: random.RandStringRunes(10),
+			Username: name,
 			Role:     "user",
 		},
 	)
@@ -60,7 +60,7 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 	}
 	match, err := hash.ComparePasswordAndHash(password, user.GetPassword())
 	if err != nil {
-		return &account.TokenInfo{}, errors.New("Error while comparing password and hash")
+		return &account.TokenInfo{}, errors.New("error while comparing password and hash")
 	}
 	if !match {
 		return &account.TokenInfo{}, errors.New("email or password does not match our record")
@@ -101,12 +101,17 @@ func (a *AccountService) LoginWithFirebase(token string, ctx context.Context) (*
 	if err != nil {
 		return &account.TokenInfo{}, err
 	}
+	name, ok := decodedToken.Claims["name"].(string)
+
+	if !ok {
+		name = random.RandStringRunes(10)
+	}
 
 	user, err := a.Repo.UserRepository.GetByGoogleAuthId(decodedToken.UID)
 
 	if err != nil {
 		if "user not found" == err.Error() {
-			err = a.CreateWithGoogle(decodedToken.Claims["email"].(string), decodedToken.UID)
+			err = a.CreateWithGoogle(decodedToken.Claims["email"].(string), name, decodedToken.UID)
 			if err != nil {
 				return &account.TokenInfo{}, err
 			}
@@ -185,10 +190,6 @@ func (a *AccountService) LoginWithGoogle(email string) (*account.TokenInfo, erro
 	}
 
 	return &account.TokenInfo{JWTToken: newToken, RefreshToken: refreshToken, Expiry: newTokenExpiry}, nil
-}
-
-func (a *AccountService) Logout(userId uint) error {
-	return nil
 }
 
 func (a *AccountService) EmailExists(email string) (bool, error) {

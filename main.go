@@ -42,8 +42,6 @@ func main() {
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/refresh", controllers.RefreshToken)
-			auth.GET("/:provider", controllers.GoogleAuth)
-			auth.GET("/:provider/callback", controllers.GoogleAuthCallback)
 			auth.POST("/", controllers.Login)
 			auth.POST("/oauth_token", controllers.FirebaseLogin)
 		}

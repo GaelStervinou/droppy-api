@@ -13,10 +13,10 @@ import (
 
 type User struct {
 	gorm.Model
-	GoogleID    *string `gorm:"unique"`
-	Email       string  `gorm:"unique"`
-	Password    string  `gorm:"size:255"`
-	Username    string  `gorm:"unique;not null"`
+	GoogleID    string `gorm:"unique"`
+	Email       string `gorm:"unique"`
+	Password    string `gorm:"size:255"`
+	Username    string `gorm:"unique;not null"`
 	PhoneNumber string
 	Bio         string `gorm:"size:1000"`
 	Avatar      string
@@ -31,7 +31,7 @@ func (u *User) GetID() uint {
 	return u.ID
 }
 
-func (u *User) GetGoogleID() *string {
+func (u *User) GetGoogleID() string {
 	return u.GoogleID
 }
 
@@ -106,7 +106,7 @@ func (repo *repoUserPrivate) Create(args model.UserCreationParam) (model.UserMod
 func (repo *repoUserPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam) (model.UserModel, error) {
 	userObject := User{
 		Email:    args.Email,
-		GoogleID: &args.GoogleId,
+		GoogleID: args.GoogleId,
 		Status:   1,
 		Role:     args.Role,
 		Username: args.Username,
@@ -136,11 +136,11 @@ func (repo *repoUserPrivate) Delete(id uint) error {
 }
 
 func (repo *repoUserPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, error) {
-	userObject := User{GoogleID: &googleId}
+	userObject := User{}
 
-	result := repo.db.Find(&userObject)
+	result := repo.db.Where("google_id = ?", googleId).First(&userObject)
 	if userObject.CreatedAt.IsZero() {
-		return &userObject, errors.New("user not found")
+		return nil, errors.New("user not found")
 	}
 
 	return &userObject, result.Error
