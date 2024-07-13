@@ -24,13 +24,17 @@ type UserRepository interface {
 	GetById(id uint) (UserModel, error)
 	Create(args UserCreationParam) (UserModel, error)
 	CreateWithGoogle(args UserCreationWithGoogleParam) (UserModel, error)
-	Update(args UserPatchParam) (UserModel, error)
+	Update(userID uint, args map[string]interface{}) (UserModel, error)
 	Delete(id uint) error
 	GetAll() ([]UserModel, error)
 	CanUserBeFollowed(followedId uint) (bool, error)
 	GetUsersFromUserIds(userIds []uint) ([]UserModel, error)
 	Search(query string) ([]UserModel, error)
 	IsActiveUser(userId uint) (bool, error)
+}
+
+type UserService interface {
+	UpdateUser(userId uint, args UserPatchParam) (UserModel, error)
 }
 
 type UserCreationParam struct {
@@ -48,8 +52,9 @@ type UserCreationWithGoogleParam struct {
 }
 
 type UserPatchParam struct {
-	Email       string                `form:"email"`
+	Bio         string                `form:"bio"`
 	Username    string                `form:"username"`
+	IsPrivate   bool                  `form:"isPrivate"`
 	Picture     *multipart.FileHeader `form:"picture"`
 	PicturePath string                `form:"-"`
 }

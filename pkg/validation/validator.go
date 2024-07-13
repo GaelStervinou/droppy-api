@@ -36,11 +36,8 @@ func ValidateUserPatch(args model.UserPatchParam) errors2.MultiFieldsError {
 	finalErrors := errors2.MultiFieldsError{
 		Fields: map[string]string{},
 	}
-	if _, err := mail.ParseAddress(args.Email); err != nil {
-		finalErrors.Fields["email"] = "Invalid email address"
-	}
-	if len(args.Username) < 4 {
-		finalErrors.Fields["username"] = "Username must be at least 4 characters long"
+	if len(args.Username) < 4 || len(args.Username) > 255 {
+		finalErrors.Fields["username"] = "Username must be at least 4 characters long and at most 255 characters long"
 	}
 
 	return finalErrors

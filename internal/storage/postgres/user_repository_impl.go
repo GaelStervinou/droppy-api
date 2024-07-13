@@ -116,22 +116,19 @@ func (repo *repoUserPrivate) CreateWithGoogle(args model.UserCreationWithGoogleP
 	return &userObject, result.Error
 }
 
-func (repo *repoUserPrivate) Update(args model.UserPatchParam) (model.UserModel, error) {
-	validationError := validation.ValidateUserPatch(args)
-
-	if len(validationError.Fields) > 0 {
-		return nil, validationError
-	}
+func (repo *repoUserPrivate) Update(userID uint, args map[string]interface{}) (model.UserModel, error) {
 	userObject := User{}
-	repo.db.Where("email = ?", args.Email).First(&userObject)
+	repo.db.First(&userObject, userID)
 	if userObject.CreatedAt.IsZero() {
 		return nil, errors.New("user not found")
 	}
 
-	userObject.Username = args.Username
+	result := repo.db.Model(&userObject).Updates(args)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 
-	result := repo.db.Save(&userObject)
-	return &userObject, result.Error
+	return &userObject, nil
 }
 
 func (repo *repoUserPrivate) Delete(id uint) error {

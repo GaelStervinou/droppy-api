@@ -6,9 +6,9 @@ import (
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	"go-api/internal/services/account"
+	"go-api/internal/services/user"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
-	"go-api/pkg/file"
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
@@ -210,14 +210,8 @@ func PatchUserById(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	sqlDB, err := postgres.Connect()
 
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-
-	us := postgres.NewUserRepo(sqlDB)
+	us := user.NewUserService(repositories.Setup())
 
 	id := strings.TrimSpace(c.Param("id"))
 
@@ -237,7 +231,7 @@ func PatchUserById(c *gin.Context) {
 		return
 	}
 
-	requestedUser, err := us.GetById(uint(userID))
+	requestedUser, err := us.Repo.UserRepository.GetById(uint(userID))
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -256,19 +250,7 @@ func PatchUserById(c *gin.Context) {
 		return
 	}
 
-	if userToPatch.Picture != nil {
-		filePath, err := file.UploadFile(userToPatch.Picture)
-		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-			return
-		}
-		userToPatch.PicturePath = filePath
-	} else {
-		userToPatch.PicturePath = ""
-	}
-	userToPatch.Email = requestedUser.GetEmail()
-
-	updatedUser, err := us.Update(userToPatch)
+	updatedUser, err := us.UpdateUser(uint(userID), userToPatch)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -280,7 +262,7 @@ func PatchUserById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, requestedUser)
+	c.JSON(200, updatedUser)
 }
 
 // SearchUsers godoc

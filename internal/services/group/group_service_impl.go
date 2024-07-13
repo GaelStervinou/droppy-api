@@ -186,5 +186,10 @@ func (s *GroupService) DeleteGroup(groupId uint, userId uint) error {
 		return errors2.NotAllowedError{Reason: "You are not allowed to delete this group"}
 	}
 
-	return s.Repo.GroupRepository.DeleteGroup(groupId)
+	err = s.Repo.GroupRepository.DeleteGroup(groupId)
+	if err != nil {
+		return err
+	}
+
+	return s.Repo.GroupMemberRepository.DeleteGroupMembers(groupId)
 }

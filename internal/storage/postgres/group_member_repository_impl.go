@@ -225,3 +225,12 @@ func (r gmRepoPrivate) GetPendingGroupMemberRequests(groupID uint) ([]model.Grou
 
 	return groupMembersModel, nil
 }
+
+func (r gmRepoPrivate) DeleteGroupMembers(groupID uint) error {
+	result := r.db.Where("group_id = ?", groupID).Delete(&GroupMember{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
