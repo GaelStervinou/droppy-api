@@ -27,6 +27,7 @@ type GroupRepository interface {
 	Delete(id uint) error
 	Search(query string) ([]GroupModel, error)
 	GetAllGroups() ([]GroupModel, error)
+	DeleteGroup(id uint) error
 }
 
 type GroupService interface {
@@ -37,6 +38,7 @@ type GroupService interface {
 	IsValidGroupUpdate(groupId uint, args GroupPatchParam) (bool, error)
 	PatchGroup(groupId uint, userId uint, args GroupPatchParam) (GroupModel, error)
 	GetGroupDrops(groupId uint, requesterID uint) ([]DropModel, error)
+	DeleteGroup(groupId uint, userId uint) error
 }
 
 type GroupCreationParam struct {

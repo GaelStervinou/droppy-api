@@ -726,3 +726,58 @@ func GetGroupFeed(c *gin.Context) {
 
 	c.JSON(http.StatusOK, groupResponse)
 }
+
+// DeleteGroup godoc
+//
+//	@Summary		Delete Group
+//	@Description	Delete Group
+//	@Tags			group
+//	@Accept			json
+//
+// @Security BearerAuth
+//
+//	@Produce		json
+//	@Param			id path int true "Group ID"
+//
+//	@Success		204 No Content
+func DeleteGroup(c *gin.Context) {
+	requesterID, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := requesterID.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	groupId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	gs := &groupservice.GroupService{
+		Repo: repositories.Setup(),
+	}
+
+	err = gs.DeleteGroup(groupId, uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
+}

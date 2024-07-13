@@ -94,14 +94,22 @@ func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPat
 }
 
 func (s *GroupService) CanUpdateGroup(groupId uint, userId uint) (bool, error) {
+	requester, err := s.Repo.GroupMemberRepository.GetByGroupIDAndMemberID(groupId, userId)
+	if err != nil {
+		return false, err
+	}
+
+	if requester == nil {
+		return false, errors2.NotAllowedError{Reason: "You are not a manager"}
+	}
 	groupToUpdate, err := s.Repo.GroupRepository.GetById(groupId)
 	if err != nil {
 		return false, err
 	}
 
-	//TODO rajouter les modérateurs qd ils seront dispo
-	if groupToUpdate.GetCreatedByID() != userId {
-		return false, errors2.CannotUpdateGroupError{Reason: "You are not the owner of the group"}
+	managerRole := &postgres.GroupMemberRoleManager{}
+	if requester.GetRole() != managerRole.ToString() && groupToUpdate.GetCreatedByID() != userId {
+		return false, errors2.NotAllowedError{Reason: "You are not a manager"}
 	}
 
 	return true, nil
@@ -162,4 +170,21 @@ func (s *GroupService) GetGroupDrops(groupId uint, requesterID uint) ([]model.Dr
 	}
 
 	return drops, nil
+}
+
+func (s *GroupService) DeleteGroup(groupId uint, userId uint) error {
+	groupToDelete, err := s.Repo.GroupRepository.GetById(groupId)
+	if err != nil {
+		return err
+	}
+
+	if groupToDelete == nil {
+		return errors.New("group not found")
+	}
+
+	if groupToDelete.GetCreatedByID() != userId {
+		return errors2.NotAllowedError{Reason: "You are not allowed to delete this group"}
+	}
+
+	return s.Repo.GroupRepository.DeleteGroup(groupId)
 }

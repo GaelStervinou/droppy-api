@@ -551,6 +551,48 @@ info:
   title: Droppy API
   version: "1.0"
 paths:
+  /admin/comments:
+    get:
+      consumes:
+      - application/json
+      description: Get all comments by admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.GetCommentResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get all comments
+      tags:
+      - admin
+  /admin/drops:
+    get:
+      consumes:
+      - application/json
+      description: Get all drops by admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.GetDropResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get all drops
+      tags:
+      - admin
   /admin/groups:
     get:
       consumes:
@@ -571,7 +613,24 @@ paths:
       - BearerAuth: []
       summary: Get all groups
       tags:
-      - user
+      - admin
+  /admin/reports:
+    get:
+      consumes:
+      - application/json
+      description: Get all reports by admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get all reports
+      tags:
+      - admin
   /admin/users:
     get:
       consumes:
@@ -592,7 +651,7 @@ paths:
       - BearerAuth: []
       summary: Get all users
       tags:
-      - user
+      - admin
   /auth:
     post:
       consumes:

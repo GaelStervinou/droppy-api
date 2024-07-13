@@ -87,6 +87,7 @@ func main() {
 			group.GET("/:id/feed", middlewares.CurrentUserMiddleware(true), controllers.GetGroupFeed)
 			group.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchGroup)
 			group.GET("/search", middlewares.CurrentUserMiddleware(true), controllers.SearchGroups)
+			group.DELETE("/:id", middlewares.CurrentUserMiddleware(true), controllers.DeleteGroup)
 
 			group.POST("/members/:id/join", middlewares.CurrentUserMiddleware(true), controllers.JoinGroup)
 			group.POST("/members/:id/:userId", middlewares.CurrentUserMiddleware(true), controllers.AddUserToGroup)
