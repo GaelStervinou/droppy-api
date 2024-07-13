@@ -30,6 +30,19 @@ import (
 // @Failure		404
 // @Router			/users/{id} [get]
 func GetUserById(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	sqlDB, err := postgres.Connect()
 
 	if err != nil {
@@ -96,6 +109,12 @@ func GetUserById(c *gin.Context) {
 	totalFollowers := fr.CountFollowers(requestedUser.GetID())
 	totalFollowing := fr.CountFollowed(requestedUser.GetID())
 	totalDrops := dr.CountUserDrops(requestedUser.GetID())
+	currentFollow, err := fr.GetUserFollowedBy(uintCurrentUserId, requestedUser.GetID())
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	userResponse := response_models.FormatGetOneUserResponse(
 		requestedUser,
@@ -105,6 +124,8 @@ func GetUserById(c *gin.Context) {
 		totalFollowers,
 		totalFollowing,
 		totalDrops,
+		currentFollow,
+		uintCurrentUserId,
 	)
 
 	c.JSON(http.StatusOK, userResponse)

@@ -1,6 +1,8 @@
 package response_models
 
 import (
+	"fmt"
+	"go-api/internal/storage/postgres"
 	"go-api/pkg/model"
 	"time"
 )
@@ -179,6 +181,7 @@ type GetOneUserResponse struct {
 	TotalFollowers int
 	TotalFollowed  int
 	TotalDrops     int
+	CurrentFollow  *GetOneFollowResponse
 }
 
 func FormatGetOneUserResponse(
@@ -189,6 +192,8 @@ func FormatGetOneUserResponse(
 	totalFollowers int,
 	totalFollowed int,
 	totalDrops int,
+	currentFollow model.FollowModel,
+	requesterID uint,
 ) GetOneUserResponse {
 	userGroups := user.GetGroups()
 	formattedGroups := make([]GetGroupResponse, 0)
@@ -210,16 +215,36 @@ func FormatGetOneUserResponse(
 	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
 
 	formattedPinnedDrops := make([]GetDropResponse, 0)
-	for _, drop := range pinnedDrops {
-		formattedPinnedDrops = append(formattedPinnedDrops, FormatGetDropResponse(drop, false))
+	var lastDropPointer *GetDropResponse
+
+	fmt.Printf("is user private : %v\n", user.IsPrivateUser())
+	fmt.Printf("user id : %v\n", user.GetID())
+	fmt.Printf("requester id : %v\n", requesterID)
+	fmt.Printf("current follow : %v\n", currentFollow)
+	if user.IsPrivateUser() &&
+		user.GetID() != requesterID &&
+		(nil == currentFollow || currentFollow.GetStatus() != new(postgres.FollowAcceptedStatus).ToInt()) {
+		lastDrop = nil
+		pinnedDrops = nil
+	} else {
+		for _, drop := range pinnedDrops {
+			formattedPinnedDrops = append(formattedPinnedDrops, FormatGetDropResponse(drop, false))
+		}
+
+		if nil != lastDrop {
+			res := FormatGetDropResponse(lastDrop, isLastDropLiked)
+			lastDropPointer = &res
+		}
 	}
 
-	var lastDropPointer *GetDropResponse
-	if nil == lastDrop {
+	currentFollowPointer := &GetOneFollowResponse{}
+	if nil != currentFollow {
+		follow := FormatGetOneFollowResponse(currentFollow)
+		currentFollowPointer = &follow
 	} else {
-		res := FormatGetDropResponse(lastDrop, isLastDropLiked)
-		lastDropPointer = &res
+		currentFollowPointer = nil
 	}
+
 	return GetOneUserResponse{
 		ID:             user.GetID(),
 		Username:       user.GetUsername(),
@@ -233,5 +258,6 @@ func FormatGetOneUserResponse(
 		TotalFollowers: totalFollowers,
 		TotalFollowed:  totalFollowed,
 		TotalDrops:     totalDrops,
+		CurrentFollow:  currentFollowPointer,
 	}
 }

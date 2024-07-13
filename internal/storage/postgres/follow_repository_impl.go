@@ -181,7 +181,7 @@ func (r *repoFollowPrivate) IsPendingFollowing(followerID, followedID uint) (boo
 
 func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 	var count int64
-	result := r.db.Model(&Follow{}).Where("followed_id = ?", userID).Count(&count)
+	result := r.db.Model(&Follow{}).Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Count(&count)
 	if result.Error != nil {
 		return 0
 	}
@@ -190,9 +190,26 @@ func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 
 func (r *repoFollowPrivate) CountFollowed(userID uint) int {
 	var count int64
-	result := r.db.Model(&Follow{}).Where("follower_id = ?", userID).Count(&count)
+	result := r.db.Model(&Follow{}).Where("follower_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Count(&count)
 	if result.Error != nil {
 		return 0
 	}
 	return int(count)
+}
+
+func (r *repoFollowPrivate) GetUserFollowedBy(followerID uint, followedID uint) (model.FollowModel, error) {
+	var follow Follow
+	result := r.db.
+		Preload("Follower").
+		Preload("Followed").
+		Where("follower_id = ? AND followed_id = ?", followerID, followedID).Find(&follow)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if follow.CreatedAt.IsZero() {
+		return nil, nil
+	}
+
+	return &follow, nil
 }
