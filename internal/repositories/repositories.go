@@ -18,6 +18,7 @@ type Repositories struct {
 	CommentRepository          model.CommentRepository
 	CommentResponseRepository  model.CommentResponseRepository
 	LikeRepository             model.LikeRepository
+	ReportRepository           model.ReportRepository
 }
 
 func Setup() *Repositories {
@@ -35,6 +36,7 @@ func Setup() *Repositories {
 		CommentRepository:          postgres.NewCommentRepo(sqlDB),
 		CommentResponseRepository:  postgres.NewCommentResponseRepo(sqlDB),
 		LikeRepository:             postgres.NewLikeRepo(sqlDB),
+		ReportRepository:           postgres.NewReportRepo(sqlDB),
 	}
 }
 
