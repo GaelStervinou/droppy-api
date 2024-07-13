@@ -747,6 +747,15 @@ const docTemplate = `{
                     "follow"
                 ],
                 "summary": "Delete follow",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Follow ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": "No Content",

@@ -482,6 +482,7 @@ func SendPendingFollowsWS(userID uint, followRepo model.FollowRepository) error 
 // @Tags			follow
 // @Accept			json
 // @Produce		json
+// @Param			id path int true "Follow ID"
 // @Security BearerAuth
 //
 // @Success		204 No Content
