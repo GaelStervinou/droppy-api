@@ -52,12 +52,7 @@ func FollowUser(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	us := postgres.NewUserRepo(sqlDB)
 
@@ -154,12 +149,7 @@ func GetMyPendingRequestsWS(c *gin.Context) {
 	fmt.Printf("Users connected: %v\n", userPendingFollowConnections)
 	muPendingFollow.Unlock()
 
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	err = SendPendingFollowsWS(uintCurrentUserId, postgres.NewFollowRepo(sqlDB))
 	if err != nil {
@@ -212,12 +202,7 @@ func AcceptRequest(c *gin.Context) {
 		return
 	}
 
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	id := c.Param("id")
 
@@ -284,12 +269,7 @@ func RejectRequest(c *gin.Context) {
 		return
 	}
 
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	id := c.Param("id")
 

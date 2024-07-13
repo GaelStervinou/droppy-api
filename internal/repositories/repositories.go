@@ -3,7 +3,6 @@ package repositories
 import (
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/model"
-	"os"
 )
 
 type Repositories struct {
@@ -22,10 +21,7 @@ type Repositories struct {
 }
 
 func Setup() *Repositories {
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		os.Exit(1)
-	}
+	sqlDB := postgres.Connect()
 
 	return &Repositories{
 		//wg:              wg,

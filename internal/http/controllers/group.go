@@ -195,12 +195,7 @@ func PatchGroup(c *gin.Context) {
 // @Failure		500
 // @Router			/groups/search [get]
 func SearchGroups(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	gr := postgres.NewGroupRepo(sqlDB)
 
@@ -604,11 +599,7 @@ func GetOneGroup(c *gin.Context) {
 		return
 	}
 
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	gr := postgres.NewGroupRepo(sqlDB)
 
@@ -675,11 +666,7 @@ func GetGroupFeed(c *gin.Context) {
 		return
 	}
 
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	gr := postgres.NewGroupRepo(sqlDB)
 

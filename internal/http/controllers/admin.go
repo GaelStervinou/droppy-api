@@ -20,11 +20,7 @@ import (
 // @Failure		500
 // @Router			/admin/users [get]
 func GetAllUsers(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	us := postgres.NewUserRepo(sqlDB)
 
@@ -54,11 +50,7 @@ func GetAllUsers(c *gin.Context) {
 // @Failure		500
 // @Router			/admin/groups [get]
 func GetAllGroups(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	gr := postgres.NewGroupRepo(sqlDB)
 
@@ -88,11 +80,7 @@ func GetAllGroups(c *gin.Context) {
 // @Failure		500
 // @Router			/admin/drops [get]
 func GetAllDrops(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	dr := postgres.NewDropRepo(sqlDB)
 
@@ -122,11 +110,7 @@ func GetAllDrops(c *gin.Context) {
 // @Failure		500
 // @Router			/admin/comments [get]
 func GetAllComments(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	cr := postgres.NewCommentRepo(sqlDB)
 
@@ -156,11 +140,7 @@ func GetAllComments(c *gin.Context) {
 // @Failure		500
 // @Router			/admin/reports [get]
 func GetAllReports(c *gin.Context) {
-	// sqlDB, err := postgres.Connect()
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	// sqlDB := postgres.Connect()
 
 	// rr := postgres.NewReportRepo(sqlDB)
 

@@ -66,12 +66,8 @@ func CreateDrop(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 
-	sqlDB, err := postgres.Connect()
+	sqlDB := postgres.Connect()
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
 	fr := postgres.NewFollowRepo(sqlDB)
 
 	userFollowers, err := fr.GetFollowers(uintCurrentUserId)

@@ -43,12 +43,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	us := postgres.NewUserRepo(sqlDB)
 
@@ -144,12 +139,7 @@ func GetUserById(c *gin.Context) {
 //	@Failure		500
 //	@Router			/users [post]
 func Create(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	var userToCreate model.UserCreationParam
 
@@ -279,12 +269,7 @@ func PatchUserById(c *gin.Context) {
 // @Failure		500
 // @Router			/users/search [get]
 func SearchUsers(c *gin.Context) {
-	sqlDB, err := postgres.Connect()
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	sqlDB := postgres.Connect()
 
 	us := postgres.NewUserRepo(sqlDB)
 

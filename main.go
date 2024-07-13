@@ -32,6 +32,7 @@ func main() {
 		return
 	}
 
+	postgres.Init()
 	postgres.AutoMigrate()
 	r := gin.Default()
 	r.Use(gin.Recovery())
