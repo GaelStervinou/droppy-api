@@ -369,3 +369,61 @@ func newDropAvailable(userID uint, dropInfo response_models.GetDropResponse) {
 		log.Printf("Error sending message to user %d: %v", userID, err)
 	}
 }
+
+// DeleteDrop godoc
+//
+//	@Summary		Delete a drop
+//	@Description	Delete a drop
+//	@Tags			drop
+//	@Accept			json
+//	@Produce		json
+//	@Security BearerAuth
+//	@Param			id path int true "Drop ID"
+//	@Success		204 No Content
+//	@Failure		400
+//	@Failure		401
+//	@Failure		500
+//	@Router			/drops/:id [delete]
+func DeleteDrop(c *gin.Context) {
+	repo := repositories.Setup()
+
+	ds := &dropservice.DropService{
+		Repo: repo,
+	}
+
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	dropId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ds.DeleteDrop(dropId, uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
+}
