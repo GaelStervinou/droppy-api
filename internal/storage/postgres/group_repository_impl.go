@@ -190,3 +190,8 @@ func (r repoGroupPrivate) GetAllGroups() ([]model.GroupModel, error) {
 	}
 	return models, result.Error
 }
+
+func (r repoGroupPrivate) DeleteGroup(id uint) error {
+	result := r.db.Delete(&Group{}, id)
+	return result.Error
+}

@@ -152,7 +152,7 @@ func GetAllComments(c *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
-// @Success		200	{object} []response_models.GetReportResponse
+// @Success		200
 // @Failure		500
 // @Router			/admin/reports [get]
 func GetAllReports(c *gin.Context) {
