@@ -225,3 +225,39 @@ func (s *DropService) DeleteDrop(dropID uint, requesterID uint) error {
 
 	return s.Repo.DropRepository.Delete(dropID)
 }
+
+func (s *DropService) PatchDrop(dropID uint, requesterID uint, patch model.DropPatch) (model.DropModel, error) {
+	drop, err := s.Repo.DropRepository.GetDropById(dropID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if drop == nil {
+		return nil, errors.New("drop not found")
+	}
+
+	if drop.GetCreatedById() != requesterID {
+		return nil, errors2.NotAllowedError{Reason: "This drop is not yours"}
+	}
+
+	updates := make(map[string]interface{})
+
+	if patch.IsPinned {
+		updates["IsPinned"] = patch.IsPinned
+	} else {
+		updates["IsPinned"] = false
+	}
+
+	if len(updates) == 0 {
+		return nil, errors.New("no updates")
+	}
+
+	updatedDrop, err := s.Repo.DropRepository.Update(dropID, updates)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Repo.DropRepository.GetDropById(updatedDrop.GetID())
+}

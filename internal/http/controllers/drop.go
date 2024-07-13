@@ -427,3 +427,56 @@ func DeleteDrop(c *gin.Context) {
 
 	c.JSON(http.StatusNoContent, nil)
 }
+
+func PatchDrop(c *gin.Context) {
+	repo := repositories.Setup()
+
+	ds := &dropservice.DropService{
+		Repo: repo,
+	}
+
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+
+	if "" == id {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	dropId, err := converters.StringToUint(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var dropPatch model.DropPatch
+
+	if err := c.ShouldBindJSON(&dropPatch); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedDrop, err := ds.PatchDrop(dropId, uintCurrentUserId, dropPatch)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	response := response_models.FormatGetDropResponse(updatedDrop, false)
+
+	c.JSON(http.StatusOK, response)
+}

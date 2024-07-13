@@ -19,6 +19,7 @@ type GetDropResponse struct {
 	TotalComments       int
 	TotalLikes          int
 	IsCurrentUserLiking bool `json:",omitempty"`
+	IsPinned            bool `json:",omitempty"`
 }
 
 func FormatGetDropResponse(drop model.DropModel, isCurrentUserLiking bool) GetDropResponse {
@@ -48,5 +49,6 @@ func FormatGetDropResponse(drop model.DropModel, isCurrentUserLiking bool) GetDr
 		TotalComments:       len(drop.GetComments()),
 		TotalLikes:          drop.GetTotalLikes(),
 		IsCurrentUserLiking: isCurrentUserLiking,
+		IsPinned:            drop.GetIsPinned(),
 	}
 }

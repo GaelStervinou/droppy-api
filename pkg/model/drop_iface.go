@@ -39,6 +39,7 @@ type DropRepository interface {
 	CountUserDrops(userId uint) int
 	CountGroupDrops(groupId uint) int
 	GetAllDrops() ([]DropModel, error)
+	Update(dropId uint, updates map[string]interface{}) (DropModel, error)
 }
 
 type DropService interface {
@@ -51,6 +52,7 @@ type DropService interface {
 	IsCurrentUserLiking(dropId uint, userId uint) (bool, error)
 	GetDropById(dropID uint, requesterID uint) (DropModel, error)
 	DeleteDrop(dropID uint, requesterID uint) error
+	PatchDrop(dropID uint, requesterID uint, patch DropPatch) (DropModel, error)
 }
 
 type DropCreationParam struct {
@@ -70,4 +72,8 @@ type FilledDropCreation struct {
 	PicturePath        string  `json:"picturePath"`
 	Lat                float64 `json:"lat"`
 	Lng                float64 `json:"lng"`
+}
+
+type DropPatch struct {
+	IsPinned bool `json:"isPinned"`
 }

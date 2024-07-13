@@ -258,3 +258,11 @@ func (r *repoDropPrivate) GetAllDrops() ([]model.DropModel, error) {
 	}
 	return result, nil
 }
+
+func (r *repoDropPrivate) Update(dropId uint, updates map[string]interface{}) (model.DropModel, error) {
+	var drop Drop
+	if err := r.db.Model(&Drop{}).Where("id = ?", dropId).Updates(updates).First(&drop).Error; err != nil {
+		return nil, err
+	}
+	return &drop, nil
+}
