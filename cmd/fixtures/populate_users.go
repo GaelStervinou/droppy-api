@@ -25,15 +25,14 @@ func PopulateUsers(db *gorm.DB) error {
 		}
 		role := roles[r.IntN(len(roles))]
 		db.Create(&postgres.User{
-			Email:       faker.Email(),
-			Password:    faker.Password(),
-			Username:    faker.FirstName(),
-			Role:        role,
-			Status:      status,
-			IsPrivate:   private,
-			Bio:         faker.Sentence(),
-			PhoneNumber: faker.Phonenumber(),
-			Avatar:      avatar,
+			Email:     faker.Email(),
+			Password:  faker.Password(),
+			Username:  faker.FirstName(),
+			Role:      role,
+			Status:    status,
+			IsPrivate: private,
+			Bio:       faker.Sentence(),
+			Avatar:    avatar,
 		})
 		i++
 	}

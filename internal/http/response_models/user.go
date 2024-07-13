@@ -80,7 +80,6 @@ type AdminGetUserResponseInterface interface {
 	GetID() uint
 	GetUsername() string
 	GetRole() string
-	GetPhoneNumber() string
 	GetEmail() string
 	GetBio() *string
 	GetAvatar() *string
@@ -98,10 +97,6 @@ func (u *AdminGetUserResponse) GetUsername() string {
 
 func (u *AdminGetUserResponse) GetRole() string {
 	return u.Role
-}
-
-func (u *AdminGetUserResponse) GetPhoneNumber() string {
-	return u.PhoneNumber
 }
 
 func (u *AdminGetUserResponse) GetEmail() string {
@@ -125,15 +120,14 @@ func (u *AdminGetUserResponse) GetCreatedAt() *time.Time {
 }
 
 type AdminGetUserResponse struct {
-	ID          uint
-	Username    string
-	Role        string
-	PhoneNumber string
-	Email       string
-	Bio         *string
-	Avatar      *string
-	IsPrivate   bool
-	CreatedAt   *time.Time
+	ID        uint
+	Username  string
+	Role      string
+	Email     string
+	Bio       *string
+	Avatar    *string
+	IsPrivate bool
+	CreatedAt *time.Time
 }
 
 func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterface {
@@ -155,15 +149,14 @@ func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterf
 	createdAt := time.Unix(int64(user.GetCreatedAt()), 0)
 
 	return &AdminGetUserResponse{
-		ID:          user.GetID(),
-		Username:    user.GetUsername(),
-		Role:        user.GetRole(),
-		PhoneNumber: user.GetPhoneNumber(),
-		Email:       user.GetEmail(),
-		Bio:         bioPointer,
-		Avatar:      avatarPointer,
-		IsPrivate:   user.IsPrivateUser(),
-		CreatedAt:   &createdAt,
+		ID:        user.GetID(),
+		Username:  user.GetUsername(),
+		Role:      user.GetRole(),
+		Email:     user.GetEmail(),
+		Bio:       bioPointer,
+		Avatar:    avatarPointer,
+		IsPrivate: user.IsPrivateUser(),
+		CreatedAt: &createdAt,
 	}
 }
 

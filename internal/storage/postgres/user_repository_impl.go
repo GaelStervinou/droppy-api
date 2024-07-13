@@ -13,11 +13,10 @@ import (
 
 type User struct {
 	gorm.Model
-	GoogleID    string `gorm:"unique"`
+	FirebaseUID string `gorm:"unique"`
 	Email       string `gorm:"unique"`
 	Password    string `gorm:"size:255"`
 	Username    string `gorm:"unique;not null"`
-	PhoneNumber string
 	Bio         string `gorm:"size:1000"`
 	Avatar      string
 	VerifyToken string
@@ -31,8 +30,8 @@ func (u *User) GetID() uint {
 	return u.ID
 }
 
-func (u *User) GetGoogleID() string {
-	return u.GoogleID
+func (u *User) GetFirebaseUID() string {
+	return u.FirebaseUID
 }
 
 func (u *User) GetEmail() string {
@@ -41,15 +40,14 @@ func (u *User) GetEmail() string {
 func (u *User) GetPassword() string {
 	return u.Password
 }
-func (u *User) GetUsername() string    { return u.Username }
-func (u *User) GetRole() string        { return u.Role }
-func (u *User) GetCreatedAt() int      { return int(u.CreatedAt.Unix()) }
-func (u *User) GetUpdatedAt() int      { return int(u.UpdatedAt.Unix()) }
-func (u *User) GetDeletedAt() int      { return int(u.UpdatedAt.Unix()) }
-func (u *User) IsPrivateUser() bool    { return u.IsPrivate }
-func (u *User) GetPhoneNumber() string { return u.PhoneNumber }
-func (u *User) GetBio() string         { return u.Bio }
-func (u *User) GetAvatar() string      { return u.Avatar }
+func (u *User) GetUsername() string { return u.Username }
+func (u *User) GetRole() string     { return u.Role }
+func (u *User) GetCreatedAt() int   { return int(u.CreatedAt.Unix()) }
+func (u *User) GetUpdatedAt() int   { return int(u.UpdatedAt.Unix()) }
+func (u *User) GetDeletedAt() int   { return int(u.UpdatedAt.Unix()) }
+func (u *User) IsPrivateUser() bool { return u.IsPrivate }
+func (u *User) GetBio() string      { return u.Bio }
+func (u *User) GetAvatar() string   { return u.Avatar }
 func (u *User) GetGroups() []model.GroupModel {
 	var result []model.GroupModel
 	for _, userGroup := range u.Groups {
@@ -105,11 +103,11 @@ func (repo *repoUserPrivate) Create(args model.UserCreationParam) (model.UserMod
 
 func (repo *repoUserPrivate) CreateWithGoogle(args model.UserCreationWithGoogleParam) (model.UserModel, error) {
 	userObject := User{
-		Email:    args.Email,
-		GoogleID: args.GoogleId,
-		Status:   1,
-		Role:     args.Role,
-		Username: args.Username,
+		Email:       args.Email,
+		FirebaseUID: args.GoogleId,
+		Status:      1,
+		Role:        args.Role,
+		Username:    args.Username,
 	}
 
 	result := repo.db.Create(&userObject)

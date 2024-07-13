@@ -7,9 +7,8 @@ type UserModel interface {
 	GetPassword() string
 	GetRole() string
 	GetEmail() string
-	GetGoogleID() string
+	GetFirebaseUID() string
 	GetUsername() string
-	GetPhoneNumber() string
 	GetBio() string
 	GetAvatar() string
 	IsPrivateUser() bool
