@@ -21,6 +21,6 @@ RUN go install -v ./...
 
 #Setup hot-reload for dev stage
 RUN go install -mod=mod github.com/githubnemo/CompileDaemon
-RUN go get -v golang.org/x/tools/gopls
+RUN go install golang.org/x/tools/gopls@latest
 
 ENTRYPOINT CompileDaemon --build="go build -a -installsuffix cgo -o main ." --command=./main
