@@ -5,6 +5,7 @@ import (
 	"go-api/internal/repositories"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
+	"go-api/pkg/file"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
 )
@@ -74,13 +75,32 @@ func (s *GroupService) PatchGroup(groupId uint, userId uint, args model.GroupPat
 		return nil, err
 	}
 
-	updatedGroup, err := s.Repo.GroupRepository.Update(model.FilledGroupPatchParam{
-		ID:          groupId,
-		Name:        args.Name,
-		Description: args.Description,
-		IsPrivate:   args.IsPrivate,
-		PicturePath: args.PicturePath,
-	})
+	updates := make(map[string]interface{})
+
+	if args.Name != "" {
+		updates["Name"] = args.Name
+	}
+
+	if args.Description != "" {
+		updates["Description"] = args.Description
+	}
+
+	if args.IsPrivate {
+		updates["IsPrivate"] = args.IsPrivate
+	} else {
+		updates["IsPrivate"] = false
+	}
+
+	if args.Picture != nil {
+		filePath, err := file.UploadFile(args.Picture)
+		if err != nil {
+			return nil, err
+		}
+		updates["PicturePath"] = filePath
+		args.PicturePath = filePath
+	}
+
+	updatedGroup, err := s.Repo.GroupRepository.Update(groupId, updates)
 
 	if err != nil {
 		return nil, err

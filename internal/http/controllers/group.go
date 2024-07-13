@@ -149,17 +149,6 @@ func PatchGroup(c *gin.Context) {
 		return
 	}
 
-	if groupPatch.Picture != nil {
-		filePath, err := file.UploadFile(groupPatch.Picture)
-		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-			return
-		}
-		groupPatch.PicturePath = filePath
-	} else {
-		groupPatch.PicturePath = ""
-	}
-
 	gs := &groupservice.GroupService{
 		Repo: repositories.Setup(),
 	}

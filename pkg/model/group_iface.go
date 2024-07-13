@@ -23,7 +23,7 @@ type GroupRepository interface {
 	GetById(id uint) (GroupModel, error)
 	GetGroupMinimalById(id uint) (GroupModel, error)
 	GetByName(name string) (GroupModel, error)
-	Update(args FilledGroupPatchParam) (GroupModel, error)
+	Update(groupID uint, args map[string]interface{}) (GroupModel, error)
 	Delete(id uint) error
 	Search(query string) ([]GroupModel, error)
 	GetAllGroups() ([]GroupModel, error)

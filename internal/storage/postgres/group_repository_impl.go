@@ -103,24 +103,15 @@ func (r repoGroupPrivate) FindAllGroupOwnedByUserId(userId uint) ([]model.GroupM
 	return models, nil
 }
 
-func (r repoGroupPrivate) Update(args model.FilledGroupPatchParam) (model.GroupModel, error) {
+func (r repoGroupPrivate) Update(groupID uint, args map[string]interface{}) (model.GroupModel, error) {
 	object := Group{}
 
-	r.db.Where("id = ?", args.ID).First(&object)
+	r.db.Where("id = ?", groupID).First(&object)
 	if object.CreatedAt.IsZero() {
-		return nil, fmt.Errorf("group with id %d not found", args.ID)
+		return nil, fmt.Errorf("group with id %d not found", groupID)
 	}
 
-	if args.Name != "" {
-		object.Name = args.Name
-	}
-	if args.Description != "" {
-		object.Description = args.Description
-	}
-	object.IsPrivate = args.IsPrivate
-	object.PicturePath = sql.NullString{String: args.PicturePath, Valid: args.PicturePath != ""}
-
-	result := r.db.Save(&object)
+	result := r.db.Model(&object).Updates(args)
 	return &object, result.Error
 }
 
