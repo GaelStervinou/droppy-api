@@ -166,6 +166,7 @@ type GetOneUserResponse struct {
 	Bio            *string
 	Avatar         *string
 	IsPrivate      bool
+	Email          string
 	CreatedAt      *time.Time
 	LastDrop       *GetDropResponse
 	PinnedDrops    []GetDropResponse
@@ -239,6 +240,7 @@ func FormatGetOneUserResponse(
 		Bio:            bioPointer,
 		Avatar:         avatarPointer,
 		IsPrivate:      user.IsPrivateUser(),
+		Email:          user.GetEmail(),
 		CreatedAt:      &createdAt,
 		LastDrop:       lastDropPointer,
 		PinnedDrops:    formattedPinnedDrops,

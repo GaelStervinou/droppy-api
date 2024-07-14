@@ -58,6 +58,10 @@ func (u *User) GetGroups() []model.GroupModel {
 }
 func (u *User) GetFCMToken() string { return u.FCMToken }
 
+func (u *User) GetStatus() int {
+	return u.Status
+}
+
 var _ model.UserModel = (*User)(nil)
 
 type repoUserPrivate struct {

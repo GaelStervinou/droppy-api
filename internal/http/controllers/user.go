@@ -67,7 +67,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	if nil == requestedUser {
+	if nil == requestedUser || requestedUser.GetStatus() != 1 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}

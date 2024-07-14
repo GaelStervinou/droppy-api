@@ -10,6 +10,7 @@ type UserModel interface {
 	GetFirebaseUID() string
 	GetUsername() string
 	GetBio() string
+	GetStatus() int
 	GetAvatar() string
 	IsPrivateUser() bool
 	GetCreatedAt() int
