@@ -53,7 +53,7 @@ func (a *AccountService) CreateWithGoogle(email string, name string, googleId st
 	return err
 }
 
-func (a *AccountService) Login(email string, password string) (*account.TokenInfo, error) {
+func (a *AccountService) Login(email string, password string, fcmToken string) (*account.TokenInfo, error) {
 	user, err := a.Repo.UserRepository.GetByEmail(email)
 	if err != nil {
 		return &account.TokenInfo{}, err
@@ -69,6 +69,13 @@ func (a *AccountService) Login(email string, password string) (*account.TokenInf
 	newToken, refreshToken, newTokenExpiry, err := jwt_helper.GenerateToken(user.GetID(), user.GetRole())
 	if err != nil {
 		return &account.TokenInfo{}, err
+	}
+
+	if fcmToken != "" && user.GetFCMToken() != fcmToken {
+		_, err = a.Repo.UserRepository.Update(user.GetID(), map[string]interface{}{"fcmToken": fcmToken})
+		if err != nil {
+			return &account.TokenInfo{}, err
+		}
 	}
 
 	_, err = a.Repo.TokenRepository.Create(context.TODO(), model.TokenCreationParam{

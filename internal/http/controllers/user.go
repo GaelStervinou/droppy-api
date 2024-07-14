@@ -166,7 +166,7 @@ func Create(c *gin.Context) {
 		Repo: repositories.Setup(),
 	}
 
-	tokenInfo, err := acc.Login(createdUser.GetEmail(), userToCreate.Password)
+	tokenInfo, err := acc.Login(createdUser.GetEmail(), userToCreate.Password, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

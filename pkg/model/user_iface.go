@@ -15,6 +15,7 @@ type UserModel interface {
 	GetCreatedAt() int
 	GetUpdatedAt() int
 	GetGroups() []GroupModel
+	GetFCMToken() string
 }
 
 type UserRepository interface {
@@ -30,6 +31,7 @@ type UserRepository interface {
 	GetUsersFromUserIds(userIds []uint) ([]UserModel, error)
 	Search(query string) ([]UserModel, error)
 	IsActiveUser(userId uint) (bool, error)
+	GetAllFCMTokens() ([]string, error)
 }
 
 type UserService interface {
@@ -61,4 +63,5 @@ type UserPatchParam struct {
 type LoginParam struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	FcmToken string `json:"fcmToken"`
 }

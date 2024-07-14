@@ -24,6 +24,7 @@ type User struct {
 	IsPrivate   bool `gorm:"default:false"`
 	Role        string
 	Groups      []Group `gorm:"many2many:group_members;foreignKey:ID;joinForeignKey:MemberID;References:ID;JoinReferences:GroupID"`
+	FCMToken    string
 }
 
 func (u *User) GetID() uint {
@@ -55,6 +56,7 @@ func (u *User) GetGroups() []model.GroupModel {
 	}
 	return result
 }
+func (u *User) GetFCMToken() string { return u.FCMToken }
 
 var _ model.UserModel = (*User)(nil)
 
@@ -176,6 +178,7 @@ func (repo *repoUserPrivate) GetAll() ([]model.UserModel, error) {
 	}
 	return models, result.Error
 }
+
 func (repo *repoUserPrivate) CanUserBeFollowed(followedId uint) (bool, error) {
 	userObject := User{}
 	userObject.ID = followedId
@@ -223,4 +226,19 @@ func (repo *repoUserPrivate) IsActiveUser(userId uint) (bool, error) {
 	}
 
 	return userObject.Status == 1, result.Error
+}
+
+func (repo *repoUserPrivate) GetAllFCMTokens() ([]string, error) {
+	var foundUsers []*User
+	result := repo.db.Find(&foundUsers)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	tokens := make([]string, len(foundUsers))
+	for i, v := range foundUsers {
+		tokens[i] = v.GetFCMToken()
+	}
+	return tokens, nil
 }

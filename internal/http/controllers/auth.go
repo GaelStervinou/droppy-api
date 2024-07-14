@@ -82,7 +82,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	tokenInfo, err := acc.Login(loginParam.Email, loginParam.Password)
+	tokenInfo, err := acc.Login(loginParam.Email, loginParam.Password, loginParam.FcmToken)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid email or password"})
 		return

@@ -1739,6 +1739,9 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "fcmToken": {
+                    "type": "string"
                 }
             }
         },
