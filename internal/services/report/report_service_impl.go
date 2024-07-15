@@ -11,6 +11,22 @@ type ReportService struct {
 	Repo *repositories.Repositories
 }
 
+func (s *ReportService) CreateReport(userId uint, args model.ReportCreationParam) (model.ReportModel, error) {
+	if args.DropId != 0 {
+		return s.ReportDrop(userId, args.DropId, args.Description)
+	}
+
+	if args.CommentId != 0 {
+		return s.ReportComment(userId, args.CommentId, args.Description)
+	}
+
+	if args.CommentResponseId != 0 {
+		return s.ReportResponse(userId, args.CommentResponseId, args.Description)
+	}
+
+	return nil, errors.New("dropId, commentId or responseId must be provided")
+}
+
 func (s *ReportService) ReportDrop(userId uint, dropId uint, description string) (model.ReportModel, error) {
 	if _, err := s.Repo.DropRepository.GetDropById(dropId); err != nil {
 		return nil, errors2.NotFoundError{Entity: "Drop"}

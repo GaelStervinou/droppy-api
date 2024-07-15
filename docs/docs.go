@@ -183,6 +183,129 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/users/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update user by admin user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminUpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/ban": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Ban user by admin user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Ban user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/unban": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Unban user by admin user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Unban user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/auth": {
             "post": {
                 "description": "login with email and password",
@@ -409,6 +532,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/contents/search": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Search content for current drop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "drop"
+                ],
+                "summary": "Search content for current drop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "search",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "search",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/drop_type_apis.ApiSearchResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/drops": {
             "post": {
                 "security": [
@@ -450,6 +629,105 @@ const docTemplate = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity"
+                    }
+                }
+            }
+        },
+        "/drops/:id": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a drop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "drop"
+                ],
+                "summary": "Delete a drop",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Drop ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "No"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Patch a drop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "drop"
+                ],
+                "summary": "Patch a drop",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Drop ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Drop object",
+                        "name": "drop",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DropPatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetDropResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -714,8 +992,8 @@ const docTemplate = `{
                 ],
                 "summary": "Refuse follow request",
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "201": {
+                        "description": "Created"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -1213,6 +1491,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/reports": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create report",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "report"
+                ],
+                "summary": "Create report",
+                "parameters": [
+                    {
+                        "description": "Report object",
+                        "name": "report",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ReportCreationParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response_models.GetReportResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors2.MultiFieldsError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Create user",
@@ -1594,6 +1917,23 @@ const docTemplate = `{
                 }
             }
         },
+        "drop_type_apis.ApiSearchResponse": {
+            "type": "object",
+            "properties": {
+                "picturePath": {
+                    "type": "string"
+                },
+                "search": {
+                    "type": "string"
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "errors2.MultiFieldsError": {
             "type": "object",
             "properties": {
@@ -1614,6 +1954,28 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "model.AdminUpdateUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "role",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -1649,6 +2011,14 @@ const docTemplate = `{
                 },
                 "picture": {
                     "$ref": "#/definitions/multipart.FileHeader"
+                }
+            }
+        },
+        "model.DropPatch": {
+            "type": "object",
+            "properties": {
+                "isPinned": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1737,11 +2107,31 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
-                },
                 "fcmToken": {
                     "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ReportCreationParam": {
+            "type": "object",
+            "required": [
+                "description"
+            ],
+            "properties": {
+                "commentId": {
+                    "type": "integer"
+                },
+                "commentResponseId": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dropId": {
+                    "type": "integer"
                 }
             }
         },
@@ -1768,8 +2158,11 @@ const docTemplate = `{
                 "-": {
                     "type": "string"
                 },
-                "email": {
+                "bio": {
                     "type": "string"
+                },
+                "isPrivate": {
+                    "type": "boolean"
                 },
                 "picture": {
                     "$ref": "#/definitions/multipart.FileHeader"
@@ -1875,6 +2268,15 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
+                "contentPicturePath": {
+                    "type": "string"
+                },
+                "contentSubtitle": {
+                    "type": "string"
+                },
+                "contentTitle": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -1907,6 +2309,9 @@ const docTemplate = `{
                 },
                 "lng": {
                     "type": "number"
+                },
+                "location": {
+                    "type": "string"
                 },
                 "picturePath": {
                     "type": "string"
@@ -2051,7 +2456,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "googleID": {
+                "fcmtoken": {
+                    "type": "string"
+                },
+                "firebaseUID": {
                     "type": "string"
                 },
                 "groups": {
@@ -2067,9 +2475,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "phoneNumber": {
                     "type": "string"
                 },
                 "role": {
@@ -2155,6 +2560,15 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
+                "contentPicturePath": {
+                    "type": "string"
+                },
+                "contentSubtitle": {
+                    "type": "string"
+                },
+                "contentTitle": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -2168,11 +2582,17 @@ const docTemplate = `{
                 "isCurrentUserLiking": {
                     "type": "boolean"
                 },
+                "isPinned": {
+                    "type": "boolean"
+                },
                 "lat": {
                     "type": "number"
                 },
                 "lng": {
                     "type": "number"
+                },
+                "location": {
+                    "type": "string"
                 },
                 "picturePath": {
                     "type": "string"
@@ -2316,6 +2736,36 @@ const docTemplate = `{
                     "$ref": "#/definitions/custom_type.NullString"
                 },
                 "totalDrops": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response_models.GetReportResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "$ref": "#/definitions/response_models.GetCommentResponse"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {},
+                "description": {
+                    "type": "string"
+                },
+                "drop": {
+                    "$ref": "#/definitions/response_models.GetDropResponse"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "response": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response_models.GetCommentResponseResponse"
+                    }
+                },
+                "status": {
                     "type": "integer"
                 }
             }

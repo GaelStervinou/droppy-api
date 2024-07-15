@@ -48,7 +48,7 @@ func GetAllUsers(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 // @Param			id path string true "User ID"
-// @Param			body request_models.UpdateUserRequest true "User data"
+// @Param		user	body model.AdminUpdateUserRequest true "User data"
 // @Success		200
 // @Failure		400
 // @Failure		500

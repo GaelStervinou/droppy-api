@@ -84,6 +84,11 @@ func CreateDrop(c *gin.Context) {
 			log.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
 		}
 	}
+
+	err = NewDropAvailable(uintCurrentUserId, createdDrop)
+	if err != nil {
+		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+	}
 }
 
 func GetOneDrop(c *gin.Context) {
@@ -582,6 +587,23 @@ func RefreshHasUserDroppedToday() {
 	}
 }
 
+// SearchContentForCurrentDrop godoc
+//
+//	@Summary		Search content for current drop
+//	@Description	Search content for current drop
+//	@Tags			drop
+//	@Accept			json
+//	@Produce		json
+//
+// @Param			search query string true "Search query"
+//
+//	@Security BearerAuth
+//	@Param			search query string true "Search query"
+//	@Success		200 {object} []drop_type_apis.ApiSearchResponse
+//	@Failure		400
+//	@Failure		401
+//	@Failure		500
+//	@Router			/contents/search [get]
 func SearchContentForCurrentDrop(c *gin.Context) {
 
 	currentUserId, exists := c.Get("userId")

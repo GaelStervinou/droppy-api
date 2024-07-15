@@ -26,17 +26,18 @@ type ReportRepository interface {
 }
 
 type ReportService interface {
-	ReportDrop(userId uint, dropId uint, args ReportCreationParam) (ReportModel, error)
-	ReportComment(userId uint, commentId uint, args ReportCreationParam) (ReportModel, error)
-	ReportResponse(userId uint, responseId uint, args ReportCreationParam) (ReportModel, error)
+	CreateReport(userId uint, args ReportCreationParam) (ReportModel, error)
+	ReportDrop(userId uint, dropId uint, description string) (ReportModel, error)
+	ReportComment(userId uint, commentId uint, description string) (ReportModel, error)
+	ReportResponse(userId uint, responseId uint, description string) (ReportModel, error)
 	DeleteReport(reportId uint) error
 }
 
 type ReportCreationParam struct {
-	Description string `json:"description"`
-	DropId      uint   `json:"dropId"`
-	CommentId   uint   `json:"commentId"`
-	ResponseId  uint   `json:"responseId"`
+	Description       string `json:"description" binding:"required"`
+	DropId            uint   `json:"dropId"`
+	CommentId         uint   `json:"commentId"`
+	CommentResponseId uint   `json:"commentResponseId"`
 }
 
 type ManageReportRequest struct {

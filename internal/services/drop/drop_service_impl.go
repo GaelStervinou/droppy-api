@@ -119,6 +119,8 @@ func (s *DropService) GetUserFeed(userId uint) ([]model.DropModel, error) {
 		followingUserIds = append(followingUserIds, user.GetFollowedID())
 	}
 
+	followingUserIds = append(followingUserIds, userId)
+
 	drops, err := s.Repo.DropRepository.GetDropsByUserIdsAndDropNotificationId(followingUserIds, lastDropNotification.GetID())
 
 	if err != nil {

@@ -7,12 +7,12 @@ import (
 
 type Report struct {
 	gorm.Model
-	Description        string `gorm:"not null"`
-	Status             int    `gorm:"not null"`
-	CreatedById        uint   `gorm:"not null"`
-	ReportedDropId     uint
-	ReportedCommentId  uint
-	ReportedResponseId uint
+	Description        string          `gorm:"not null"`
+	Status             int             `gorm:"not null"`
+	CreatedById        uint            `gorm:"not null"`
+	ReportedDropId     uint            `gorm:"default:null"`
+	ReportedCommentId  uint            `gorm:"default:null"`
+	ReportedResponseId uint            `gorm:"default:null"`
 	CreatedBy          User            `gorm:"foreignKey:CreatedById;references:ID"`
 	ReportedDrop       Drop            `gorm:"foreignKey:ReportedDropId;references:ID"`
 	ReportedComment    Comment         `gorm:"foreignKey:ReportedCommentId;references:ID"`

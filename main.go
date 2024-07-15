@@ -89,6 +89,11 @@ func main() {
 			content.GET("/search", middlewares.CurrentUserMiddleware(true), controllers.SearchContentForCurrentDrop)
 		}
 
+		report := v1.Group("/reports")
+		{
+			report.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateReport)
+		}
+
 		group := v1.Group("/groups")
 		{
 			group.POST("", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)
