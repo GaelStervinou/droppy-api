@@ -249,14 +249,16 @@ func (r *repoDropPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, er
 	return result, nil
 }
 
-func (r *repoDropPrivate) GetUserLastDrop(userId uint) (model.DropModel, error) {
+func (r *repoDropPrivate) GetUserLastDrop(userId uint, lastNotifID uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.
 		Preload("CreatedBy").
 		Preload("Comments").
 		Preload("Comments.Responses").
 		Preload("Comments.Responses.CreatedBy").
-		Where("created_by_id = ?", userId).Order("created_at desc").First(&drop).Error; err != nil {
+		Where("created_by_id = ? AND drop_notification_id = ?", userId, lastNotifID).
+		Order("created_at desc").
+		First(&drop).Error; err != nil {
 		return nil, err
 	}
 

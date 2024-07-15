@@ -39,7 +39,7 @@ type DropRepository interface {
 	GetDropById(dropId uint) (DropModel, error)
 	DropExists(dropId uint) (bool, error)
 	GetUserPinnedDrops(userId uint) ([]DropModel, error)
-	GetUserLastDrop(userId uint) (DropModel, error)
+	GetUserLastDrop(userId uint, lastNotifID uint) (DropModel, error)
 	CountUserDrops(userId uint) int
 	CountGroupDrops(groupId uint) int
 	GetDropGroups(dropId uint) ([]GroupModel, error)

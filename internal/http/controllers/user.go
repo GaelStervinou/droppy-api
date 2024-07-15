@@ -81,7 +81,15 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	userLastDrop, err := dr.GetUserLastDrop(requestedUser.GetID())
+	dnr := postgres.NewDropNotifRepo(sqlDB)
+
+	lastNotification, err := dnr.GetCurrentDropNotification()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	userLastDrop, err := dr.GetUserLastDrop(requestedUser.GetID(), lastNotification.GetID())
 	if err != nil {
 		if err.Error() != "record not found" {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

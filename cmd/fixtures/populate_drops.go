@@ -41,7 +41,6 @@ func PopulateDrops(db *gorm.DB) error {
 			dropType := dropNotifications[i].Type
 			status := statuses[r.IntN(len(statuses))]
 			picture := images[dropType][r.IntN(len(images[dropType]))]
-			hasPicture := r.IntN(3) == 0
 			db.Create(&postgres.Drop{
 				Type:               dropType,
 				ContentTitle:       faker.Sentence(),
