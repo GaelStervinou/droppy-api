@@ -100,7 +100,8 @@ func FollowUser(c *gin.Context) {
 	}
 
 	if createdFollow.GetStatus() == new(postgres.FollowPendingStatus).ToInt() {
-		err = SendPendingFollowsWS(uintCurrentUserId, postgres.NewFollowRepo(sqlDB))
+		fmt.Printf("Sending pending follows for user %d\n", uintCurrentUserId)
+		err = SendPendingFollowsWS(followCreationParam.UserToFollowID, postgres.NewFollowRepo(sqlDB))
 		if err != nil {
 			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
 			return
@@ -220,9 +221,14 @@ func AcceptRequest(c *gin.Context) {
 
 	followRepo := postgres.NewFollowRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsPendingFollowing(uintCurrentUserId, followId)
+	myFollow, err := followRepo.GetFollowByID(followId)
 
-	if IsMyFollow == false {
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if myFollow.GetFollowed().GetID() != uintCurrentUserId || myFollow.GetStatus() != new(postgres.FollowPendingStatus).ToInt() {
 		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
 	}
@@ -251,7 +257,7 @@ func AcceptRequest(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 //
-// @Success		200
+// @Success		201
 // @Failure		422
 // @Failure		401
 // @Failure		500
@@ -287,9 +293,14 @@ func RejectRequest(c *gin.Context) {
 
 	followRepo := postgres.NewFollowRepo(sqlDB)
 
-	IsMyFollow, err := followRepo.IsPendingFollowing(uintCurrentUserId, followId)
+	myFollow, err := followRepo.GetFollowByID(followId)
 
-	if IsMyFollow == false {
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if myFollow.GetFollowed().GetID() != uintCurrentUserId || myFollow.GetStatus() != new(postgres.FollowPendingStatus).ToInt() {
 		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
 	}
@@ -305,7 +316,7 @@ func RejectRequest(c *gin.Context) {
 		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Follow request refused"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Follow request refused"})
 }
 
 // GetUserFollowing godoc
@@ -437,22 +448,27 @@ func GetUserFollowers(c *gin.Context) {
 }
 
 func SendPendingFollowsWS(userID uint, followRepo model.FollowRepository) error {
-	if _, ok := userPendingFollowConnections[strconv.Itoa(int(userID))]; !ok {
+	fmt.Printf("Sending pending follows for user %d\n", userID)
+	muPendingFollow.Lock()
+	wsConn, ok := userPendingFollowConnections[strconv.Itoa(int(userID))]
+	muPendingFollow.Unlock()
+	if !ok {
+		fmt.Printf("Connections are: %v\n", userPendingFollowConnections)
+		fmt.Printf("User %d not found in userPendingFollowConnections\n", userID)
 		return nil
 	}
 
 	pendingRequests, err := followRepo.GetPendingRequests(userID)
-
 	if err != nil {
 		return err
 	}
 
 	var pendingFollowResponses []response_models.GetOnePendingFollowResponse
-	for _, follow := range pendingRequests {
-		pendingFollowResponses = append(pendingFollowResponses, response_models.FormatGetOnePendingFollowResponse(follow))
+	for _, pendingFollow := range pendingRequests {
+		pendingFollowResponses = append(pendingFollowResponses, response_models.FormatGetOnePendingFollowResponse(pendingFollow))
 	}
 
-	return userPendingFollowConnections[strconv.Itoa(int(userID))].conn.WriteJSON(pendingFollowResponses)
+	return wsConn.conn.WriteJSON(pendingFollowResponses)
 }
 
 // DeleteFollow godoc
