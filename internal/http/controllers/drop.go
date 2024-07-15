@@ -9,6 +9,7 @@ import (
 	dropservice "go-api/internal/services/drop"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/converters"
+	"go-api/pkg/drop_type_apis"
 	"go-api/pkg/model"
 	"log"
 	"net/http"
@@ -596,4 +597,69 @@ func RefreshHasUserDroppedToday() {
 		}
 		mu.Unlock()
 	}
+}
+
+func SearchContentForCurrentDrop(c *gin.Context) {
+
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+
+	hadUserDroppedToday, err := ds.HasUserDroppedToday(uintCurrentUserId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if hadUserDroppedToday {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You already dropped"})
+		return
+	}
+
+	search := c.Query("search")
+
+	if "" == search {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "search is required"})
+		return
+	}
+
+	lastDropNotif, err := ds.Repo.DropNotificationRepository.GetCurrentDropNotification()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if nil == lastDropNotif {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No drop notification found"})
+		return
+	}
+
+	apiService := drop_type_apis.Factory(lastDropNotif.GetType())
+
+	if nil == apiService {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid drop type"})
+		return
+	}
+
+	apiService.Init()
+
+	results := apiService.Search(search)
+
+	c.JSON(http.StatusOK, results)
+
 }
