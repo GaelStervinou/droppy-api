@@ -8,15 +8,15 @@ import (
 type Report struct {
 	gorm.Model
 	Description        string `gorm:"not null"`
-	Status             uint   `gorm:"not null"`
+	Status             int    `gorm:"not null"`
 	CreatedById        uint   `gorm:"not null"`
 	ReportedDropId     uint
 	ReportedCommentId  uint
 	ReportedResponseId uint
-	CreatedBy          User            `gorm:"foreignKey:CreatedById;references:ID"`
-	ReportedDrop       Drop            `gorm:"foreignKey:ReportedDropId;references:ID"`
-	ReportedComment    Comment         `gorm:"foreignKey:ReportedCommentId;references:ID"`
-	ReportedResponse   CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
+	CreatedBy          User              `gorm:"foreignKey:CreatedById;references:ID"`
+	ReportedDrop       Drop              `gorm:"foreignKey:ReportedDropId;references:ID"`
+	ReportedComment    Comment           `gorm:"foreignKey:ReportedCommentId;references:ID"`
+	ReportedResponse   []CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
 }
 
 func (r *Report) GetID() uint {
@@ -27,7 +27,7 @@ func (r *Report) GetDescription() string {
 	return r.Description
 }
 
-func (r *Report) GetStatus() uint {
+func (r *Report) GetStatus() int {
 	return r.Status
 }
 
@@ -47,19 +47,24 @@ func (r *Report) GetReportedComment() model.CommentModel {
 	return &r.ReportedComment
 }
 
-func (r *Report) GetReportedResponse() model.CommentResponseModel {
-	return &r.ReportedResponse
+func (r *Report) GetReportedResponse() []model.CommentResponseModel {
+	var result []model.CommentResponseModel
+	for _, response := range r.ReportedResponse {
+		result = append(result, &response)
+	}
+	return result
+
 }
 
 type ReportStatusActive struct{}
 
-func (r *ReportStatusActive) ToInt() uint {
+func (r *ReportStatusActive) ToInt() int {
 	return 1
 }
 
 type ReportStatusResolved struct{}
 
-func (r *ReportStatusResolved) ToInt() uint {
+func (r *ReportStatusResolved) ToInt() int {
 	return 2
 }
 
@@ -103,7 +108,7 @@ func (r *repoReportPrivate) CreateReport(
 		}
 	}
 
-	var reportedResponse CommentResponse
+	var reportedResponse []CommentResponse
 	if reportedResponseId != 0 {
 		if err := r.db.First(&reportedResponse, reportedResponseId).Error; err != nil {
 			return nil, err

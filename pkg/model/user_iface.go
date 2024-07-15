@@ -33,6 +33,9 @@ type UserRepository interface {
 	Search(query string) ([]UserModel, error)
 	IsActiveUser(userId uint) (bool, error)
 	GetAllFCMTokens() ([]string, error)
+	BanUser(userId uint) (UserModel, error)
+	UnbanUser(userId uint) (UserModel, error)
+	UpdateByAdmin(userId uint, args AdminUpdateUserRequest) (UserModel, error)
 }
 
 type UserService interface {
@@ -65,4 +68,11 @@ type LoginParam struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	FcmToken string `json:"fcmToken"`
+}
+
+type AdminUpdateUserRequest struct {
+	Role     string `json:"role" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Status   int    `json:"status"`
 }

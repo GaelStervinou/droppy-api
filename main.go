@@ -121,10 +121,13 @@ func main() {
 		admin := v1.Group("/admin")
 		{
 			admin.GET("/users", middlewares.AdminRequired(), controllers.GetAllUsers)
+			admin.PUT("/users/:id", middlewares.AdminRequired(), controllers.UpdateUser)
+			admin.PUT("/users/:id/ban", middlewares.AdminRequired(), controllers.BanUser)
+			admin.PUT("/users/:id/unban", middlewares.AdminRequired(), controllers.UnbanUser)
 			admin.GET("/groups", middlewares.AdminRequired(), controllers.GetAllGroups)
 			admin.GET("/drops", middlewares.AdminRequired(), controllers.GetAllDrops)
 			admin.GET("/comments", middlewares.AdminRequired(), controllers.GetAllComments)
-			// admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
+			admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

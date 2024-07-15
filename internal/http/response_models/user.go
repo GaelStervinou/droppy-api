@@ -128,6 +128,7 @@ type AdminGetUserResponse struct {
 	Avatar    *string
 	IsPrivate bool
 	CreatedAt *time.Time
+	Status    int
 }
 
 func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterface {
@@ -157,6 +158,7 @@ func FormatAdminGetUserResponse(user model.UserModel) AdminGetUserResponseInterf
 		Avatar:    avatarPointer,
 		IsPrivate: user.IsPrivateUser(),
 		CreatedAt: &createdAt,
+		Status:    user.GetStatus(),
 	}
 }
 
