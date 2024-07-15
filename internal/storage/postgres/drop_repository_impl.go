@@ -8,7 +8,11 @@ import (
 type Drop struct {
 	gorm.Model
 	Type               string `gorm:"not null"`
+	ContentTitle       string `gorm:"not null"`
+	ContentSubtitle    string
+	Location           string
 	Content            string `gorm:"not null"`
+	ContentPicturePath string `gorm:"not null"`
 	Description        string
 	CreatedById        uint `gorm:"not null"`
 	CreatedBy          User `gorm:"foreignKey:CreatedById;references:ID"`
@@ -60,6 +64,14 @@ func (d *Drop) GetComments() []model.CommentModel {
 }
 
 func (d *Drop) GetTotalLikes() int { return d.TotalLikes }
+
+func (d *Drop) GetContentTitle() string { return d.ContentTitle }
+
+func (d *Drop) GetContentSubtitle() string { return d.ContentSubtitle }
+
+func (d *Drop) GetContentPicturePath() string { return d.ContentPicturePath }
+
+func (d *Drop) GetLocation() string { return d.Location }
 
 type DropStatusActive struct{}
 

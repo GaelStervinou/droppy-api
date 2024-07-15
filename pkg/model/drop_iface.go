@@ -10,6 +10,10 @@ type DropModel interface {
 	GetID() uint
 	GetType() string
 	GetContent() string
+	GetContentTitle() string
+	GetContentSubtitle() string
+	GetContentPicturePath() string
+	GetLocation() string
 	GetDescription() string
 	GetCreatedById() uint
 	GetStatus() uint

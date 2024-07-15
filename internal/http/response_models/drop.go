@@ -8,6 +8,10 @@ import (
 type GetDropResponse struct {
 	ID                  uint
 	Type                string
+	ContentTitle        string
+	ContentSubtitle     string
+	ContentPicturePath  string
+	Location            string
 	Content             string
 	Description         string
 	Lat                 *float64
@@ -38,6 +42,10 @@ func FormatGetDropResponse(drop model.DropModel, isCurrentUserLiking bool) GetDr
 	return GetDropResponse{
 		ID:                  drop.GetID(),
 		Type:                drop.GetType(),
+		ContentTitle:        drop.GetContentTitle(),
+		ContentSubtitle:     drop.GetContentSubtitle(),
+		ContentPicturePath:  drop.GetContentPicturePath(),
+		Location:            drop.GetLocation(),
 		Content:             drop.GetContent(),
 		Description:         drop.GetDescription(),
 		Lat:                 latPointer,
