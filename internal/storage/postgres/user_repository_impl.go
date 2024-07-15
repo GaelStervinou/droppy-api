@@ -246,3 +246,47 @@ func (repo *repoUserPrivate) GetAllFCMTokens() ([]string, error) {
 	}
 	return tokens, nil
 }
+
+func (repo *repoUserPrivate) BanUser(userId uint) (model.UserModel, error) {
+	userObject := User{}
+	userObject.ID = userId
+
+	result := repo.db.Find(&userObject)
+	if result.Error != nil {
+		return nil, errors.New("user not found")
+	}
+
+	userObject.Status = -1
+	return nil, repo.db.Save(&userObject).Error
+}
+
+func (repo *repoUserPrivate) UnbanUser(userId uint) (model.UserModel, error) {
+	userObject := User{}
+	userObject.ID = userId
+
+	result := repo.db.Find(&userObject)
+	if result.Error != nil {
+		return nil, errors.New("user not found")
+	}
+
+	userObject.Status = 1
+	return nil, repo.db.Save(&userObject).Error
+}
+
+func (repo *repoUserPrivate) UpdateByAdmin(userID uint, args model.AdminUpdateUserRequest) (model.UserModel, error) {
+	userObject := User{}
+	repo.db.First(&userObject, userID)
+	if userObject.CreatedAt.IsZero() {
+		return nil, errors.New("user not found")
+	}
+
+	// print the args
+	fmt.Println(args)
+
+	result := repo.db.Model(&userObject).Updates(args)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &userObject, nil
+}

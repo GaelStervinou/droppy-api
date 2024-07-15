@@ -3,12 +3,12 @@ package model
 type ReportModel interface {
 	GetID() uint
 	GetDescription() string
-	GetStatus() uint
+	GetStatus() int
 	GetCreatedBy() UserModel
 	GetCreatedAt() int
 	GetReportedDrop() DropModel
 	GetReportedComment() CommentModel
-	GetReportedResponse() CommentResponseModel
+	GetReportedResponse() []CommentResponseModel
 }
 
 type ReportRepository interface {
@@ -38,6 +38,3 @@ type ReportCreationParam struct {
 	CommentId   uint   `json:"commentId"`
 	ResponseId  uint   `json:"responseId"`
 }
-
-
-
