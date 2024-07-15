@@ -84,6 +84,11 @@ func main() {
 			drop.DELETE("/:id/like", middlewares.CurrentUserMiddleware(true), controllers.UnlikeDrop)
 		}
 
+		content := v1.Group("/contents")
+		{
+			content.GET("/search", middlewares.CurrentUserMiddleware(true), controllers.SearchContentForCurrentDrop)
+		}
+
 		group := v1.Group("/groups")
 		{
 			group.POST("", middlewares.CurrentUserMiddleware(true), controllers.CreateGroup)

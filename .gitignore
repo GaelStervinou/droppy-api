@@ -10,3 +10,5 @@
 /.idea/.gitignore
 /.DS_Store
 /assets/
+
+config/
