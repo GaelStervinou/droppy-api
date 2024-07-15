@@ -261,7 +261,7 @@ type WebSocketConnection struct {
 }
 
 // Global map to store connections per user
-var userConnections = make(map[string]*WebSocketConnection)
+var userFeedConnections = make(map[string]*WebSocketConnection)
 var mu sync.Mutex
 
 func GetCurrentUserFeedWS(c *gin.Context) {
@@ -287,8 +287,8 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 	wsConn := &WebSocketConnection{conn: conn}
 
 	mu.Lock()
-	userConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
-	fmt.Printf("Users connected: %v\n", userConnections)
+	userFeedConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
+	fmt.Printf("Users connected: %v\n", userFeedConnections)
 	mu.Unlock()
 
 	ds := &dropservice.DropService{
@@ -333,7 +333,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 	defer func() {
 		mu.Lock()
-		delete(userConnections, strconv.Itoa(int(uintCurrentUserId)))
+		delete(userFeedConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
 		if err != nil {
@@ -351,8 +351,8 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 func sendToUser(userID uint, ds *dropservice.DropService) error {
 	mu.Lock()
-	wsConn, ok := userConnections[strconv.Itoa(int(userID))]
-	fmt.Printf("Users: %v\n", userConnections)
+	wsConn, ok := userFeedConnections[strconv.Itoa(int(userID))]
+	fmt.Printf("Users: %v\n", userFeedConnections)
 	mu.Unlock()
 
 	if !ok {
@@ -451,6 +451,21 @@ func DeleteDrop(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// PatchDrop godoc
+//
+//	@Summary		Patch a drop
+//	@Description	Patch a drop
+//	@Tags			drop
+//	@Accept			json
+//	@Produce		json
+//	@Security BearerAuth
+//	@Param			id path int true "Drop ID"
+//	@Param			drop body		model.DropPatch true "Drop object"
+//	@Success		200 {object} response_models.GetDropResponse
+//	@Failure		400
+//	@Failure		401
+//	@Failure		500
+//	@Router			/drops/:id [patch]
 func PatchDrop(c *gin.Context) {
 	repo := repositories.Setup()
 
@@ -502,4 +517,83 @@ func PatchDrop(c *gin.Context) {
 	response := response_models.FormatGetDropResponse(updatedDrop, false)
 
 	c.JSON(http.StatusOK, response)
+}
+
+var hasUserDroppedTodayConnections = make(map[string]*WebSocketConnection)
+
+func HasUserDroppedTodayWS(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uintCurrentUserId, ok := currentUserId.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upgrade WebSocket"})
+		return
+	}
+
+	wsConn := &WebSocketConnection{conn: conn}
+
+	mu.Lock()
+	hasUserDroppedTodayConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
+	fmt.Printf("Users connected to has user dropped today: %v\n", hasUserDroppedTodayConnections)
+	mu.Unlock()
+
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+
+	hasDropped, err := ds.HasUserDroppedToday(uintCurrentUserId)
+
+	if err != nil {
+		log.Printf("Error checking if user has dropped today: %v", err)
+		return
+	}
+
+	err = wsConn.conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: hasDropped})
+
+	if err != nil {
+		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		return
+	}
+
+	defer func() {
+		mu.Lock()
+		delete(hasUserDroppedTodayConnections, strconv.Itoa(int(uintCurrentUserId)))
+		mu.Unlock()
+		err := conn.Close()
+		if err != nil {
+			log.Printf("Error closing WebSocket connection: %v", err)
+		}
+	}()
+
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+	}
+}
+
+func RefreshHasUserDroppedToday() {
+	for {
+		mu.Lock()
+		for userId := range hasUserDroppedTodayConnections {
+			err := hasUserDroppedTodayConnections[userId].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
+			if err != nil {
+				log.Printf("Error sending message to user %s: %v", userId, err)
+				continue
+			}
+		}
+		mu.Unlock()
+	}
 }

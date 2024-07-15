@@ -60,3 +60,7 @@ func FormatGetDropResponse(drop model.DropModel, isCurrentUserLiking bool) GetDr
 		IsPinned:            drop.GetIsPinned(),
 	}
 }
+
+type HasUserDroppedTodayResponse struct {
+	Status bool `json:"status"`
+}

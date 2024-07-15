@@ -75,6 +75,7 @@ func main() {
 		drop := v1.Group("/drops")
 		{
 			drop.POST("/", middlewares.CurrentUserMiddleware(true), controllers.CreateDrop)
+			drop.GET("/has-user-dropped", middlewares.CurrentUserMiddleware(true), controllers.HasUserDroppedTodayWS)
 			drop.GET("/:id", middlewares.CurrentUserMiddleware(true), controllers.GetOneDrop)
 			drop.PATCH("/:id", middlewares.CurrentUserMiddleware(true), controllers.PatchDrop)
 			drop.DELETE("/:id", middlewares.CurrentUserMiddleware(true), controllers.DeleteDrop)
