@@ -208,7 +208,12 @@ func (s *GroupService) DeleteGroup(groupId uint, userId uint) error {
 		return errors.New("group not found")
 	}
 
-	if groupToDelete.GetCreatedByID() != userId {
+	user, err := s.Repo.UserRepository.GetById(userId)
+	if err != nil {
+		return err
+	}
+
+	if groupToDelete.GetCreatedByID() != userId || user.GetRole() != "admin" {
 		return errors2.NotAllowedError{Reason: "You are not allowed to delete this group"}
 	}
 

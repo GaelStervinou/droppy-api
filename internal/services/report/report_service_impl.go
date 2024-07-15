@@ -61,10 +61,42 @@ func (s *ReportService) ReportResponse(userId uint, responseId uint, description
 	return report, nil
 }
 
-func (s *ReportService) DeleteReport(reportId uint) error {
-	if err := s.Repo.ReportRepository.DeleteReport(reportId); err != nil {
+func (s *ReportService) ManageReport(reportId uint, status string) error {
+	if status != "approved" && status != "rejected" {
+		return errors2.InvalidStatusError{}
+	}
+
+	if status == "rejected" {
+		s.Repo.ReportRepository.UpdateReportStatus(reportId, -1)
+	}
+
+	report, err := s.Repo.ReportRepository.GetReportById(reportId)
+	if err != nil {
 		return err
 	}
+
+	if report.GetReportedDrop() != nil {
+		err := s.Repo.DropRepository.Delete(report.GetReportedDrop().GetID())
+		if err != nil {
+			return err
+		}
+	}
+
+	if report.GetReportedComment() != nil {
+		err := s.Repo.CommentRepository.DeleteComment(report.GetReportedComment().GetID())
+		if err != nil {
+			return err
+		}
+	}
+
+	if report.GetReportedResponse() != nil {
+		err := s.Repo.CommentResponseRepository.DeleteCommentResponse(report.GetReportedResponse().GetID())
+		if err != nil {
+			return err
+		}
+	}
+
+	s.Repo.ReportRepository.UpdateReportStatus(reportId, 1)
 
 	return nil
 }

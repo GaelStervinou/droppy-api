@@ -11,9 +11,9 @@ type GetReportResponse struct {
 	CreatedAt   *time.Time
 	CreatedBy   GetUserResponseInterface
 	Status      int
-	Drop        GetDropResponse              `json:",omitempty"`
-	Comment     GetCommentResponse           `json:",omitempty"`
-	Response    []GetCommentResponseResponse `json:",omitempty"`
+	Drop        GetDropResponse            `json:",omitempty"`
+	Comment     GetCommentResponse         `json:",omitempty"`
+	Response    GetCommentResponseResponse `json:",omitempty"`
 }
 
 func FormatGetReportResponse(report model.ReportModel) GetReportResponse {
@@ -31,6 +31,6 @@ func FormatGetReportResponse(report model.ReportModel) GetReportResponse {
 		Status:      report.GetStatus(),
 		Drop:        FormatGetDropResponse(report.GetReportedDrop(), false),
 		Comment:     FormatGetCommentResponse(report.GetReportedComment()),
-		Response:    FormatGetCommentResponsesResponse(report.GetReportedResponse()),
+		Response:    FormatGetCommentResponseResponse(report.GetReportedResponse()),
 	}
 }

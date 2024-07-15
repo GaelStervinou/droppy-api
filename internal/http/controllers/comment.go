@@ -75,3 +75,45 @@ func CommentDrop(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 }
+
+func DeleteComment(c *gin.Context) {
+	currentUserId, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	commentId := c.Param("id")
+
+	if "" == commentId {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	commentIdUint, err := strconv.ParseUint(commentId, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid comment ID"})
+		return
+	}
+
+	cs := &commentservice.CommentService{
+		Repo: repositories.Setup(),
+	}
+
+	err = cs.CanDeleteComment(uint(commentIdUint), currentUserId.(uint))
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = cs.DeleteComment(uint(commentIdUint))
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
+}

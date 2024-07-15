@@ -8,21 +8,21 @@ type ReportModel interface {
 	GetCreatedAt() int
 	GetReportedDrop() DropModel
 	GetReportedComment() CommentModel
-	GetReportedResponse() []CommentResponseModel
+	GetReportedResponse() CommentResponseModel
 }
 
 type ReportRepository interface {
 	CreateReport(description string, createdBy uint, reportedDrop uint, reportedComment uint, reportedResponse uint) (ReportModel, error)
-	DeleteReport(reportId uint) error
 	GetReportsByDropId(dropId uint) ([]ReportModel, error)
 	GetReportsByCommentId(commentId uint) ([]ReportModel, error)
 	GetReportsByUserId(userId uint) ([]ReportModel, error)
 	GetReportById(reportId uint) (ReportModel, error)
 	GetAllReports() ([]ReportModel, error)
-	UpdateReportStatus(reportId uint, status uint) error
 	GetActiveReportByDropAndUser(dropId uint, userId uint) (ReportModel, error)
 	GetActiveReportByCommentAndUser(commentId uint, userId uint) (ReportModel, error)
 	GetActiveReportByResponseAndUser(responseId uint, userId uint) (ReportModel, error)
+	UpdateReportStatus(id uint, status int) error
+	ManageReport(reportId uint, status ManageReportRequest) (ReportModel, error)
 }
 
 type ReportService interface {
@@ -37,4 +37,8 @@ type ReportCreationParam struct {
 	DropId      uint   `json:"dropId"`
 	CommentId   uint   `json:"commentId"`
 	ResponseId  uint   `json:"responseId"`
+}
+
+type ManageReportRequest struct {
+	Status string `json:"status" binding:"required"`
 }

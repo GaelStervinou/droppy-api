@@ -13,10 +13,10 @@ type Report struct {
 	ReportedDropId     uint
 	ReportedCommentId  uint
 	ReportedResponseId uint
-	CreatedBy          User              `gorm:"foreignKey:CreatedById;references:ID"`
-	ReportedDrop       Drop              `gorm:"foreignKey:ReportedDropId;references:ID"`
-	ReportedComment    Comment           `gorm:"foreignKey:ReportedCommentId;references:ID"`
-	ReportedResponse   []CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
+	CreatedBy          User            `gorm:"foreignKey:CreatedById;references:ID"`
+	ReportedDrop       Drop            `gorm:"foreignKey:ReportedDropId;references:ID"`
+	ReportedComment    Comment         `gorm:"foreignKey:ReportedCommentId;references:ID"`
+	ReportedResponse   CommentResponse `gorm:"foreignKey:ReportedResponseId;references:ID"`
 }
 
 func (r *Report) GetID() uint {
@@ -47,13 +47,8 @@ func (r *Report) GetReportedComment() model.CommentModel {
 	return &r.ReportedComment
 }
 
-func (r *Report) GetReportedResponse() []model.CommentResponseModel {
-	var result []model.CommentResponseModel
-	for _, response := range r.ReportedResponse {
-		result = append(result, &response)
-	}
-	return result
-
+func (r *Report) GetReportedResponse() model.CommentResponseModel {
+	return &r.ReportedResponse
 }
 
 type ReportStatusActive struct{}
@@ -108,7 +103,7 @@ func (r *repoReportPrivate) CreateReport(
 		}
 	}
 
-	var reportedResponse []CommentResponse
+	var reportedResponse CommentResponse
 	if reportedResponseId != 0 {
 		if err := r.db.First(&reportedResponse, reportedResponseId).Error; err != nil {
 			return nil, err
@@ -129,10 +124,6 @@ func (r *repoReportPrivate) CreateReport(
 		return nil, err
 	}
 	return &report, nil
-}
-
-func (r *repoReportPrivate) DeleteReport(reportId uint) error {
-	return r.db.Delete(&Report{}, reportId).Error
 }
 
 func (r *repoReportPrivate) GetReportsByDropId(dropId uint) ([]model.ReportModel, error) {
@@ -191,7 +182,7 @@ func (r *repoReportPrivate) GetAllReports() ([]model.ReportModel, error) {
 	return result, nil
 }
 
-func (r *repoReportPrivate) UpdateReportStatus(reportId uint, status uint) error {
+func (r *repoReportPrivate) UpdateReportStatus(reportId uint, status int) error {
 	return r.db.Model(&Report{}).Where("id = ?", reportId).Update("status", status).Error
 }
 
@@ -217,4 +208,11 @@ func (r *repoReportPrivate) GetActiveReportByResponseAndUser(responseId uint, us
 		return nil, err
 	}
 	return &report, nil
+}
+
+func (r *repoReportPrivate) ManageReport(reportId uint, args model.ManageReportRequest) (model.ReportModel, error) {
+	if err := r.db.Model(&Report{}).Where("id = ?", reportId).Update("status", args.Status).Error; err != nil {
+		return nil, err
+	}
+	return r.GetReportById(reportId)
 }

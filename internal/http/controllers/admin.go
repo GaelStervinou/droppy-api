@@ -79,7 +79,18 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response_models.FormatAdminGetUserResponse(userModel))
+	users, err := us.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var usersResponse []response_models.GetUserResponseInterface
+	for _, userModel := range users {
+		usersResponse = append(usersResponse, response_models.FormatAdminGetUserResponse(userModel))
+	}
+
+	c.JSON(http.StatusOK, usersResponse)
 }
 
 // BanUser godoc
@@ -257,6 +268,179 @@ func GetAllReports(c *gin.Context) {
 	sqlDB := postgres.Connect()
 
 	rr := postgres.NewReportRepo(sqlDB)
+
+	reports, err := rr.GetAllReports()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var reportsResponse []response_models.GetReportResponse
+	for _, reportModel := range reports {
+		reportsResponse = append(reportsResponse, response_models.FormatGetReportResponse(reportModel))
+	}
+
+	c.JSON(http.StatusOK, reportsResponse)
+}
+
+// AdminDeleteDrop godoc
+//
+// @Summary		Delete drop
+// @Description	Delete drop by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			id path string true "Drop ID"
+// @Success		200
+// @Failure		500
+// @Router			/admin/drops/{id} [delete]
+func AdminDeleteDrop(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	dr := postgres.NewDropRepo(sqlDB)
+
+	dropID := c.Param("id")
+	uintDropID, err := strconv.ParseUint(dropID, 10, 64)
+
+	err = dr.Delete(uint(uintDropID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	drops, err := dr.GetAllDrops()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var dropsResponse []response_models.GetDropResponse
+	for _, dropModel := range drops {
+		dropsResponse = append(dropsResponse, response_models.FormatGetDropResponse(dropModel, false))
+	}
+
+	c.JSON(http.StatusOK, dropsResponse)
+}
+
+// AdminDeleteGroup godoc
+//
+// @Summary		Delete group
+// @Description	Delete group by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			id path string true "Group ID"
+// @Success		200
+// @Failure		500
+// @Router			/admin/groups/{id} [delete]
+func AdminDeleteGroup(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	gr := postgres.NewGroupRepo(sqlDB)
+
+	groupID := c.Param("id")
+	uintGroupID, err := strconv.ParseUint(groupID, 10, 64)
+
+	err = gr.Delete(uint(uintGroupID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	groups, err := gr.GetAllGroups()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var groupsResponse []response_models.GetGroupResponse
+	for _, groupModel := range groups {
+		groupsResponse = append(groupsResponse, response_models.FormatGetGroupResponse(groupModel))
+	}
+
+	c.JSON(http.StatusOK, groupsResponse)
+}
+
+// AdminDeleteComment godoc
+//
+// @Summary		Delete comment
+// @Description	Delete comment by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			id path string true "Comment ID"
+// @Success		200
+// @Failure		500
+// @Router			/admin/comments/{id} [delete]
+func AdminDeleteComment(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	cr := postgres.NewCommentRepo(sqlDB)
+
+	commentID := c.Param("id")
+	uintCommentID, err := strconv.ParseUint(commentID, 10, 64)
+
+	err = cr.DeleteComment(uint(uintCommentID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	comments, err := cr.GetAllComments()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var commentsResponse []response_models.GetCommentResponse
+	for _, commentModel := range comments {
+		commentsResponse = append(commentsResponse, response_models.FormatGetCommentResponse(commentModel))
+	}
+
+	c.JSON(http.StatusOK, commentsResponse)
+}
+
+// AdminManageReport godoc
+//
+// @Summary		Manage report
+// @Description	Manage report by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			id path string true "Report ID"
+// @Param 		body request_models.ManageReportRequest true "Manage report data"
+// @Success		200
+// @Failure		500
+// @Router			/admin/reports/{id}/manage [put]
+func AdminManageReport(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	rr := postgres.NewReportRepo(sqlDB)
+
+	reportID := c.Param("id")
+
+	var manageReportRequest model.ManageReportRequest
+	if err := c.ShouldBindJSON(&manageReportRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	uintReportID, err := strconv.ParseUint(reportID, 10, 64)
+	reportModel, err := rr.GetReportById(uint(uintReportID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	reportModel, err = rr.ManageReport(reportModel.GetID(), manageReportRequest)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	reports, err := rr.GetAllReports()
 	if err != nil {

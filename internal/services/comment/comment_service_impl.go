@@ -101,3 +101,21 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 func (s *CommentService) DeleteComment(commentId uint) error {
 	return s.Repo.CommentRepository.DeleteComment(commentId)
 }
+
+func (s *CommentService) CanDeleteComment(author uint, user uint) error {
+	comment, err := s.Repo.CommentRepository.GetById(author)
+	if err != nil || nil == comment {
+		return errors.New("comment not found")
+	}
+
+	connectedUser, err := s.Repo.UserRepository.GetById(user)
+	if err != nil || nil == connectedUser {
+		return errors.New("user not found")
+	}
+
+	if comment.GetCreatedBy().GetID() != user || connectedUser.GetRole() != "admin" {
+		return errors.New("unauthorized")
+	}
+
+	return nil
+}
