@@ -78,7 +78,7 @@ func CreateDrop(c *gin.Context) {
 
 	fmt.Printf("Sending new drop to followers %v\n", userFollowers)
 	for _, follower := range userFollowers {
-		newDropAvailable(follower.GetFollowerID())
+		NewDropAvailable(follower.GetFollowerID())
 	}
 }
 
@@ -382,7 +382,7 @@ func sendToUser(userID uint, ds *dropservice.DropService) error {
 	return wsConn.conn.WriteJSON(dropResponses)
 }
 
-func newDropAvailable(userID uint) {
+func NewDropAvailable(userID uint) {
 	fmt.Println("New drop available for user", userID)
 	ds := &dropservice.DropService{
 		Repo: repositories.Setup(),

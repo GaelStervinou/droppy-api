@@ -106,6 +106,9 @@ func FollowUser(c *gin.Context) {
 			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
 			return
 		}
+	} else if createdFollow.GetStatus() == new(postgres.FollowAcceptedStatus).ToInt() {
+		fmt.Printf("Sending drops to user %d\n", uintCurrentUserId)
+		NewDropAvailable(uintCurrentUserId)
 	}
 
 	c.JSON(http.StatusCreated, createdFollow)
@@ -244,6 +247,15 @@ func AcceptRequest(c *gin.Context) {
 	if err != nil {
 		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
 	}
+
+	acceptedFollow, err := followRepo.GetFollowByID(followId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	NewDropAvailable(acceptedFollow.GetFollowerID())
 
 	c.JSON(http.StatusOK, gin.H{"message": "Follow request accepted"})
 }
