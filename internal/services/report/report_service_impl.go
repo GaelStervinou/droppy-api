@@ -1,6 +1,7 @@
 package report
 
 import (
+	"errors"
 	"go-api/internal/repositories"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
@@ -63,7 +64,7 @@ func (s *ReportService) ReportResponse(userId uint, responseId uint, description
 
 func (s *ReportService) ManageReport(reportId uint, status string) error {
 	if status != "approved" && status != "rejected" {
-		return errors2.InvalidStatusError{}
+		return errors.New("invalid status")
 	}
 
 	if status == "rejected" {
