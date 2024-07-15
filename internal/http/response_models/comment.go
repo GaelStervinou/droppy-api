@@ -41,7 +41,6 @@ func FormatGetCommentResponseForDrop(comment model.CommentModel) GetCommentRespo
 func FormatGetCommentResponsesForDrop(comments []model.CommentModel) []GetCommentResponseForDrop {
 	var result []GetCommentResponseForDrop
 	for _, comment := range comments {
-		result = append(result)
 		result = append(result, FormatGetCommentResponseForDrop(comment))
 	}
 	return result
