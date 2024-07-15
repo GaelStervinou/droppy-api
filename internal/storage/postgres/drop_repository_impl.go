@@ -124,6 +124,18 @@ func (r *repoDropPrivate) CountUserDrops(userId uint) int {
 	return int(count)
 }
 
+func (r *repoDropPrivate) GetDropGroups(dropId uint) ([]model.GroupModel, error) {
+	var groups []Group
+	if err := r.db.Where("id = ?", dropId).Preload("Group").Find(&groups).Error; err != nil {
+		return nil, err
+	}
+	var result []model.GroupModel
+	for _, group := range groups {
+		result = append(result, &group)
+	}
+	return result, nil
+}
+
 func (r *repoDropPrivate) CountGroupDrops(groupId uint) int {
 	var count int64
 	r.db.Model(&Drop{}).Where("drop_notification_id = ?", groupId).Count(&count)

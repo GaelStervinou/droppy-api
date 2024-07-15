@@ -23,6 +23,7 @@ type GroupMemberRepository interface {
 	IsGroupMember(groupID uint, memberID uint) (bool, error)
 	GetPendingGroupMemberRequests(groupID uint) ([]GroupMemberModel, error)
 	DeleteGroupMembers(groupID uint) error
+	IsUserInGroups(groupIds []uint, memberID uint) (bool, error)
 }
 
 type GroupMemberService interface {

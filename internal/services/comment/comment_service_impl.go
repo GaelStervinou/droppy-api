@@ -82,7 +82,17 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 	}
 
 	if !isFollowing {
-		return false, errors.New("you must follow the drop creator before posting comments")
+		availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(drop.GetID())
+		if err != nil {
+			return false, err
+		}
+		areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
+		if err != nil {
+			return false, err
+		}
+		if !areUserInSameGroups {
+			return false, errors.New("you must follow the drop creator are be in the same group before posting comments")
+		}
 	}
 
 	return true, nil

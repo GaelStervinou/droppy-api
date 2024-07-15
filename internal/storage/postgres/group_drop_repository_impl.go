@@ -88,3 +88,18 @@ func (r repoGroupDropPrivate) GetByGroupIdAndLastNotificationId(groupId uint, la
 	}
 	return result, nil
 }
+
+func (r repoGroupDropPrivate) GetGroupIdsByDropId(dropID uint) ([]uint, error) {
+	var gds []GroupDrop
+	if err := r.db.Where("drop_id = ?", dropID).Find(&gds).Error; err != nil {
+		return nil, err
+	}
+
+	var result []uint
+
+	for _, gd := range gds {
+		result = append(result, gd.GroupID)
+	}
+
+	return result, nil
+}

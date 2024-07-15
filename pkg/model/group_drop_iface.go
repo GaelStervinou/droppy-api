@@ -10,5 +10,6 @@ type GroupDropRepository interface {
 	Create(dropId uint, groupId uint) (GroupDropModel, error)
 	Delete(dropId uint, groupId uint) error
 	GetByDropId(dropId uint) (GroupDropModel, error)
+	GetGroupIdsByDropId(dropID uint) ([]uint, error)
 	GetByGroupIdAndLastNotificationId(groupId uint, lastNotificationId uint) ([]GroupDropModel, error)
 }

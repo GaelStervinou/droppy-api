@@ -141,7 +141,8 @@ func (r gmRepoPrivate) GetByMemberID(memberID uint) ([]model.GroupMemberModel, e
 
 func (r gmRepoPrivate) GetByGroupIDAndMemberID(groupID uint, memberID uint) (model.GroupMemberModel, error) {
 	var groupMember GroupMember
-	result := r.db.Preload("Group").Preload("Group.CreatedBy").Preload("Member").Where("group_id = ? AND member_id = ?", groupID, memberID).First(&groupMember)
+	activeStatus := &GroupMemberStatusActive{}
+	result := r.db.Preload("Group").Preload("Group.CreatedBy").Preload("Member").Where("group_id = ? AND member_id = ? AND status = ?", groupID, memberID, activeStatus.ToIntGroupMemberStatus()).First(&groupMember)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -233,4 +234,15 @@ func (r gmRepoPrivate) DeleteGroupMembers(groupID uint) error {
 	}
 
 	return nil
+}
+
+func (r gmRepoPrivate) IsUserInGroups(groupIds []uint, memberID uint) (bool, error) {
+	var groupMembers []GroupMember
+	activeStatus := &GroupMemberStatusActive{}
+	result := r.db.Preload("Group").Preload("Group.CreatedBy").Preload("Member").Where("group_id IN ? AND member_id = ? AND status = ?", groupIds, memberID, activeStatus.ToIntGroupMemberStatus()).Find(&groupMembers)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	return len(groupMembers) > 0, nil
 }
