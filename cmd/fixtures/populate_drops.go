@@ -42,10 +42,6 @@ func PopulateDrops(db *gorm.DB) error {
 			status := statuses[r.IntN(len(statuses))]
 			picture := images[dropType][r.IntN(len(images[dropType]))]
 			hasPicture := r.IntN(3) == 0
-			var dropPicture string
-			if hasPicture {
-				dropPicture = randomPic
-			}
 			db.Create(&postgres.Drop{
 				Type:               dropType,
 				ContentTitle:       faker.Sentence(),
@@ -60,7 +56,7 @@ func PopulateDrops(db *gorm.DB) error {
 				Lat:                faker.Latitude(),
 				Lng:                faker.Longitude(),
 				Location:           location[r.IntN(len(location))],
-				PicturePath:        dropPicture,
+				PicturePath:        randomPic,
 			})
 		}
 	}
