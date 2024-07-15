@@ -216,7 +216,10 @@ func (r *repoFollowPrivate) GetUserFollowedBy(followerID uint, followedID uint) 
 
 func (r *repoFollowPrivate) GetFollowByID(followID uint) (model.FollowModel, error) {
 	var follow Follow
-	result := r.db.Where("id = ?", followID).First(&follow)
+	result := r.db.
+		Preload("Follower").
+		Preload("Followed").
+		Where("id = ?", followID).First(&follow)
 	if result.Error != nil {
 		return nil, result.Error
 	}

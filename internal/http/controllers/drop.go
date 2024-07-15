@@ -78,7 +78,7 @@ func CreateDrop(c *gin.Context) {
 
 	fmt.Printf("Sending new drop to followers %v\n", userFollowers)
 	for _, follower := range userFollowers {
-		newDropAvailable(follower.GetFollowerID(), response)
+		newDropAvailable(follower.GetFollowerID())
 	}
 }
 
@@ -349,9 +349,9 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 	}
 }
 
-func sendToUser(userID string, drop response_models.GetDropResponse) error {
+func sendToUser(userID uint, ds *dropservice.DropService) error {
 	mu.Lock()
-	wsConn, ok := userConnections[userID]
+	wsConn, ok := userConnections[strconv.Itoa(int(userID))]
 	fmt.Printf("Users: %v\n", userConnections)
 	mu.Unlock()
 
@@ -359,12 +359,35 @@ func sendToUser(userID string, drop response_models.GetDropResponse) error {
 		return fmt.Errorf("user not connected")
 	}
 
-	return wsConn.conn.WriteMessage(websocket.TextMessage, []byte("okkkkk"))
+	availableDrops, err := ds.GetUserFeed(userID)
+
+	if err != nil {
+		log.Printf("Error getting user feed: %v", err)
+		return err
+	}
+
+	var dropResponses []response_models.GetDropResponse
+	for _, drop := range availableDrops {
+		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), userID)
+
+		if err != nil {
+			log.Printf("Error checking if user is liking drop: %v", err)
+			return err
+		}
+
+		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
+		dropResponses = append(dropResponses, dropResponse)
+	}
+
+	return wsConn.conn.WriteJSON(dropResponses)
 }
 
-func newDropAvailable(userID uint, dropInfo response_models.GetDropResponse) {
+func newDropAvailable(userID uint) {
 	fmt.Println("New drop available for user", userID)
-	err := sendToUser(strconv.Itoa(int(userID)), dropInfo)
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+	err := sendToUser(userID, ds)
 	if err != nil {
 		log.Printf("Error sending message to user %d: %v", userID, err)
 	}
