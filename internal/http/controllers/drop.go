@@ -79,7 +79,10 @@ func CreateDrop(c *gin.Context) {
 
 	fmt.Printf("Sending new drop to followers %v\n", userFollowers)
 	for _, follower := range userFollowers {
-		NewDropAvailable(follower.GetFollowerID())
+		err := NewDropAvailable(follower.GetFollowerID(), createdDrop)
+		if err != nil {
+			log.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
+		}
 	}
 }
 
@@ -350,7 +353,10 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 	}
 }
 
-func sendToUser(userID uint, ds *dropservice.DropService) error {
+func NewDropAvailable(userID uint, newDrop model.DropModel) error {
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
 	mu.Lock()
 	wsConn, ok := userFeedConnections[strconv.Itoa(int(userID))]
 	fmt.Printf("Users: %v\n", userFeedConnections)
@@ -360,38 +366,15 @@ func sendToUser(userID uint, ds *dropservice.DropService) error {
 		return fmt.Errorf("user not connected")
 	}
 
-	availableDrops, err := ds.GetUserFeed(userID)
-
+	isCurrentUserLiking, err := ds.IsCurrentUserLiking(newDrop.GetID(), userID)
 	if err != nil {
-		log.Printf("Error getting user feed: %v", err)
+		log.Printf("Error checking if user is liking drop: %v", err)
 		return err
 	}
 
-	var dropResponses []response_models.GetDropResponse
-	for _, drop := range availableDrops {
-		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), userID)
+	dropResponse := response_models.FormatGetDropResponse(newDrop, isCurrentUserLiking)
 
-		if err != nil {
-			log.Printf("Error checking if user is liking drop: %v", err)
-			return err
-		}
-
-		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
-		dropResponses = append(dropResponses, dropResponse)
-	}
-
-	return wsConn.conn.WriteJSON(dropResponses)
-}
-
-func NewDropAvailable(userID uint) {
-	fmt.Println("New drop available for user", userID)
-	ds := &dropservice.DropService{
-		Repo: repositories.Setup(),
-	}
-	err := sendToUser(userID, ds)
-	if err != nil {
-		log.Printf("Error sending message to user %d: %v", userID, err)
-	}
+	return wsConn.conn.WriteJSON(dropResponse)
 }
 
 // DeleteDrop godoc

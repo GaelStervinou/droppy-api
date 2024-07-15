@@ -99,6 +99,8 @@ func FollowUser(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusCreated, createdFollow)
+
 	if createdFollow.GetStatus() == new(postgres.FollowPendingStatus).ToInt() {
 		fmt.Printf("Sending pending follows for user %d\n", uintCurrentUserId)
 		err = SendPendingFollowsWS(followCreationParam.UserToFollowID, postgres.NewFollowRepo(sqlDB))
@@ -107,11 +109,38 @@ func FollowUser(c *gin.Context) {
 			return
 		}
 	} else if createdFollow.GetStatus() == new(postgres.FollowAcceptedStatus).ToInt() {
+		dnr := postgres.NewDropNotifRepo(sqlDB)
+
+		lastNotification, err := dnr.GetCurrentDropNotification()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		dr := postgres.NewDropRepo(sqlDB)
+
+		newFollow, err := followRepo.GetFollowByID(createdFollow.GetID())
+		if err != nil {
+			fmt.Printf("Error getting follow: %v", err)
+			return
+		}
+
+		userLastDrop, err := dr.GetUserLastDrop(newFollow.GetFollowed().GetID(), lastNotification.GetID())
+		if err != nil {
+			fmt.Printf("Error getting user last drop: %v", err)
+			return
+		}
+
 		fmt.Printf("Sending drops to user %d\n", uintCurrentUserId)
-		NewDropAvailable(uintCurrentUserId)
+		if userLastDrop != nil {
+			err = NewDropAvailable(uintCurrentUserId, userLastDrop)
+			if err != nil {
+				fmt.Printf("Error sending drop to user %d: %v", uintCurrentUserId, err)
+				return
+			}
+		}
 	}
 
-	c.JSON(http.StatusCreated, createdFollow)
 }
 
 var pendingFollowUpgrader = websocket.Upgrader{
@@ -243,6 +272,7 @@ func AcceptRequest(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusCreated, gin.H{"message": "Follow request accepted"})
 	err = SendPendingFollowsWS(uintCurrentUserId, followRepo)
 	if err != nil {
 		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
@@ -255,9 +285,30 @@ func AcceptRequest(c *gin.Context) {
 		return
 	}
 
-	NewDropAvailable(acceptedFollow.GetFollowerID())
+	dnr := postgres.NewDropNotifRepo(sqlDB)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Follow request accepted"})
+	lastNotification, err := dnr.GetCurrentDropNotification()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	dr := postgres.NewDropRepo(sqlDB)
+
+	userLastDrop, err := dr.GetUserLastDrop(uintCurrentUserId, lastNotification.GetID())
+	if err != nil {
+		fmt.Printf("Error getting user last drop: %v", err)
+		return
+	}
+
+	fmt.Printf("Sending drops to user %d\n", uintCurrentUserId)
+	if userLastDrop != nil {
+		err = NewDropAvailable(acceptedFollow.GetFollowerID(), userLastDrop)
+		if err != nil {
+			fmt.Printf("Error sending drop to user %d: %v", uintCurrentUserId, err)
+			return
+		}
+	}
 }
 
 // RejectRequest godoc
