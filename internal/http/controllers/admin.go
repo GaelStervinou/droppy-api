@@ -3,6 +3,8 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
+	"go-api/internal/repositories"
+	reportservice "go-api/internal/services/report"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/model"
 	"net/http"
@@ -415,7 +417,7 @@ func AdminDeleteComment(c *gin.Context) {
 // @Param 		body request_models.ManageReportRequest true "Manage report data"
 // @Success		200
 // @Failure		500
-// @Router			/admin/reports/{id}/manage [put]
+// @Router			/admin/reports/{id} [put]
 func AdminManageReport(c *gin.Context) {
 	sqlDB := postgres.Connect()
 
@@ -436,7 +438,11 @@ func AdminManageReport(c *gin.Context) {
 		return
 	}
 
-	reportModel, err = rr.ManageReport(reportModel.GetID(), manageReportRequest)
+	reportService := reportservice.ReportService{
+		Repo: repositories.Setup(),
+	}
+
+	reportModel, err = reportService.ManageReport(reportModel.GetID(), manageReportRequest.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

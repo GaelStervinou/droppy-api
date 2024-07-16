@@ -78,42 +78,50 @@ func (s *ReportService) ReportResponse(userId uint, responseId uint, description
 	return report, nil
 }
 
-func (s *ReportService) ManageReport(reportId uint, status string) error {
+func (s *ReportService) ManageReport(reportId uint, status string) (model.ReportModel, error) {
 	if status != "approved" && status != "rejected" {
-		return errors.New("invalid status")
+		return nil, errors.New("invalid status")
 	}
 
 	if status == "rejected" {
-		s.Repo.ReportRepository.UpdateReportStatus(reportId, -1)
+		err := s.Repo.ReportRepository.UpdateReportStatus(reportId, -1)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, nil
 	}
 
 	report, err := s.Repo.ReportRepository.GetReportById(reportId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if report.GetReportedDrop() != nil {
 		err := s.Repo.DropRepository.Delete(report.GetReportedDrop().GetID())
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	if report.GetReportedComment() != nil {
 		err := s.Repo.CommentRepository.DeleteComment(report.GetReportedComment().GetID())
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	if report.GetReportedResponse() != nil {
 		err := s.Repo.CommentResponseRepository.DeleteCommentResponse(report.GetReportedResponse().GetID())
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	s.Repo.ReportRepository.UpdateReportStatus(reportId, 1)
+	err = s.Repo.ReportRepository.UpdateReportStatus(reportId, 1)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	return nil, nil
 }

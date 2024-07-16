@@ -151,8 +151,8 @@ func (r repoGroupPrivate) GetByName(name string) (model.GroupModel, error) {
 }
 
 func (r repoGroupPrivate) Delete(id uint) error {
-	//TODO implement me
-	panic("implement me")
+	result := r.db.Delete(&Group{}, id)
+	return result.Error
 }
 
 func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
