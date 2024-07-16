@@ -72,7 +72,7 @@ func (a *AccountService) Login(email string, password string, fcmToken string) (
 	}
 
 	if fcmToken != "" && user.GetFCMToken() != fcmToken {
-		_, err = a.Repo.UserRepository.Update(user.GetID(), map[string]interface{}{"fcmToken": fcmToken})
+		_, err = a.Repo.UserRepository.Update(user.GetID(), map[string]interface{}{"fcm_token": fcmToken})
 		if err != nil {
 			return &account.TokenInfo{}, err
 		}
