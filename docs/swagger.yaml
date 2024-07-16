@@ -72,20 +72,31 @@ definitions:
     type: object
   model.DropCreationParam:
     properties:
-      '-':
-        type: string
       content:
+        type: string
+      contentPicturePath:
+        type: string
+      contentSubtitle:
+        type: string
+      contentTitle:
         type: string
       description:
         type: string
+      groups:
+        items:
+          type: integer
+        type: array
       lat:
         type: number
       lng:
         type: number
+      location:
+        type: string
       picture:
         $ref: '#/definitions/multipart.FileHeader'
     required:
     - content
+    - contentTitle
     - description
     type: object
   model.DropPatch:

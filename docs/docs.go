@@ -2200,23 +2200,39 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "content",
+                "contentTitle",
                 "description"
             ],
             "properties": {
-                "-": {
+                "content": {
                     "type": "string"
                 },
-                "content": {
+                "contentPicturePath": {
+                    "type": "string"
+                },
+                "contentSubtitle": {
+                    "type": "string"
+                },
+                "contentTitle": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "lat": {
                     "type": "number"
                 },
                 "lng": {
                     "type": "number"
+                },
+                "location": {
+                    "type": "string"
                 },
                 "picture": {
                     "$ref": "#/definitions/multipart.FileHeader"

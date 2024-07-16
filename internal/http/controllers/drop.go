@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/gorilla/websocket"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -35,7 +36,8 @@ import (
 func CreateDrop(c *gin.Context) {
 	var dropCreationParam model.DropCreationParam
 
-	if err := c.ShouldBindJSON(&dropCreationParam); err != nil {
+	if err := c.MustBindWith(&dropCreationParam, binding.FormMultipart); err != nil {
+		fmt.Printf("Error: %v\n", err)
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}

@@ -127,18 +127,6 @@ func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 	return &object, result.Error
 }
 
-func (r repoGroupPrivate) GetGroupMinimalById(id uint) (model.GroupModel, error) {
-	object := Group{}
-
-	result := r.db.
-		Preload("CreatedBy").Find(&object)
-	if object.CreatedAt.IsZero() {
-		return nil, fmt.Errorf("group with id %d not found", id)
-	}
-
-	return &object, result.Error
-}
-
 func (r repoGroupPrivate) GetByName(name string) (model.GroupModel, error) {
 	object := Group{}
 

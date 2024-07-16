@@ -5,9 +5,11 @@ import (
 	"go-api/internal/repositories"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
+	"go-api/pkg/file"
 	"go-api/pkg/model"
 	"go-api/pkg/validation"
 	"gorm.io/gorm"
+	"slices"
 )
 
 type DropService struct {
@@ -55,14 +57,26 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		return nil, err
 	}
 
+	var picturePath string
+	if args.Picture != nil {
+		picturePath, err = file.UploadFile(args.Picture)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	filledDrop := model.FilledDropCreation{
 		Type:               currentDropNotification.GetType(),
 		Content:            args.Content,
+		ContentTile:        args.ContentTile,
+		ContentSubTitle:    args.ContentSubTitle,
+		ContentPicturePath: args.ContentPicturePath,
 		Description:        args.Description,
 		DropNotificationId: currentDropNotification.GetID(),
-		PicturePath:        args.PicturePath,
+		PicturePath:        picturePath,
 		Lat:                args.Lat,
 		Lng:                args.Lng,
+		Location:           args.Location,
 	}
 
 	statusActive := postgres.DropStatusActive{}
@@ -72,16 +86,39 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 		filledDrop.Type,
 		filledDrop.Content,
 		filledDrop.Description,
+		filledDrop.ContentPicturePath,
+		filledDrop.ContentTile,
+		filledDrop.ContentSubTitle,
 		userId,
 		statusActive.ToInt(),
 		false,
 		filledDrop.PicturePath,
 		filledDrop.Lat,
 		filledDrop.Lng,
+		filledDrop.Location,
 	)
 
 	if err != nil {
 		return nil, err
+	}
+
+	user, err := s.Repo.UserRepository.GetById(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	for _, group := range user.GetGroups() {
+		if slices.Contains(args.Groups, group.GetID()) {
+			_, err = s.Repo.GroupDropRepository.Create(group.GetID(), createdDrop.GetID())
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return s.Repo.DropRepository.GetDropById(createdDrop.GetID())

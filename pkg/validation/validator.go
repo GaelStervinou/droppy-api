@@ -64,18 +64,6 @@ func ValidateDropCreation(args model.DropCreationParam) errors2.MultiFieldsError
 		finalErrors.Fields["lng"] = "Invalid longitude"
 	}
 
-	/*validTypes := []string{"youtube", "spotify", "film"}
-
-	if slices.Contains(validTypes, args.Type) == false {
-		finalErrors.Fields["type"] = "Invalid type"
-	}*/
-
-	/*err := validateContentByType(args.Content, args.Type)
-
-	if err != nil {
-		finalErrors.Fields["content"] = err.Error()
-	}*/
-
 	return finalErrors
 }
 

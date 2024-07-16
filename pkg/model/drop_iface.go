@@ -30,7 +30,7 @@ type DropModel interface {
 }
 
 type DropRepository interface {
-	Create(dropNotificationId uint, contentType string, content string, description string, createdById uint, status uint, isPinned bool, picturePath string, lat float64, lng float64) (DropModel, error)
+	Create(dropNotificationId uint, contentType string, content string, description string, contentPicturePath string, contentTitle string, contentSubtitle string, createdById uint, status uint, isPinned bool, picturePath string, lat float64, lng float64, location string) (DropModel, error)
 	Delete(dropId uint) error
 	GetUserDrops(userId uint) ([]DropModel, error)
 	GetDropByDropNotificationAndUser(dropNotificationId uint, userId uint) (DropModel, error)
@@ -61,22 +61,30 @@ type DropService interface {
 }
 
 type DropCreationParam struct {
-	Content     string                `form:"content" binding:"required"`
-	Description string                `form:"description" binding:"required"`
-	Lat         float64               `form:"lat"`
-	Lng         float64               `form:"lng"`
-	Picture     *multipart.FileHeader `form:"picture"`
-	PicturePath string                `form:"-"`
+	Content            string                `form:"content" binding:"required"`
+	Description        string                `form:"description" binding:"required"`
+	ContentTile        string                `form:"contentTitle" binding:"required"`
+	ContentSubTitle    string                `form:"contentSubtitle"`
+	ContentPicturePath string                `form:"contentPicturePath"`
+	Lat                float64               `form:"lat"`
+	Lng                float64               `form:"lng"`
+	Location           string                `form:"location"`
+	Picture            *multipart.FileHeader `form:"picture"`
+	Groups             []uint                `form:"groups"`
 }
 
 type FilledDropCreation struct {
 	Type               string  `json:"type"`
 	Content            string  `json:"content"`
+	ContentTile        string  `form:"contentTitle" binding:"required"`
+	ContentSubTitle    string  `form:"contentSubtitle"`
+	ContentPicturePath string  `form:"contentPicturePath"`
 	Description        string  `json:"description"`
 	DropNotificationId uint    `json:"dropNotificationId"`
 	PicturePath        string  `json:"picturePath"`
 	Lat                float64 `json:"lat"`
 	Lng                float64 `json:"lng"`
+	Location           string  `json:"location"`
 }
 
 type DropPatch struct {

@@ -9,7 +9,7 @@ type Drop struct {
 	gorm.Model
 	Type               string `gorm:"not null"`
 	ContentTitle       string `gorm:"not null"`
-	ContentSubtitle    string
+	ContentSubtitle    string `gorm:"default:null"`
 	Location           string
 	Content            string `gorm:"not null"`
 	ContentPicturePath string `gorm:"not null"`
@@ -100,18 +100,26 @@ func (r *repoDropPrivate) Create(
 	contentType string,
 	content string,
 	description string,
+	contentPicturePath string,
+	contentTitle string,
+	contentSubtitle string,
 	createdById uint,
 	status uint,
 	isPinned bool,
 	picturePath string,
 	lat float64,
 	lng float64,
+	location string,
 
 ) (model.DropModel, error) {
 	drop := &Drop{
 		Type:               contentType,
 		Content:            content,
 		Description:        description,
+		ContentPicturePath: contentPicturePath,
+		ContentTitle:       contentTitle,
+		ContentSubtitle:    contentSubtitle,
+		Location:           location,
 		CreatedById:        createdById,
 		Status:             status,
 		IsPinned:           isPinned,

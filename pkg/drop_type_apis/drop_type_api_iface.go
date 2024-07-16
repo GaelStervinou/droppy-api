@@ -6,7 +6,7 @@ type DropTypeAPI interface {
 }
 
 type ApiSearch interface {
-	GetType() string
+	GetSearch() string
 	GetContentTitle() string
 	GetContentDescription() string
 	GetContentPicturePath() string
@@ -21,7 +21,7 @@ type ApiSearchResponse struct {
 	Content     string
 }
 
-func (a ApiSearchResponse) GetType() string {
+func (a ApiSearchResponse) GetSearch() string {
 	return a.Search
 }
 

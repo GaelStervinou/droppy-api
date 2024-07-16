@@ -21,7 +21,6 @@ type GroupRepository interface {
 	Create(name string, description string, isPrivate bool, picturePath string, createdBy UserModel) (GroupModel, error)
 	FindAllGroupOwnedByUserId(userId uint) ([]GroupModel, error)
 	GetById(id uint) (GroupModel, error)
-	GetGroupMinimalById(id uint) (GroupModel, error)
 	GetByName(name string) (GroupModel, error)
 	Update(groupID uint, args map[string]interface{}) (GroupModel, error)
 	Delete(id uint) error
