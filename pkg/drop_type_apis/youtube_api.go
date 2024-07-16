@@ -37,6 +37,7 @@ func (y *YoutubeAPI) Search(search string) []ApiSearchResponse {
 			PicturePath: item.Snippet.Thumbnails.Default.Url,
 			Title:       item.Snippet.Title,
 			Subtitle:    item.Snippet.ChannelTitle,
+			Content:     generateUrl(item.Id.VideoId),
 		})
 	}
 
@@ -60,3 +61,7 @@ func (y *YoutubeAPI) Init() {
 var (
 	_ DropTypeAPI = &YoutubeAPI{}
 )
+
+func generateUrl(videoId string) string {
+	return fmt.Sprintf("https://www.youtube.com/watch?v=%s", videoId)
+}

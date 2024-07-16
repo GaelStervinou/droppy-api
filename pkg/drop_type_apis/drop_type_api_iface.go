@@ -10,6 +10,7 @@ type ApiSearch interface {
 	GetContentTitle() string
 	GetContentDescription() string
 	GetContentPicturePath() string
+	GetContent() string
 }
 
 type ApiSearchResponse struct {
@@ -17,6 +18,7 @@ type ApiSearchResponse struct {
 	PicturePath string
 	Title       string
 	Subtitle    string
+	Content     string
 }
 
 func (a ApiSearchResponse) GetType() string {
@@ -33,4 +35,8 @@ func (a ApiSearchResponse) GetContentDescription() string {
 
 func (a ApiSearchResponse) GetContentPicturePath() string {
 	return a.PicturePath
+}
+
+func (a ApiSearchResponse) GetContent() string {
+	return a.Content
 }
