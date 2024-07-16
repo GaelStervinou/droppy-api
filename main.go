@@ -118,9 +118,11 @@ func main() {
 
 		fixtures := v1.Group("/fixtures")
 		{
+			fixtures.GET("/all", controllers.PopulateAll)
 			fixtures.GET("/users", controllers.PopulateUsers)
 			fixtures.GET("/follows", controllers.PopulateFollows)
 			fixtures.GET("/drops", controllers.PopulateDrops)
+			fixtures.GET("/groups", controllers.PopulateGroups)
 		}
 
 		admin := v1.Group("/admin")

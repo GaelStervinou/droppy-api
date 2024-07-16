@@ -119,11 +119,22 @@ func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 	object := Group{}
 	object.ID = id
 
-	result := r.db.Preload("CreatedBy").Preload("GroupMembers").Preload("GroupMembers.Member").Find(&object)
+	result := r.db.
+		Preload("CreatedBy").
+		Preload("GroupMembers", "status = 1").
+		Preload("GroupMembers.Member", "status = 1").
+		Joins("JOIN group_members ON group_members.group_id = groups.id AND group_members.status = ?", 1).
+		Joins("JOIN users ON group_members.member_id = users.id AND users.status = ?", 1).
+		Find(&object)
 	if object.CreatedAt.IsZero() {
 		return nil, fmt.Errorf("group with id %d not found", id)
 	}
 
+	for i, v := range object.GroupMembers {
+		if v.Member.Status != 1 {
+			object.GroupMembers = append(object.GroupMembers[:i], object.GroupMembers[i+1:]...)
+		}
+	}
 	return &object, result.Error
 }
 

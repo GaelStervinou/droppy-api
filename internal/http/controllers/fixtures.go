@@ -6,6 +6,20 @@ import (
 	"go-api/internal/storage/postgres"
 )
 
+func PopulateAll(c *gin.Context) {
+	truncate := c.Query("truncate")
+	sqlDB := postgres.Connect()
+
+	if truncate == "true" {
+		fixtures.TruncateTables(sqlDB)
+	}
+
+	fixtures.PopulateUsers(sqlDB)
+	fixtures.PopulateFollows(sqlDB)
+	fixtures.PopulateDrops(sqlDB)
+	fixtures.PopulateGroups(sqlDB)
+}
+
 func PopulateUsers(c *gin.Context) {
 	sqlDB := postgres.Connect()
 
@@ -40,4 +54,12 @@ func PopulateDrops(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"message": "Drops populated"})
+}
+
+func PopulateGroups(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	fixtures.PopulateGroups(sqlDB)
+
+	c.JSON(200, gin.H{"message": "Groups populated"})
 }

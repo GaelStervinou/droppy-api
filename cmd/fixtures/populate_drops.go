@@ -8,7 +8,6 @@ import (
 )
 
 func PopulateDrops(db *gorm.DB) error {
-
 	types := []string{"youtube", "twitch", "films", "spotify", "tiktok"}
 	var dropNotifications []postgres.DropNotification
 	for i := range 365 {
