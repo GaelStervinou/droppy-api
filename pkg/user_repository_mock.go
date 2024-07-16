@@ -148,7 +148,7 @@ func (m *MockUserRepository) GetByGoogleAuthId(googleID string) (model.UserModel
 // GetByGoogleAuthId indicates an expected call of GetByGoogleAuthId.
 func (mr *MockUserRepositoryMockRecorder) GetByGoogleAuthId(googleID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByGoogleAuthId", reflect.TypeOf((*MockUserRepository)(nil).GetByGoogleAuthId), googleID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByFirebaseUid", reflect.TypeOf((*MockUserRepository)(nil).GetByGoogleAuthId), googleID)
 }
 
 // GetById mocks base method.
