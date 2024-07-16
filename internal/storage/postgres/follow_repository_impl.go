@@ -119,7 +119,8 @@ func (r *repoFollowPrivate) GetFollowers(userID uint) ([]model.FollowModel, erro
 	result := r.db.
 		Preload("Followed").
 		Preload("Follower").
-		Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
+		Joins("JOIN users AS follower ON follower.id = follows.follower_id AND follower.status = ?", 1).
+		Where("followed_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -135,7 +136,8 @@ func (r *repoFollowPrivate) GetFollowing(userID uint) ([]model.FollowModel, erro
 	result := r.db.
 		Preload("Followed").
 		Preload("Follower").
-		Where("follower_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
+		Joins("JOIN users AS followed ON followed.id = follows.followed_id AND followed.status = ?", 1).
+		Where("follower_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
 	}

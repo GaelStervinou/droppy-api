@@ -164,7 +164,11 @@ func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 	userObject := User{}
 	userObject.ID = id
 
-	result := repo.db.Preload("Groups").Preload("Groups.CreatedBy").Find(&userObject)
+	result := repo.db.
+		Preload("Groups").
+		Joins("JOIN group_members ON group_members.member_id = users.id AND group_members.deleted_at IS NULL").
+		Preload("Groups.CreatedBy").
+		Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
 		return nil, nil
 	}

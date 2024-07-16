@@ -191,7 +191,15 @@ func (r gmRepoPrivate) UpdateStatus(groupID uint, memberID uint, status uint) (m
 }
 
 func (r gmRepoPrivate) Delete(groupID uint, memberID uint) error {
-	result := r.db.Where("group_id = ? AND member_id = ?", groupID, memberID).Delete(&GroupMember{})
+	result := r.db.Model(&GroupMember{
+		MemberID: memberID,
+	}).Where("group_id = ? AND member_id = ?", groupID, memberID).Update("status", -1)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	result = r.db.Where("group_id = ? AND member_id = ?", groupID, memberID).Delete(&GroupMember{})
 	if result.Error != nil {
 		return result.Error
 	}
