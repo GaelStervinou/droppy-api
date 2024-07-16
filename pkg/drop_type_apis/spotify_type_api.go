@@ -15,10 +15,7 @@ var (
 )
 
 type SpotifyAPI struct {
-	ContentTitle       string
-	ContentDescription string
-	ContentPicturePath string
-	Client             *spotify.Client
+	Client *spotify.Client
 }
 
 func (s *SpotifyAPI) Search(search string) []ApiSearchResponse {

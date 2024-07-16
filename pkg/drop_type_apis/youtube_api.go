@@ -13,10 +13,7 @@ var (
 )
 
 type YoutubeAPI struct {
-	ContentTitle       string
-	ContentDescription string
-	ContentPicturePath string
-	Client             *youtube.Service
+	Client *youtube.Service
 }
 
 func (y *YoutubeAPI) Search(search string) []ApiSearchResponse {
