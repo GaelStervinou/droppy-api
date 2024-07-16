@@ -13,7 +13,7 @@ import (
 
 type User struct {
 	gorm.Model
-	FirebaseUID string `gorm:"unique"`
+	FirebaseUID string
 	Email       string `gorm:"unique"`
 	Password    string `gorm:"size:255"`
 	Username    string `gorm:"unique;not null"`

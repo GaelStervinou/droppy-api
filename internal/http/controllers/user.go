@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
-	"go-api/internal/services/account"
 	"go-api/internal/services/user"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/errors2"
@@ -142,7 +141,7 @@ func GetUserById(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			user	body		model.UserCreationParam	true	"User creation object"
-//	@Success		201	{object} account.TokenInfo
+//	@Success		201	{object} response_models.GetUserResponse
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
 //	@Router			/users [post]
@@ -170,17 +169,14 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	acc := &account.AccountService{
-		Repo: repositories.Setup(),
-	}
+	newUser, err := us.GetById(createdUser.GetID())
 
-	tokenInfo, err := acc.Login(createdUser.GetEmail(), userToCreate.Password, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, tokenInfo)
+	c.JSON(http.StatusCreated, response_models.FormatGetUserResponse(newUser))
 }
 
 // PatchUserById godoc
