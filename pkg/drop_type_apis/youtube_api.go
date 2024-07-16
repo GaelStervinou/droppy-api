@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+var (
+	_ DropTypeAPI = &YoutubeAPI{}
+)
+
 type YoutubeAPI struct {
 	ContentTitle       string
 	ContentDescription string
@@ -57,10 +61,6 @@ func (y *YoutubeAPI) Init() {
 	}
 	y.Client = service
 }
-
-var (
-	_ DropTypeAPI = &YoutubeAPI{}
-)
 
 func generateUrl(videoId string) string {
 	return fmt.Sprintf("https://www.youtube.com/watch?v=%s", videoId)
