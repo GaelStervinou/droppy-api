@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
+	pushnotificationservice "go-api/internal/services/push_notification"
 	reportservice "go-api/internal/services/report"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/model"
@@ -460,4 +461,76 @@ func AdminManageReport(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, reportsResponse)
+}
+
+// AdminScheduleDrop godoc
+//
+// @Summary		Schedule drop
+// @Description	Schedule drop by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param		params	body model.ScheduleDropParam true "Send drop data"
+// @Success		201 {object} response_models.GetDropNotificationResponse
+// @Failure		422 "Invalid drop data"
+// @Failure		500
+// @Router			/admin/drops/schedule [post]
+func AdminScheduleDrop(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	dnr := postgres.NewDropNotifRepo(sqlDB)
+
+	var scheduleDropParam model.ScheduleDropParam
+	if err := c.ShouldBindJSON(&scheduleDropParam); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	dropNotifModel, err := dnr.Create(scheduleDropParam.Type)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response_models.FormatGetDropNotificationResponse(dropNotifModel))
+}
+
+// AdminSendDropNow godoc
+//
+// @Summary		Send drop now
+// @Description	Send drop now by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			params	body model.SendDropRequest true "Send drop data"
+// @Success		201 {object} response_models.GetDropNotificationResponse
+// @Failure		422 "Invalid drop data"
+// @Failure		500
+// @Router			/admin/drops/send-now [post]
+func AdminSendDropNow(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	dnr := postgres.NewDropNotifRepo(sqlDB)
+
+	var scheduleDropParam model.ScheduleDropParam
+	if err := c.ShouldBindJSON(&scheduleDropParam); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	dropNotifModel, err := dnr.Create(scheduleDropParam.Type)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	pushNotificationService := pushnotificationservice.PushNotificationService{
+		Repo: repositories.Setup(),
+	}
+
+	pushNotificationService.SendNotificationsToAllUser(scheduleDropParam.Type)
+
+	c.JSON(http.StatusCreated, response_models.FormatGetDropNotificationResponse(dropNotifModel))
 }

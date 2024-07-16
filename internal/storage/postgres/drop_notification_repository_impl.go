@@ -24,7 +24,7 @@ func NewDropNotifRepo(db *gorm.DB) model.DropNotificationRepository {
 	return &repoDropNotifPrivate{db: db}
 }
 
-func (r *repoDropNotifPrivate) Create(dropId, createdById uint, notificationType string) (model.DropNotificationModel, error) {
+func (r *repoDropNotifPrivate) Create(notificationType string) (model.DropNotificationModel, error) {
 	notification := &DropNotification{
 		Type: notificationType,
 	}

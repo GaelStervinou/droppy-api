@@ -32,11 +32,19 @@ func GenerateRandomNotification() {
 	// Sleep until the random time and then send the notification
 	time.Sleep(duration)
 
-	deviceTokens := []string{"device_token_1", "device_token_2"} // TODO get tokens from database so create a route or adapt user creation or wahtever to get token for users
-	sendNotification(deviceTokens)
+	SendNotificationsToAllUser()
 }
 
-func sendNotification(deviceTokens []string) {
+func SendNotificationsToAllUser() {
+	fcmTokens, err := userRepo.GetAllFCMTokens()
+	if err != nil {
+		log.Errorf("error getting fcm tokens: %v", err)
+	}
+
+	sendNotification(fcmTokens)
+}
+
+func SendNotification(fcmTokens []string) {
 	firebaseRepo, err := firebase.NewRepo()
 
 	if err != nil {
@@ -54,7 +62,7 @@ func sendNotification(deviceTokens []string) {
 			Title: "Congratulations!!",
 			Body:  "You have just implemented push notification",
 		},
-		Tokens: deviceTokens, // it's an array of device tokens
+		Tokens: fcmTokens,
 	})
 
 	if err != nil {

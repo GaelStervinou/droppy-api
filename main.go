@@ -137,6 +137,8 @@ func main() {
 			admin.DELETE("/comments/:id", middlewares.AdminRequired(), controllers.DeleteComment)
 			admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
 			admin.PUT("/reports/:id", middlewares.AdminRequired(), controllers.AdminManageReport)
+			admin.POST("/drops/schedule", middlewares.AdminRequired(), controllers.AdminScheduleDrop)
+			admin.POST("/drops/send-now", middlewares.AdminRequired(), controllers.AdminSendDropNow)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

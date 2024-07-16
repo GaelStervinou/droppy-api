@@ -7,7 +7,11 @@ type DropNotificationModel interface {
 }
 
 type DropNotificationRepository interface {
-	Create(dropId, createdById uint, notificationType string) (DropNotificationModel, error)
+	Create(notificationType string) (DropNotificationModel, error)
 	GetNotificationByID(notificationId uint) (DropNotificationModel, error)
 	GetCurrentDropNotification() (DropNotificationModel, error)
+}
+
+type ScheduleDropParam struct {
+	Type string `json:"type" binding:"required"`
 }
