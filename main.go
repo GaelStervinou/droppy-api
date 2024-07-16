@@ -153,7 +153,7 @@ func main() {
 	c.Start()
 	fmt.Println("Scheduler started...")*/
 
-	err = r.Run(":3000")
+	err = r.Run(":80")
 
 	if err != nil {
 		log.Fatal(err)
