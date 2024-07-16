@@ -30,12 +30,22 @@ func PopulateGroups(db *gorm.DB) {
 		}
 		randNbUsers := rand.Intn(100)
 		for j := range randNbUsers {
+			activeUser := activeUsers[j]
 			db.Create(&postgres.GroupMember{
 				GroupID:  grp.ID,
-				MemberID: activeUsers[j].ID,
+				MemberID: activeUser.ID,
 				Status:   1,
 				Role:     memberRoles[rand.Intn(len(memberRoles))],
 			})
+
+			var dropIds []uint
+			db.Model(&postgres.Drop{}).Where("created_by_id = ?", activeUser.ID).Limit(rand.Intn(5)).Pluck("id", &dropIds)
+			for _, dropId := range dropIds {
+				db.Create(&postgres.GroupDrop{
+					GroupID: grp.ID,
+					DropID:  dropId,
+				})
+			}
 		}
 	}
 }
