@@ -139,7 +139,7 @@ func (mr *MockUserRepositoryMockRecorder) GetByEmail(email any) *gomock.Call {
 // GetByGoogleAuthId mocks base method.
 func (m *MockUserRepository) GetByGoogleAuthId(googleID string) (model.UserModel, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByGoogleAuthId", googleID)
+	ret := m.ctrl.Call(m, "GetByFirebaseUid", googleID)
 	ret0, _ := ret[0].(model.UserModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1

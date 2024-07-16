@@ -20,7 +20,7 @@ type UserModel interface {
 }
 
 type UserRepository interface {
-	GetByGoogleAuthId(googleID string) (UserModel, error)
+	GetByFirebaseUid(googleID string) (UserModel, error)
 	GetByEmail(email string) (UserModel, error)
 	GetById(id uint) (UserModel, error)
 	Create(args UserCreationParam) (UserModel, error)

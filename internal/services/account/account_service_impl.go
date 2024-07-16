@@ -114,7 +114,7 @@ func (a *AccountService) LoginWithFirebase(token string, ctx context.Context) (*
 		name = random.RandStringRunes(10)
 	}
 
-	user, err := a.Repo.UserRepository.GetByGoogleAuthId(decodedToken.UID)
+	user, err := a.Repo.UserRepository.GetByFirebaseUid(decodedToken.UID)
 
 	if err != nil {
 		if "user not found" == err.Error() {
@@ -123,7 +123,7 @@ func (a *AccountService) LoginWithFirebase(token string, ctx context.Context) (*
 				return &account.TokenInfo{}, err
 			}
 
-			user, err = a.Repo.UserRepository.GetByGoogleAuthId(decodedToken.UID)
+			user, err = a.Repo.UserRepository.GetByFirebaseUid(decodedToken.UID)
 
 			if err != nil {
 				return &account.TokenInfo{}, err

@@ -139,10 +139,10 @@ func (repo *repoUserPrivate) Delete(id uint) error {
 	return repo.db.Delete(&User{}, id).Error
 }
 
-func (repo *repoUserPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, error) {
+func (repo *repoUserPrivate) GetByFirebaseUid(googleId string) (model.UserModel, error) {
 	userObject := User{}
 
-	result := repo.db.Where("firebase_uuid = ?", googleId).First(&userObject)
+	result := repo.db.Where("firebase_uid = ?", googleId).First(&userObject)
 	if userObject.CreatedAt.IsZero() {
 		return nil, errors.New("user not found")
 	}
@@ -166,7 +166,7 @@ func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 
 	result := repo.db.
 		Preload("Groups").
-		Joins("JOIN group_members ON group_members.member_id = users.id AND group_members.deleted_at IS NULL").
+		Joins("LEFT JOIN group_members ON group_members.member_id = users.id AND group_members.deleted_at IS NULL").
 		Preload("Groups.CreatedBy").
 		Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
