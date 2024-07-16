@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -74,8 +75,50 @@ func CommentDrop(c *gin.Context) {
 	response := response_models.FormatGetCommentResponse(comment)
 
 	c.JSON(http.StatusCreated, response)
+
+	drop, err := cs.Repo.DropRepository.GetDropById(uint(dropIdUint))
+
+	if err != nil {
+		fmt.Printf("Error getting drop: %v", err)
+		return
+	}
+
+	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting followers: %v", err)
+		return
+	}
+
+	for _, follower := range followers {
+		err = NewDropAvailable(follower.GetFollowerID(), drop)
+		if err != nil {
+			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
+		}
+	}
+
+	err = NewDropAvailable(drop.GetCreatedById(), drop)
+	if err != nil {
+		fmt.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
+	}
 }
 
+// DeleteComment godoc
+//
+//	@Summary		Delete a comment
+//	@Description	Delete a comment
+//	@Tags			drop
+//	@Accept			json
+//	@Produce		json
+//
+// @Security BearerAuth
+//
+//	@Param			id path int true "Comment ID"
+//	@Success		204 No Content
+//	@Failure		401
+//	@Failure		422 {object} errors2.MultiFieldsError
+//	@Failure		500
+//	@Router			/comments/{id} [delete]
 func DeleteComment(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
@@ -108,6 +151,13 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
+	comment, err := cs.Repo.CommentRepository.GetById(uint(commentIdUint))
+
+	if err != nil {
+		fmt.Printf("Error getting comment: %v", err)
+		return
+	}
+
 	err = cs.DeleteComment(uint(commentIdUint))
 
 	if err != nil {
@@ -115,5 +165,31 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
+	c.JSON(http.StatusNoContent, nil)
+
+	drop, err := cs.Repo.DropRepository.GetDropById(comment.GetDrop().GetID())
+
+	if err != nil {
+		fmt.Printf("Error getting drop: %v", err)
+		return
+	}
+
+	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting followers: %v", err)
+		return
+	}
+
+	for _, follower := range followers {
+		err = NewDropAvailable(follower.GetFollowerID(), drop)
+		if err != nil {
+			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
+		}
+	}
+
+	err = NewDropAvailable(drop.GetCreatedById(), drop)
+	if err != nil {
+		fmt.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
+	}
 }

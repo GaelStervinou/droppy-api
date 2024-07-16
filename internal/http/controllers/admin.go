@@ -414,7 +414,7 @@ func AdminDeleteComment(c *gin.Context) {
 // @Produce		json
 // @Security BearerAuth
 // @Param			id path string true "Report ID"
-// @Param 		body request_models.ManageReportRequest true "Manage report data"
+// @Param 		report body model.ManageReportRequest true "Manage report data"
 // @Success		200
 // @Failure		500
 // @Router			/admin/reports/{id} [put]

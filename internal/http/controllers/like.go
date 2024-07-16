@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/repositories"
 	likeservice "go-api/internal/services/like"
@@ -20,7 +21,7 @@ import (
 // @Security BearerAuth
 //
 //	@Param			id path int true "Drop ID"
-//	@Success		200	{object} response_models.GetDropResponse
+//	@Success		201	{object} postgres.Like
 //	@Failure		401
 //	@Failure		422 {object} errors2.MultiFieldsError
 //	@Failure		500
@@ -64,7 +65,33 @@ func LikeDrop(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, like)
+	c.JSON(http.StatusCreated, like)
+
+	likedDrop, err := ls.Repo.DropRepository.GetDropById(like.GetDropID())
+
+	if err != nil {
+		fmt.Printf("Error getting drop: %v", err)
+		return
+	}
+
+	followers, err := ls.Repo.FollowRepository.GetFollowers(likedDrop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting followers: %v", err)
+		return
+	}
+
+	for _, follower := range followers {
+		err = NewDropAvailable(follower.GetFollowerID(), likedDrop)
+		if err != nil {
+			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
+		}
+	}
+
+	err = NewDropAvailable(likedDrop.GetCreatedById(), likedDrop)
+	if err != nil {
+		fmt.Printf("Error sending message to user %d: %v", likedDrop.GetCreatedById(), err)
+	}
 }
 
 // UnlikeDrop godoc
@@ -123,4 +150,30 @@ func UnlikeDrop(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+
+	unlikedDrop, err := ls.Repo.DropRepository.GetDropById(uint(uintDropId))
+
+	if err != nil {
+		fmt.Printf("Error getting drop: %v", err)
+		return
+	}
+
+	followers, err := ls.Repo.FollowRepository.GetFollowers(unlikedDrop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting followers: %v", err)
+		return
+	}
+
+	for _, follower := range followers {
+		err = NewDropAvailable(follower.GetFollowerID(), unlikedDrop)
+		if err != nil {
+			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
+		}
+	}
+
+	err = NewDropAvailable(unlikedDrop.GetCreatedById(), unlikedDrop)
+	if err != nil {
+		fmt.Printf("Error sending message to user %d: %v", unlikedDrop.GetCreatedById(), err)
+	}
 }
