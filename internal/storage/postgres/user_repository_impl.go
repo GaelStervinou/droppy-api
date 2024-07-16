@@ -142,7 +142,7 @@ func (repo *repoUserPrivate) Delete(id uint) error {
 func (repo *repoUserPrivate) GetByGoogleAuthId(googleId string) (model.UserModel, error) {
 	userObject := User{}
 
-	result := repo.db.Where("google_id = ?", googleId).First(&userObject)
+	result := repo.db.Where("firebase_uuid = ?", googleId).First(&userObject)
 	if userObject.CreatedAt.IsZero() {
 		return nil, errors.New("user not found")
 	}
