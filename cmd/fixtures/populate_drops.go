@@ -3,12 +3,13 @@ package fixtures
 import (
 	"github.com/go-faker/faker/v4"
 	"go-api/internal/storage/postgres"
+	"go-api/pkg/drop_type_apis"
 	"gorm.io/gorm"
 	"math/rand/v2"
 )
 
 func PopulateDrops(db *gorm.DB) error {
-	types := []string{"youtube", "twitch", "films", "spotify", "tiktok"}
+	types := drop_type_apis.GetValidDropTypes()
 	var dropNotifications []postgres.DropNotification
 	for i := range 365 {
 		iuint := uint64(uint(i))

@@ -8,6 +8,8 @@ func Factory(dropType string) DropTypeAPI {
 		return &SpotifyAPI{}
 	case FilmType:
 		return &FilmsAPI{}
+	case TwitchType:
+		return &TwitchTypeApi{}
 	default:
 		return nil
 	}

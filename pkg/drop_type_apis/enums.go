@@ -5,8 +5,9 @@ import "slices"
 var YoutubeType = "youtube"
 var SpotifyType = "spotify"
 var FilmType = "films"
+var TwitchType = "twitch"
 
-var ValidDropTypes = []string{YoutubeType, SpotifyType, FilmType}
+var ValidDropTypes = []string{YoutubeType, SpotifyType, FilmType, TwitchType}
 
 func GetValidDropTypes() []string {
 	return ValidDropTypes
