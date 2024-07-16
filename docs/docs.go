@@ -2126,6 +2126,9 @@ const docTemplate = `{
         "drop_type_apis.ApiSearchResponse": {
             "type": "object",
             "properties": {
+                "content": {
+                    "type": "string"
+                },
                 "picturePath": {
                     "type": "string"
                 },

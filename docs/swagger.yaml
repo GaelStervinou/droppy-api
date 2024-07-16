@@ -24,6 +24,8 @@ definitions:
     type: object
   drop_type_apis.ApiSearchResponse:
     properties:
+      content:
+        type: string
       picturePath:
         type: string
       search:
