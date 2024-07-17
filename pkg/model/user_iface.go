@@ -27,7 +27,8 @@ type UserRepository interface {
 	CreateWithGoogle(args UserCreationWithGoogleParam) (UserModel, error)
 	Update(userID uint, args map[string]interface{}) (UserModel, error)
 	Delete(id uint) error
-	GetAll() ([]UserModel, error)
+	GetAll(page int, pageSize int) ([]UserModel, error)
+	GetAllUserCount() (int64, error)
 	CanUserBeFollowed(followedId uint) (bool, error)
 	GetUsersFromUserIds(userIds []uint) ([]UserModel, error)
 	Search(query string) ([]UserModel, error)

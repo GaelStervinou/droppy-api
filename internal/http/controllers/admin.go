@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -21,6 +22,8 @@ import (
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
+// @Param			page query int false "Page number"
+// @Param			pageSize query int false "Page size"
 // @Success		200	{object} []response_models.GetUserResponse
 // @Failure		500
 // @Router			/admin/users [get]
@@ -29,7 +32,10 @@ func GetAllUsers(c *gin.Context) {
 
 	us := postgres.NewUserRepo(sqlDB)
 
-	users, err := us.GetAll()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	users, err := us.GetAll(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -41,6 +47,31 @@ func GetAllUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, usersResponse)
+}
+
+// GetAllUsersCount godoc
+//
+// @Summary		Get all users count
+// @Description	Get all users count by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Success		200
+// @Failure		500
+// @Router			/admin/users/count [get]
+func GetAllUsersCount(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	us := postgres.NewUserRepo(sqlDB)
+
+	count, err := us.GetAllUserCount()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, count)
 }
 
 // UpdateUser godoc
@@ -83,7 +114,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	users, err := us.GetAll()
+	users, err := us.GetAll(1, 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -97,76 +128,6 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, usersResponse)
 }
 
-// BanUser godoc
-//
-// @Summary		Ban user
-// @Description	Ban user by admin user
-// @Tags			admin
-// @Accept			json
-// @Produce		json
-// @Security BearerAuth
-// @Param			id path string true "User ID"
-// @Success		200
-// @Failure		500
-// @Router			/admin/users/{id}/ban [put]
-func BanUser(c *gin.Context) {
-	sqlDB := postgres.Connect()
-
-	us := postgres.NewUserRepo(sqlDB)
-
-	userID := c.Param("id")
-	uintUserID, err := strconv.ParseUint(userID, 10, 64)
-
-	userModel, err := us.GetById(uint(uintUserID))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	userModel, err = us.BanUser(userModel.GetID())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, response_models.FormatAdminGetUserResponse(userModel))
-}
-
-// UnbanUser godoc
-//
-// @Summary		Unban user
-// @Description	Unban user by admin user
-// @Tags			admin
-// @Accept			json
-// @Produce		json
-// @Security BearerAuth
-// @Param			id path string true "User ID"
-// @Success		200
-// @Failure		500
-// @Router			/admin/users/{id}/unban [put]
-func UnbanUser(c *gin.Context) {
-	sqlDB := postgres.Connect()
-
-	us := postgres.NewUserRepo(sqlDB)
-
-	userID := c.Param("id")
-	uintUserID, err := strconv.ParseUint(userID, 10, 64)
-
-	userModel, err := us.GetById(uint(uintUserID))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	userModel, err = us.UnbanUser(userModel.GetID())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, response_models.FormatAdminGetUserResponse(userModel))
-}
-
 // GetAllGroups godoc
 //
 // @Summary		Get all groups
@@ -175,6 +136,8 @@ func UnbanUser(c *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
+// @Param			page query int false "Page number"
+// @Param			pageSize query int false "Page size"
 // @Success		200	{object} []response_models.GetGroupResponse
 // @Failure		500
 // @Router			/admin/groups [get]
@@ -183,7 +146,10 @@ func GetAllGroups(c *gin.Context) {
 
 	gr := postgres.NewGroupRepo(sqlDB)
 
-	groups, err := gr.GetAllGroups()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	groups, err := gr.GetAllGroups(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -197,6 +163,32 @@ func GetAllGroups(c *gin.Context) {
 	c.JSON(http.StatusOK, groupsResponse)
 }
 
+// GetAllGroupsCount godoc
+//
+// @Summary		Get all groups count
+// @Description	Get all groups count by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Success		200
+// @Failure		500
+// @Router			/admin/groups/count [get]
+func GetAllGroupsCount(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	gr := postgres.NewGroupRepo(sqlDB)
+
+	count, err := gr.GetAllGroupsCount()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, count)
+
+}
+
 // GetAllDrops godoc
 //
 // @Summary		Get all drops
@@ -205,6 +197,8 @@ func GetAllGroups(c *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
+// @Param			page query int false "Page number"
+// @Param			pageSize query int false "Page size"
 // @Success		200	{object} []response_models.GetDropResponse
 // @Failure		500
 // @Router			/admin/drops [get]
@@ -213,7 +207,10 @@ func GetAllDrops(c *gin.Context) {
 
 	dr := postgres.NewDropRepo(sqlDB)
 
-	drops, err := dr.GetAllDrops()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	drops, err := dr.GetAllDrops(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -225,6 +222,31 @@ func GetAllDrops(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dropsResponse)
+}
+
+// GetAllDropsCount godoc
+//
+// @Summary		Get all drops count
+// @Description	Get all drops count by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Success		200
+// @Failure		500
+// @Router			/admin/drops/count [get]
+func GetAllDropsCount(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	dr := postgres.NewDropRepo(sqlDB)
+
+	count, err := dr.GetAllDropsCount()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, count)
 }
 
 // GetAllComments godoc
@@ -265,6 +287,8 @@ func GetAllComments(c *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
+// @Param			page query int false "Page number"
+// @Param			pageSize query int false "Page size"
 // @Success		200
 // @Failure		500
 // @Router			/admin/reports [get]
@@ -273,7 +297,12 @@ func GetAllReports(c *gin.Context) {
 
 	rr := postgres.NewReportRepo(sqlDB)
 
-	reports, err := rr.GetAllReports()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	fmt.Printf("page: %d, pageSize: %d\n", page, pageSize)
+
+	reports, err := rr.GetAllReports(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -313,7 +342,7 @@ func AdminDeleteDrop(c *gin.Context) {
 		return
 	}
 
-	drops, err := dr.GetAllDrops()
+	drops, err := dr.GetAllDrops(1, 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -353,7 +382,7 @@ func AdminDeleteGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := gr.GetAllGroups()
+	groups, err := gr.GetAllGroups(1, 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -450,7 +479,7 @@ func AdminManageReport(c *gin.Context) {
 		return
 	}
 
-	reports, err := rr.GetAllReports()
+	reports, err := rr.GetAllReports(1, 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

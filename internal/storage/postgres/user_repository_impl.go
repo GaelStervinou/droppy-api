@@ -176,15 +176,23 @@ func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 	return &userObject, result.Error
 }
 
-func (repo *repoUserPrivate) GetAll() ([]model.UserModel, error) {
-	var foundStudents []*User
-	result := repo.db.Find(&foundStudents)
+func (repo *repoUserPrivate) GetAll(page int, pageSize int) ([]model.UserModel, error) {
+	var users []*User
+	offset := (page - 1) * pageSize
+	result := repo.db.Offset(offset).Limit(pageSize).Find(&users)
 
-	models := make([]model.UserModel, len(foundStudents))
-	for i, v := range foundStudents {
+	models := make([]model.UserModel, len(users))
+	for i, v := range users {
 		models[i] = model.UserModel(v)
 	}
+
 	return models, result.Error
+}
+
+func (repo *repoUserPrivate) GetAllUserCount() (int64, error) {
+	var count int64
+	result := repo.db.Model(&User{}).Count(&count)
+	return count, result.Error
 }
 
 func (repo *repoUserPrivate) CanUserBeFollowed(followedId uint) (bool, error) {

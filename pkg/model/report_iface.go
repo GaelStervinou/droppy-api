@@ -17,7 +17,7 @@ type ReportRepository interface {
 	GetReportsByCommentId(commentId uint) ([]ReportModel, error)
 	GetReportsByUserId(userId uint) ([]ReportModel, error)
 	GetReportById(reportId uint) (ReportModel, error)
-	GetAllReports() ([]ReportModel, error)
+	GetAllReports(page int, limit int) ([]ReportModel, error)
 	GetActiveReportByDropAndUser(dropId uint, userId uint) (ReportModel, error)
 	GetActiveReportByCommentAndUser(commentId uint, userId uint) (ReportModel, error)
 	GetActiveReportByResponseAndUser(responseId uint, userId uint) (ReportModel, error)

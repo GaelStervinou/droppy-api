@@ -273,14 +273,17 @@ func (r *repoDropPrivate) GetUserLastDrop(userId uint, lastNotifID uint) (model.
 	return &drop, nil
 }
 
-func (r *repoDropPrivate) GetAllDrops() ([]model.DropModel, error) {
+func (r *repoDropPrivate) GetAllDrops(page int, pageSize int) ([]model.DropModel, error) {
 	var drops []Drop
+	offset := (page - 1) * pageSize
 	if err := r.db.
 		Preload("CreatedBy").
 		Preload("Comments").
 		Preload("Comments.CreatedBy").
 		Preload("Comments.Responses").
 		Preload("Comments.Responses.CreatedBy").
+		Offset(offset).
+		Limit(pageSize).
 		Find(&drops).Error; err != nil {
 		return nil, err
 	}
@@ -298,6 +301,14 @@ func (r *repoDropPrivate) GetAllDrops() ([]model.DropModel, error) {
 		result = append(result, &drop)
 	}
 	return result, nil
+}
+
+func (r *repoDropPrivate) GetAllDropsCount() (int64, error) {
+	var count int64
+	if err := r.db.Model(&Drop{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (r *repoDropPrivate) Update(dropId uint, updates map[string]interface{}) (model.DropModel, error) {

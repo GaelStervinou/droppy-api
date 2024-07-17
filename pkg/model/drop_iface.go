@@ -43,7 +43,8 @@ type DropRepository interface {
 	CountUserDrops(userId uint) int
 	CountGroupDrops(groupId uint) int
 	GetDropGroups(dropId uint) ([]GroupModel, error)
-	GetAllDrops() ([]DropModel, error)
+	GetAllDrops(page int, pageSize int) ([]DropModel, error)
+	GetAllDropsCount() (int64, error)
 	Update(dropId uint, updates map[string]interface{}) (DropModel, error)
 }
 

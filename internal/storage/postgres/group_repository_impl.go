@@ -170,15 +170,22 @@ func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
 	return models, nil
 }
 
-func (r repoGroupPrivate) GetAllGroups() ([]model.GroupModel, error) {
+func (r repoGroupPrivate) GetAllGroups(page int, pageSize int) ([]model.GroupModel, error) {
 	var foundGroups []*Group
-	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Find(&foundGroups)
+	offset := (page - 1) * pageSize
+	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Offset(offset).Limit(pageSize).Find(&foundGroups)
 
 	models := make([]model.GroupModel, len(foundGroups))
 	for i, v := range foundGroups {
 		models[i] = model.GroupModel(v)
 	}
 	return models, result.Error
+}
+
+func (r repoGroupPrivate) GetAllGroupsCount() (int64, error) {
+	var count int64
+	result := r.db.Model(&Group{}).Count(&count)
+	return count, result.Error
 }
 
 func (r repoGroupPrivate) DeleteGroup(id uint) error {

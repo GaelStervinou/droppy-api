@@ -25,7 +25,8 @@ type GroupRepository interface {
 	Update(groupID uint, args map[string]interface{}) (GroupModel, error)
 	Delete(id uint) error
 	Search(query string) ([]GroupModel, error)
-	GetAllGroups() ([]GroupModel, error)
+	GetAllGroups(page int, pageSize int) ([]GroupModel, error)
+	GetAllGroupsCount() (int64, error)
 	DeleteGroup(id uint) error
 }
 
