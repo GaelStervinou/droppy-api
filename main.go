@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	cors "github.com/rs/cors/wrapper/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "go-api/docs"
@@ -36,6 +36,16 @@ func main() {
 	postgres.Init()
 	postgres.AutoMigrate()
 	r := gin.Default()
+	config := cors.DefaultConfig()
+	config.AddAllowHeaders("Authorization")
+	config.AllowCredentials = true
+	config.AllowAllOrigins = false
+	// I think you should whitelist a limited origins instead:
+	//  config.AllowAllOrigins = []{"xxxx", "xxxx"}
+	config.AllowOriginFunc = func(origin string) bool {
+		return true
+	}
+	r.Use(cors.New(config))
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 

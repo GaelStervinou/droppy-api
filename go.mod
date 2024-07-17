@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	firebase.google.com/go/v4 v4.14.1
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.4.2
 	github.com/golang-jwt/jwt/v5 v5.2.1
