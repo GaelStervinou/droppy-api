@@ -68,7 +68,7 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 	filledDrop := model.FilledDropCreation{
 		Type:               currentDropNotification.GetType(),
 		Content:            args.Content,
-		ContentTile:        args.ContentTile,
+		ContentTile:        args.ContentTitle,
 		ContentSubTitle:    args.ContentSubTitle,
 		ContentPicturePath: args.ContentPicturePath,
 		Description:        args.Description,
@@ -114,7 +114,7 @@ func (s *DropService) CreateDrop(userId uint, args model.DropCreationParam) (mod
 
 	for _, group := range user.GetGroups() {
 		if slices.Contains(args.Groups, group.GetID()) {
-			_, err = s.Repo.GroupDropRepository.Create(group.GetID(), createdDrop.GetID())
+			_, err = s.Repo.GroupDropRepository.Create(createdDrop.GetID(), group.GetID())
 			if err != nil {
 				return nil, err
 			}

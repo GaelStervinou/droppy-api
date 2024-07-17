@@ -62,14 +62,14 @@ type DropService interface {
 
 type DropCreationParam struct {
 	Content            string                `form:"content" binding:"required"`
-	Description        string                `form:"description" binding:"required"`
-	ContentTile        string                `form:"contentTitle" binding:"required"`
+	Description        string                `form:"description"`
+	ContentTitle       string                `form:"contentTitle" binding:"required"`
 	ContentSubTitle    string                `form:"contentSubtitle"`
-	ContentPicturePath string                `form:"contentPicturePath"`
+	ContentPicturePath string                `form:"contentPicturePath" binding:"required"`
 	Lat                float64               `form:"lat"`
 	Lng                float64               `form:"lng"`
 	Location           string                `form:"location"`
-	Picture            *multipart.FileHeader `form:"picture"`
+	Picture            *multipart.FileHeader `form:"picture" binding:"required"`
 	Groups             []uint                `form:"groups"`
 }
 
