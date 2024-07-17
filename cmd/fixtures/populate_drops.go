@@ -23,7 +23,6 @@ func PopulateDrops(db *gorm.DB) error {
 
 	var activeUsers []postgres.User
 	db.Where("status = ?", 1).Find(&activeUsers)
-	statuses := []int{-1, 1}
 	images := make(map[string][]string)
 	images["youtube"] = []string{"https://i.ytimg.com/vi/RLyxAGHGjfg/hqdefault.jpg", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPuJxaPIWJT4qdma0OwtXhJwS6dy--hYD6ab52Et0RNG29qwepYVPKR1kIKxgNR4ibDic&usqp=CAU", "https://i.ytimg.com/vi/AI6uPdYDxvo/sddefault.jpg?sqp=-oaymwEmCIAFEOAD8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgXihGMA8=&rs=AOn4CLC8PIKS6ucM5d4LMPhjaCdO2aXWrw"}
 	images["twitch"] = []string{"https://c.clc2l.com/t/t/w/twitch-4aRVhk.png", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrkPx4Ow5yqjiymd4_5v-Y92jYeVtKtUqvJw&s"}

@@ -183,7 +183,9 @@ func (r *repoFollowPrivate) IsPendingFollowing(followerID, followedID uint) (boo
 
 func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 	var count int64
-	result := r.db.Model(&Follow{}).Where("followed_id = ? AND status = ?", userID, new(FollowAcceptedStatus).ToInt()).Count(&count)
+	result := r.db.
+		Joins("JOIN users AS follower ON follower.id = follows.follower_id AND follower.status = ?", 1).
+		Where("followed_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Count(&count)
 	if result.Error != nil {
 		return 0
 	}
