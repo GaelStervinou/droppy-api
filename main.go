@@ -39,6 +39,7 @@ func main() {
 	config := cors.DefaultConfig()
 	config.AddAllowHeaders("Authorization")
 	config.AllowCredentials = true
+	config.AllowMethods = []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowOrigins = []string{"https://droppy-420013.web.app"}
 
 	r.Use(cors.New(config))
