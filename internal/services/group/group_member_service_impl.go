@@ -42,6 +42,8 @@ func (s *GroupMemberService) JoinGroup(currentUserId uint, userId uint, args mod
 	}
 
 	status := &grouprepository.GroupMemberStatusActive{}
+	role := &grouprepository.GroupMemberRoleMember{}
+	args.Role = role.ToString()
 
 	_, err = s.Repo.GroupMemberRepository.Create(args.GroupID, userId, args.Role, status.ToIntGroupMemberStatus())
 

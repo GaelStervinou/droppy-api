@@ -297,10 +297,6 @@ func JoinGroup(c *gin.Context) {
 
 	var groupMemberToCreate model.GroupMemberCreationParam
 
-	if err := c.ShouldBindJSON(&groupMemberToCreate); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-		return
-	}
 	groupMemberToCreate.GroupID = groupId
 
 	gms := &groupservice.GroupMemberService{
