@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	cors "github.com/rs/cors/wrapper/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "go-api/docs"
@@ -35,10 +36,10 @@ func main() {
 	postgres.Init()
 	postgres.AutoMigrate()
 	r := gin.Default()
+	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 
 	v1 := r.Group("/")
-	v1.Use(middlewares.Cors())
 	{
 		auth := v1.Group("/auth")
 		{
