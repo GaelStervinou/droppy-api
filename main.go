@@ -38,6 +38,7 @@ func main() {
 	r.Use(gin.Recovery())
 
 	v1 := r.Group("/")
+	v1.Use(middlewares.Cors())
 	{
 		auth := v1.Group("/auth")
 		{
