@@ -39,12 +39,8 @@ func main() {
 	config := cors.DefaultConfig()
 	config.AddAllowHeaders("Authorization")
 	config.AllowCredentials = true
-	config.AllowAllOrigins = false
-	// I think you should whitelist a limited origins instead:
-	//  config.AllowAllOrigins = []{"xxxx", "xxxx"}
-	config.AllowOriginFunc = func(origin string) bool {
-		return true
-	}
+	config.AllowOrigins = []string{"https://droppy-420013.web.app"}
+
 	r.Use(cors.New(config))
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
