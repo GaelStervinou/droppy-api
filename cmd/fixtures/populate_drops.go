@@ -39,7 +39,6 @@ func PopulateDrops(db *gorm.DB) error {
 			r := rand.New(s)
 			isPinned := r.IntN(3) == 0
 			dropType := dropNotifications[i].Type
-			status := statuses[r.IntN(len(statuses))]
 			picture := images[dropType][r.IntN(len(images[dropType]))]
 			randomPic := randomPics[r.IntN(len(randomPics))]
 			db.Create(&postgres.Drop{
@@ -50,7 +49,7 @@ func PopulateDrops(db *gorm.DB) error {
 				ContentPicturePath: picture,
 				Description:        faker.Sentence(),
 				CreatedById:        activeUsers[j].ID,
-				Status:             uint(status),
+				Status:             1,
 				IsPinned:           isPinned,
 				DropNotificationID: dropNotifications[i].ID,
 				Lat:                faker.Latitude(),
