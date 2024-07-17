@@ -69,6 +69,16 @@ func CreateDrop(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 
+	mu.Lock()
+	wsConn, ok := hasUserDroppedTodayConnections[strconv.Itoa(int(uintCurrentUserId))]
+	mu.Unlock()
+	if ok {
+		err := wsConn.conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: true})
+		if err != nil {
+			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		}
+	}
+
 	sqlDB := postgres.Connect()
 
 	fr := postgres.NewFollowRepo(sqlDB)
