@@ -29,6 +29,7 @@ func (t *TwitchTypeApi) Search(search string) []ApiSearchResponse {
 	req.Header.Set("Authorization", "Bearer "+t.Token)
 
 	client := &http.Client{}
+	req.Close = true
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil
