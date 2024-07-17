@@ -41,6 +41,10 @@ func main() {
 	config.AllowCredentials = true
 	config.AllowMethods = []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowOrigins = []string{"https://droppy-420013.web.app"}
+	config.AllowOriginFunc = func(origin string) bool {
+		fmt.Println("origin égale " + origin)
+		return true
+	}
 
 	r.Use(cors.New(config))
 	r.Use(cors.Default())
