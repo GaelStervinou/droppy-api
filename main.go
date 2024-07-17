@@ -134,6 +134,7 @@ func main() {
 			fixtures.GET("/users", controllers.PopulateUsers)
 			fixtures.GET("/follows", controllers.PopulateFollows)
 			fixtures.GET("/drops", controllers.PopulateDrops)
+			fixtures.GET("/comments", controllers.PopulateComments)
 			fixtures.GET("/groups", controllers.PopulateGroups)
 		}
 

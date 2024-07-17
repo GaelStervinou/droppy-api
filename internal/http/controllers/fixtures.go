@@ -17,6 +17,7 @@ func PopulateAll(c *gin.Context) {
 	fixtures.PopulateUsers(sqlDB)
 	fixtures.PopulateFollows(sqlDB)
 	fixtures.PopulateDrops(sqlDB)
+	fixtures.PopulateComments(sqlDB)
 	fixtures.PopulateGroups(sqlDB)
 }
 
@@ -62,4 +63,16 @@ func PopulateGroups(c *gin.Context) {
 	fixtures.PopulateGroups(sqlDB)
 
 	c.JSON(200, gin.H{"message": "Groups populated"})
+}
+
+func PopulateComments(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	err := fixtures.PopulateComments(sqlDB)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Comments populated"})
 }
