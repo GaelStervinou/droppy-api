@@ -534,5 +534,7 @@ func AdminSendDropNow(c *gin.Context) {
 
 	pushNotificationService.SendNotificationsToAllUser(scheduleDropParam.Type)
 
+	RefreshHasUserDroppedToday()
+
 	c.JSON(http.StatusCreated, response_models.FormatGetDropNotificationResponse(dropNotifModel))
 }

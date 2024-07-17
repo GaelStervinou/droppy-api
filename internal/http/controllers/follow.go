@@ -102,10 +102,10 @@ func FollowUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdFollow)
 
 	if createdFollow.GetStatus() == new(postgres.FollowPendingStatus).ToInt() {
-		fmt.Printf("Sending pending follows for user %d\n", uintCurrentUserId)
+		fmt.Printf("Sending pending follows for user %d\n", followCreationParam.UserToFollowID)
 		err = SendPendingFollowsWS(followCreationParam.UserToFollowID, postgres.NewFollowRepo(sqlDB))
 		if err != nil {
-			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+			log.Printf("Error sending message to user %d: %v", followCreationParam.UserToFollowID, err)
 			return
 		}
 	} else if createdFollow.GetStatus() == new(postgres.FollowAcceptedStatus).ToInt() {
@@ -304,6 +304,20 @@ func AcceptRequest(c *gin.Context) {
 	fmt.Printf("Sending drops to user %d\n", uintCurrentUserId)
 	if userLastDrop != nil {
 		err = NewDropAvailable(acceptedFollow.GetFollowerID(), userLastDrop)
+		if err != nil {
+			fmt.Printf("Error sending drop to user %d: %v", acceptedFollow.GetFollowerID(), err)
+			return
+		}
+	}
+
+	followedUserLastDrop, err := dr.GetUserLastDrop(acceptedFollow.GetFollowerID(), lastNotification.GetID())
+	if err != nil {
+		fmt.Printf("Error getting user last drop: %v", err)
+		return
+	}
+
+	if followedUserLastDrop != nil {
+		err = NewDropAvailable(uintCurrentUserId, followedUserLastDrop)
 		if err != nil {
 			fmt.Printf("Error sending drop to user %d: %v", uintCurrentUserId, err)
 			return
