@@ -10,6 +10,7 @@ import (
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // GetAllUsers godoc
@@ -520,7 +521,8 @@ func AdminSendDropNow(c *gin.Context) {
 		return
 	}
 
-	dropNotifModel, err := dnr.Create(scheduleDropParam.Type)
+	dropType := strings.ToLower(scheduleDropParam.Type)
+	dropNotifModel, err := dnr.Create(dropType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
