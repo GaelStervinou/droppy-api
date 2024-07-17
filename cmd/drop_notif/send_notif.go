@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/martian/v3/log"
 	"go-api/internal/storage/firebase"
+	"go-api/internal/storage/postgres"
 	"math/rand"
 	"time"
 )
@@ -36,12 +37,13 @@ func GenerateRandomNotification() {
 }
 
 func SendNotificationsToAllUser() {
+	userRepo := postgres.NewUserRepo(postgres.Connect())
 	fcmTokens, err := userRepo.GetAllFCMTokens()
 	if err != nil {
 		log.Errorf("error getting fcm tokens: %v", err)
 	}
 
-	sendNotification(fcmTokens)
+	SendNotification(fcmTokens)
 }
 
 func SendNotification(fcmTokens []string) {
