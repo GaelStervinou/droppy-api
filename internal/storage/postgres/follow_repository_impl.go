@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -184,10 +183,9 @@ func (r *repoFollowPrivate) IsPendingFollowing(followerID, followedID uint) (boo
 
 func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 	var count int64
-	fmt.Println("CountFollowers")
 	result := r.db.Table("follows").
 		Joins("JOIN users ON users.id = follows.follower_id").
-		Where("follows.deleted_at IS NULL AND follows.status = ? AND follows.followed_id = ? AND users.status = ? AND users.deleted_at IS NULL", 1, 10018, 1).
+		Where("follows.deleted_at IS NULL AND follows.status = ? AND follows.followed_id = ? AND users.status = ? AND users.deleted_at IS NULL", 1, userID, 1).
 		Count(&count).Count(&count)
 	if result.Error != nil {
 		return 0
