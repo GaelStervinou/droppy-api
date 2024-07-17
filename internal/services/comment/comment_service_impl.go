@@ -52,10 +52,6 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 		return false, errors.New("drop not found")
 	}
 
-	if drop.GetCreatedBy().GetID() == userID {
-		return false, errors.New("cannot comment on own drop")
-	}
-
 	lastNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
 	if err != nil || nil == lastNotification {
 		return false, errors.New("no drop notifications found")
