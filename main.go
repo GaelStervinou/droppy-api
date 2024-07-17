@@ -47,7 +47,6 @@ func main() {
 	}
 
 	r.Use(cors.New(config))
-	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 
 	v1 := r.Group("/")
