@@ -48,7 +48,7 @@ func PopulateUsers(db *gorm.DB) error {
 		FirebaseUID: faker.UUIDDigit(),
 	})
 
-	for i := range 1000 {
+	for i := range 500 {
 
 		if err != nil {
 			fmt.Printf("Error generating password: %v", err)

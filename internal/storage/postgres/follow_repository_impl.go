@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"go-api/pkg/model"
 	"gorm.io/gorm"
 )
@@ -119,7 +120,7 @@ func (r *repoFollowPrivate) GetFollowers(userID uint) ([]model.FollowModel, erro
 	result := r.db.
 		Preload("Followed").
 		Preload("Follower").
-		Joins("JOIN users AS follower ON follower.id = follows.follower_id AND follower.status = ?", 1).
+		Joins("JOIN users AS follower ON follower.id = follows.follower_id AND follower.status = ? AND follower.deleted_at IS NULL", 1).
 		Where("followed_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
@@ -136,7 +137,7 @@ func (r *repoFollowPrivate) GetFollowing(userID uint) ([]model.FollowModel, erro
 	result := r.db.
 		Preload("Followed").
 		Preload("Follower").
-		Joins("JOIN users AS followed ON followed.id = follows.followed_id AND followed.status = ?", 1).
+		Joins("JOIN users AS followed ON followed.id = follows.followed_id AND followed.status = ? AND followed.deleted_at IS NULL", 1).
 		Where("follower_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Find(&follows)
 	if result.Error != nil {
 		return nil, result.Error
@@ -183,9 +184,11 @@ func (r *repoFollowPrivate) IsPendingFollowing(followerID, followedID uint) (boo
 
 func (r *repoFollowPrivate) CountFollowers(userID uint) int {
 	var count int64
-	result := r.db.
-		Joins("JOIN users AS follower ON follower.id = follows.follower_id AND follower.status = ?", 1).
-		Where("followed_id = ? AND follows.status = ?", userID, new(FollowAcceptedStatus).ToInt()).Count(&count)
+	fmt.Println("CountFollowers")
+	result := r.db.Table("follows").
+		Joins("JOIN users ON users.id = follows.follower_id").
+		Where("follows.deleted_at IS NULL AND follows.status = ? AND follows.followed_id = ? AND users.status = ? AND users.deleted_at IS NULL", 1, 10018, 1).
+		Count(&count).Count(&count)
 	if result.Error != nil {
 		return 0
 	}

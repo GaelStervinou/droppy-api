@@ -20,8 +20,8 @@ func PopulateFollows(db *gorm.DB) error {
 		fnb := rand.Intn(50)
 		for range fnb {
 			db.Create(&postgres.Follow{
-				FollowerID: user.ID,
-				FollowedID: users[rand.Intn(len(users))].ID,
+				FollowerID: users[rand.Intn(len(users))].ID,
+				FollowedID: user.ID,
 				Status:     status,
 			})
 		}

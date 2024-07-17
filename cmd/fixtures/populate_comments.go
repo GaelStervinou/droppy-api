@@ -26,7 +26,7 @@ func PopulateComments(db *gorm.DB) error {
 	db.Where("status = 1").Find(&users)
 	lenUsers := len(users)
 	for _, drop := range drops {
-		for i := 0; i < rand.Intn(10); i++ {
+		for i := 0; i < rand.Intn(5); i++ {
 			user := users[rand.Intn(lenUsers)]
 			db.Create(&postgres.Comment{
 				Content:     contents[rand.Intn(lenContents)],
