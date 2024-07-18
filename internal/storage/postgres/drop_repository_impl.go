@@ -212,7 +212,9 @@ func (r *repoDropPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint,
 		Preload("Comments.CreatedBy").
 		Preload("Comments.Responses").
 		Preload("Comments.Responses.CreatedBy").
-		Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).Find(&drops).Error; err != nil {
+		Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).
+		Order("created_at desc").
+		Find(&drops).Error; err != nil {
 		return nil, err
 	}
 
@@ -247,7 +249,10 @@ func (r *repoDropPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, er
 		Preload("Comments.CreatedBy").
 		Preload("Comments.Responses").
 		Preload("Comments.Responses.CreatedBy").
-		Where("created_by_id = ? AND is_pinned = ?", userId, true).Find(&drops).Error; err != nil {
+		Where("created_by_id = ? AND is_pinned = ?", userId, true).
+		Order("created_at desc").
+		Find(&drops).
+		Error; err != nil {
 		return nil, err
 	}
 	var result []model.DropModel

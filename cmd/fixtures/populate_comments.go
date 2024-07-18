@@ -7,7 +7,6 @@ import (
 )
 
 func PopulateComments(db *gorm.DB) error {
-
 	contents := []string{
 		"J'adore ce drop!",
 		"Je suis fan de Crusty le Clown",

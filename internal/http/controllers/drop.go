@@ -97,7 +97,13 @@ func CreateDrop(c *gin.Context) {
 		}
 	}
 
-	err = NewDropAvailable(uintCurrentUserId, createdDrop)
+	drops, err := ds.GetUserFeed(uintCurrentUserId)
+
+	if err != nil {
+		log.Printf("Error getting user feed: %v", err)
+		return
+	}
+	err = NewDropsAvailable(uintCurrentUserId, drops)
 	if err != nil {
 		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
 	}
@@ -378,7 +384,6 @@ func NewDropAvailable(userID uint, newDrop model.DropModel) error {
 	}
 	mu.Lock()
 	wsConn, ok := userFeedConnections[strconv.Itoa(int(userID))]
-	fmt.Printf("Users: %v\n", userFeedConnections)
 	mu.Unlock()
 
 	if !ok {
@@ -394,6 +399,34 @@ func NewDropAvailable(userID uint, newDrop model.DropModel) error {
 	dropResponse := response_models.FormatGetDropResponse(newDrop, isCurrentUserLiking)
 
 	return wsConn.conn.WriteJSON(dropResponse)
+}
+
+func NewDropsAvailable(userID uint, newDrops []model.DropModel) error {
+	ds := &dropservice.DropService{
+		Repo: repositories.Setup(),
+	}
+	mu.Lock()
+	wsConn, ok := userFeedConnections[strconv.Itoa(int(userID))]
+	mu.Unlock()
+
+	if !ok {
+		return nil
+	}
+
+	var dropResponses []response_models.GetDropResponse
+	for _, drop := range newDrops {
+		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), userID)
+
+		if err != nil {
+			log.Printf("Error checking if user is liking drop: %v", err)
+			return err
+		}
+
+		dropResponse := response_models.FormatGetDropResponse(drop, isCurrentUserLiking)
+		dropResponses = append(dropResponses, dropResponse)
+	}
+
+	return wsConn.conn.WriteJSON(dropResponses)
 }
 
 // DeleteDrop godoc
@@ -548,7 +581,6 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 
 	mu.Lock()
 	hasUserDroppedTodayConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
-	fmt.Printf("Users connected to has user dropped today: %v\n", hasUserDroppedTodayConnections)
 	mu.Unlock()
 
 	ds := &dropservice.DropService{
@@ -588,7 +620,6 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 }
 
 func RefreshHasUserDroppedToday() {
-	fmt.Printf("Length of hasUserDroppedTodayConnections: %v\n", len(hasUserDroppedTodayConnections))
 	mu.Lock()
 	for userId := range hasUserDroppedTodayConnections {
 		err := hasUserDroppedTodayConnections[userId].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})

@@ -41,9 +41,28 @@ func (f *FilmsAPI) Search(search string) []ApiSearchResponse {
 
 	var results []ApiSearchResponse
 	for _, item := range result.Results {
+		var title string
+		if item.Title != "" {
+			title = item.Title
+		} else if item.Name != "" {
+			title = item.Name
+		} else if item.OriginalTitle != "" {
+			title = item.OriginalTitle
+		} else if item.OriginalName != "" {
+			title = item.OriginalName
+		} else {
+			title = "Nom manquant"
+		}
+		var imagePath string
+		if item.BackdropPath != "" {
+			imagePath = "https://image.tmdb.org/t/p/w500" + item.BackdropPath
+		} else if item.PosterPath != "" {
+			imagePath = "https://image.tmdb.org/t/p/w500" + item.PosterPath
+		}
 		results = append(results, ApiSearchResponse{
-			Title:       item.Title,
-			PicturePath: item.BackdropPath,
+			Search:      search,
+			Title:       title,
+			PicturePath: imagePath,
 			Subtitle:    item.Overview,
 			Content:     strconv.Itoa(item.Id),
 		})
@@ -57,10 +76,13 @@ func (f *FilmsAPI) Init() {
 type TMDBResponse struct {
 	Page    int `json:"page"`
 	Results []struct {
-		Title        string `json:"title"`
-		Name         string `json:"name"`
-		Overview     string `json:"overview"`
-		BackdropPath string `json:"backdrop_path"`
-		Id           int    `json:"id"`
+		Title         string `json:"title"`
+		OriginalTitle string `json:"original_title"`
+		Name          string `json:"name"`
+		OriginalName  string `json:"original_name"`
+		Overview      string `json:"overview"`
+		BackdropPath  string `json:"backdrop_path"`
+		PosterPath    string `json:"poster_path"`
+		Id            int    `json:"id"`
 	} `json:"results"`
 }
