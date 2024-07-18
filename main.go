@@ -11,7 +11,9 @@ import (
 	"go-api/internal/http/controllers"
 	"go-api/internal/http/middlewares"
 	"go-api/internal/storage/postgres"
+	"go-api/pkg/environment"
 	"log"
+	"os"
 )
 
 // @title Droppy API
@@ -32,6 +34,11 @@ func main() {
 		fmt.Println("Error loading .env file")
 		return
 	}
+	if env, ok := os.LookupEnv("ENV"); ok {
+		environment.SetEnv(env)
+	}
+
+	fmt.Println("ENV: " + environment.GetEnv())
 
 	postgres.Init()
 	postgres.AutoMigrate()
@@ -81,7 +88,6 @@ func main() {
 			follow.POST("/accept/:id", middlewares.CurrentUserMiddleware(true), controllers.AcceptRequest)
 			follow.POST("/reject/:id", middlewares.CurrentUserMiddleware(true), controllers.RejectRequest)
 			follow.DELETE("/:id", middlewares.CurrentUserMiddleware(true), controllers.DeleteFollow)
-			//follow.GET("/:id/accept", middlewares.CurrentUserMiddleware(), controllers.AcceptFollow)
 		}
 
 		drop := v1.Group("/drops")
@@ -128,14 +134,16 @@ func main() {
 			comment.DELETE("/:id/responses/:responseId", middlewares.CurrentUserMiddleware(true), controllers.DeleteCommentResponse)
 		}
 
-		fixtures := v1.Group("/fixtures")
-		{
-			fixtures.GET("/all", controllers.PopulateAll)
-			fixtures.GET("/users", controllers.PopulateUsers)
-			fixtures.GET("/follows", controllers.PopulateFollows)
-			fixtures.GET("/drops", controllers.PopulateDrops)
-			fixtures.GET("/comments", controllers.PopulateComments)
-			fixtures.GET("/groups", controllers.PopulateGroups)
+		if environment.IsDev() {
+			fixtures := v1.Group("/fixtures")
+			{
+				fixtures.GET("/all", controllers.PopulateAll)
+				fixtures.GET("/users", controllers.PopulateUsers)
+				fixtures.GET("/follows", controllers.PopulateFollows)
+				fixtures.GET("/drops", controllers.PopulateDrops)
+				fixtures.GET("/comments", controllers.PopulateComments)
+				fixtures.GET("/groups", controllers.PopulateGroups)
+			}
 		}
 
 		admin := v1.Group("/admin")
@@ -158,7 +166,9 @@ func main() {
 			admin.POST("/drops/send-now", middlewares.AdminRequired(), controllers.AdminSendDropNow)
 		}
 	}
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	if environment.IsDev() {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	r.Static("/assets", "./assets")
 
