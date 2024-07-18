@@ -173,7 +173,15 @@ func (r *repoReportPrivate) GetReportById(reportId uint) (model.ReportModel, err
 func (r *repoReportPrivate) GetAllReports(page int, pageSize int) ([]model.ReportModel, error) {
 	var reports []Report
 
-	if err := r.db.Preload("CreatedBy").Preload("ReportedDrop").Preload("ReportedComment").Preload("ReportedResponse").Limit(pageSize).Offset((page - 1) * pageSize).Find(&reports).Error; err != nil {
+	if err := r.db.
+		Preload("CreatedBy").
+		Preload("ReportedDrop").
+		Preload("ReportedComment").
+		Preload("ReportedResponse").
+		Order("id desc").
+		Limit(pageSize).
+		Offset((page - 1) * pageSize).
+		Find(&reports).Error; err != nil {
 		return nil, err
 	}
 	var result []model.ReportModel

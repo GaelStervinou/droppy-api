@@ -185,7 +185,7 @@ func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 func (repo *repoUserPrivate) GetAll(page int, pageSize int) ([]model.UserModel, error) {
 	var users []*User
 	offset := (page - 1) * pageSize
-	result := repo.db.Offset(offset).Limit(pageSize).Find(&users)
+	result := repo.db.Order("id desc").Offset(offset).Limit(pageSize).Find(&users)
 
 	models := make([]model.UserModel, len(users))
 	for i, v := range users {

@@ -175,7 +175,13 @@ func (r repoGroupPrivate) Search(query string) ([]model.GroupModel, error) {
 func (r repoGroupPrivate) GetAllGroups(page int, pageSize int) ([]model.GroupModel, error) {
 	var foundGroups []*Group
 	offset := (page - 1) * pageSize
-	result := r.db.Preload("GroupMembers").Preload("GroupMembers.Member").Offset(offset).Limit(pageSize).Find(&foundGroups)
+	result := r.db.
+		Preload("GroupMembers").
+		Preload("GroupMembers.Member").
+		Order("id desc").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&foundGroups)
 
 	models := make([]model.GroupModel, len(foundGroups))
 	for i, v := range foundGroups {

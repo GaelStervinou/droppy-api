@@ -287,6 +287,7 @@ func (r *repoDropPrivate) GetAllDrops(page int, pageSize int) ([]model.DropModel
 		Preload("Comments.CreatedBy").
 		Preload("Comments.Responses").
 		Preload("Comments.Responses.CreatedBy").
+		Order("id desc").
 		Offset(offset).
 		Limit(pageSize).
 		Find(&drops).Error; err != nil {

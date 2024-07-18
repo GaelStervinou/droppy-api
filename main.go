@@ -157,7 +157,7 @@ func main() {
 			admin.GET("/drops", middlewares.AdminRequired(), controllers.GetAllDrops)
 			admin.GET("/drops/count", middlewares.AdminRequired(), controllers.GetAllDropsCount)
 			admin.DELETE("/drops/:id", middlewares.AdminRequired(), controllers.AdminDeleteDrop)
-			admin.GET("/comments", middlewares.AdminRequired(), controllers.GetAllComments)
+			//admin.GET("/comments", middlewares.AdminRequired(), controllers.GetAllComments)
 			admin.DELETE("/comments/:id", middlewares.AdminRequired(), controllers.DeleteComment)
 			admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
 			admin.PUT("/reports/:id", middlewares.AdminRequired(), controllers.AdminManageReport)

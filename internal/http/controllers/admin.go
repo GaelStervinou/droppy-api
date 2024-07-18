@@ -147,7 +147,10 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	users, err := us.GetAll(1, 20)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	users, err := us.GetAll(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -375,7 +378,10 @@ func AdminDeleteDrop(c *gin.Context) {
 		return
 	}
 
-	drops, err := dr.GetAllDrops(1, 20)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	drops, err := dr.GetAllDrops(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -415,7 +421,9 @@ func AdminDeleteGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := gr.GetAllGroups(1, 20)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+	groups, err := gr.GetAllGroups(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -512,7 +520,10 @@ func AdminManageReport(c *gin.Context) {
 		return
 	}
 
-	reports, err := rr.GetAllReports(1, 20)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	reports, err := rr.GetAllReports(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
