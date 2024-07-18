@@ -346,6 +346,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		dropResponses = append(dropResponses, dropResponse)
 	}
 
+	fmt.Println("Sending drops to WebSocket connection")
 	err = wsConn.conn.WriteJSON(dropResponses)
 	if err != nil {
 		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
@@ -353,6 +354,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 	}
 
 	defer func() {
+		fmt.Println("Closing WebSocket connection")
 		mu.Lock()
 		delete(userFeedConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
