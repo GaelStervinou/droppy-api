@@ -200,7 +200,7 @@ func GetMyPendingRequestsWS(c *gin.Context) {
 
 	muPendingFollow.Lock()
 	userPendingFollowConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
-	fmt.Printf("Users connected: %v\n", userPendingFollowConnections)
+	fmt.Printf("Users connected to pending follows: %v\n", userPendingFollowConnections)
 	muPendingFollow.Unlock()
 
 	sqlDB := postgres.Connect()

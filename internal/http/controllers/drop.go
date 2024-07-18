@@ -309,7 +309,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 	mu.Lock()
 	userFeedConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
-	fmt.Printf("Users connected: %v\n", userFeedConnections)
+	fmt.Printf("Users connected to drop feed: %v\n", userFeedConnections)
 	mu.Unlock()
 
 	ds := &dropservice.DropService{
@@ -354,7 +354,6 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 	defer func() {
 		mu.Lock()
-		_ = userFeedConnections[strconv.Itoa(int(uintCurrentUserId))].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
 		delete(userFeedConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
@@ -570,7 +569,6 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 
 	defer func() {
 		mu.Lock()
-		_ = hasUserDroppedTodayConnections[strconv.Itoa(int(uintCurrentUserId))].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
 		delete(hasUserDroppedTodayConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
