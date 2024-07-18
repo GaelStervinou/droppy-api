@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-api/internal/repositories"
 	likeservice "go-api/internal/services/like"
+	pushnotificationservice "go-api/internal/services/push_notification"
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
@@ -72,6 +73,21 @@ func LikeDrop(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("Error getting drop: %v", err)
 		return
+	}
+
+	user, err := ls.Repo.UserRepository.GetById(likedDrop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting user: %v", err)
+		return
+	}
+
+	if user.GetFCMToken() != "" {
+		pushNotificationService := &pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
+		err = pushNotificationService.SendNotification("like", []string{user.GetFCMToken()})
+		if err != nil {
+			fmt.Printf("Error sending push notification: %v", err)
+		}
 	}
 
 	followers, err := ls.Repo.FollowRepository.GetFollowers(likedDrop.GetCreatedById())
