@@ -14,12 +14,12 @@ type Drop struct {
 	Content            string `gorm:"not null"`
 	ContentPicturePath string `gorm:"not null"`
 	Description        string
-	CreatedById        uint `gorm:"not null"`
+	CreatedById        uint `gorm:"not null;index:idx_drop_notification_created_by"`
 	CreatedBy          User `gorm:"foreignKey:CreatedById;references:ID"`
 	Status             uint `gorm:"not null"`
 	DeletedById        uint
 	IsPinned           bool `gorm:"default:false"`
-	DropNotificationID uint `gorm:"not null"`
+	DropNotificationID uint `gorm:"not null;index:idx_drop_notification_created_by"`
 	Lat                float64
 	Lng                float64
 	PicturePath        string

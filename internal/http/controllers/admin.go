@@ -556,14 +556,13 @@ func AdminSendDropNow(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	RefreshHasUserDroppedToday()
 
 	pushNotificationService := pushnotificationservice.PushNotificationService{
 		Repo: repositories.Setup(),
 	}
 
 	pushNotificationService.SendNotificationsToAllUser(scheduleDropParam.Type)
-
-	RefreshHasUserDroppedToday()
 
 	c.JSON(http.StatusCreated, response_models.FormatGetDropNotificationResponse(dropNotifModel))
 }

@@ -354,6 +354,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 	defer func() {
 		mu.Lock()
+		_ = userFeedConnections[strconv.Itoa(int(uintCurrentUserId))].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
 		delete(userFeedConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
@@ -380,7 +381,7 @@ func NewDropAvailable(userID uint, newDrop model.DropModel) error {
 	mu.Unlock()
 
 	if !ok {
-		return fmt.Errorf("user not connected")
+		return nil
 	}
 
 	isCurrentUserLiking, err := ds.IsCurrentUserLiking(newDrop.GetID(), userID)
@@ -569,6 +570,7 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 
 	defer func() {
 		mu.Lock()
+		_ = hasUserDroppedTodayConnections[strconv.Itoa(int(uintCurrentUserId))].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
 		delete(hasUserDroppedTodayConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
@@ -586,17 +588,21 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 }
 
 func RefreshHasUserDroppedToday() {
-	for {
-		mu.Lock()
-		for userId := range hasUserDroppedTodayConnections {
-			err := hasUserDroppedTodayConnections[userId].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
+	fmt.Printf("Length of hasUserDroppedTodayConnections: %v\n", len(hasUserDroppedTodayConnections))
+	mu.Lock()
+	for userId := range hasUserDroppedTodayConnections {
+		err := hasUserDroppedTodayConnections[userId].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
+		if err != nil {
+			log.Printf("Error sending message to user %s: %v", userId, err)
+			err = hasUserDroppedTodayConnections[userId].conn.Close()
 			if err != nil {
-				log.Printf("Error sending message to user %s: %v", userId, err)
-				continue
+				log.Printf("Error closing WebSocket connection: %v", err)
 			}
+			delete(hasUserDroppedTodayConnections, userId)
+			continue
 		}
-		mu.Unlock()
 	}
+	mu.Unlock()
 }
 
 // SearchContentForCurrentDrop godoc
