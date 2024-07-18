@@ -56,42 +56,25 @@ func (s *CommentResponseService) CanCommentResponse(commentId uint, userID uint)
 		return false, errors.New("comment not found")
 	}
 
-	lastNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
-	if err != nil || nil == lastNotification {
-		return false, errors.New("no drop notifications found")
-	}
+	if comment.GetDrop().GetCreatedBy().GetID() != userID {
+		isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, comment.GetDrop().GetCreatedBy().GetID())
 
-	if lastNotification.GetID() != comment.GetDrop().GetDropNotificationID() {
-		return false, errors.New("drop notification is not current")
-	}
-
-	hasUserDropped, err := s.Repo.DropRepository.HasUserDropped(comment.GetDrop().GetDropNotificationID(), userID)
-
-	if err != nil {
-		return false, err
-	}
-
-	if !hasUserDropped {
-		return false, errors.New("you must drop before posting comments")
-	}
-
-	isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, comment.GetDrop().GetCreatedBy().GetID())
-
-	if err != nil {
-		return false, err
-	}
-
-	if !isFollowing {
-		availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(comment.GetDrop().GetID())
 		if err != nil {
 			return false, err
 		}
-		areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
-		if err != nil {
-			return false, err
-		}
-		if !areUserInSameGroups {
-			return false, errors.New("you must follow the drop creator are be in the same group before posting comments")
+
+		if !isFollowing {
+			availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(comment.GetDrop().GetID())
+			if err != nil {
+				return false, err
+			}
+			areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
+			if err != nil {
+				return false, err
+			}
+			if !areUserInSameGroups {
+				return false, errors.New("you must follow the drop creator are be in the same group before posting comments")
+			}
 		}
 	}
 

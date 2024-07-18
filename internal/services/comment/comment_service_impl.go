@@ -52,25 +52,6 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 		return false, errors.New("drop not found")
 	}
 
-	lastNotification, err := s.Repo.DropNotificationRepository.GetCurrentDropNotification()
-	if err != nil || nil == lastNotification {
-		return false, errors.New("no drop notifications found")
-	}
-
-	if lastNotification.GetID() != drop.GetDropNotificationID() {
-		return false, errors.New("drop notification is not current")
-	}
-
-	hasUserDropped, err := s.Repo.DropRepository.HasUserDropped(drop.GetDropNotificationID(), userID)
-
-	if err != nil {
-		return false, err
-	}
-
-	if !hasUserDropped {
-		return false, errors.New("you must drop before posting comments")
-	}
-
 	if drop.GetCreatedBy().GetID() != userID {
 		isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, drop.GetCreatedBy().GetID())
 
