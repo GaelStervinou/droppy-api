@@ -398,6 +398,11 @@ func RejectRequest(c *gin.Context) {
 		return
 	}
 
+	if nil == myFollow {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Follow request not found"})
+		return
+	}
+
 	if myFollow.GetFollowed().GetID() != uintCurrentUserId || myFollow.GetStatus() != new(postgres.FollowPendingStatus).ToInt() {
 		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
