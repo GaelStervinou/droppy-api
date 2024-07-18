@@ -8,6 +8,7 @@ import (
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	"go-api/internal/services/follow"
+	pushnotificationservice "go-api/internal/services/push_notification"
 	"go-api/internal/storage/postgres"
 	"go-api/pkg/converters"
 	"go-api/pkg/errors2"
@@ -108,7 +109,27 @@ func FollowUser(c *gin.Context) {
 			log.Printf("Error sending message to user %d: %v", followCreationParam.UserToFollowID, err)
 			return
 		}
+
+		if requestedUser.GetFCMToken() != "" {
+			pns := pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
+			err = pns.SendNotification("follow-private", []string{requestedUser.GetFCMToken()})
+			if err != nil {
+				log.Printf("Error sending notification to user %d: %v", followCreationParam.UserToFollowID, err)
+				return
+			}
+		}
+
 	} else if createdFollow.GetStatus() == new(postgres.FollowAcceptedStatus).ToInt() {
+
+		if requestedUser.GetFCMToken() != "" {
+			pns := pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
+			err = pns.SendNotification("follow-public", []string{requestedUser.GetFCMToken()})
+			if err != nil {
+				log.Printf("Error sending notification to user %d: %v", followCreationParam.UserToFollowID, err)
+				return
+			}
+		}
+
 		dnr := postgres.NewDropNotifRepo(sqlDB)
 
 		lastNotification, err := dnr.GetCurrentDropNotification()
