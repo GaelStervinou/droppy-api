@@ -6,6 +6,7 @@ import (
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	commentservice "go-api/internal/services/comment"
+	pushnotificationservice "go-api/internal/services/push_notification"
 	"go-api/pkg/model"
 	"net/http"
 	"strconv"
@@ -81,6 +82,21 @@ func CommentDrop(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("Error getting drop: %v", err)
 		return
+	}
+
+	user, err := cs.Repo.UserRepository.GetById(drop.GetCreatedById())
+
+	if err != nil {
+		fmt.Printf("Error getting user: %v", err)
+		return
+	}
+
+	if user.GetFCMToken() != "" {
+		pushNotificationService := &pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
+		err = pushNotificationService.SendNotification("like", []string{user.GetFCMToken()})
+		if err != nil {
+			fmt.Printf("Error sending push notification: %v", err)
+		}
 	}
 
 	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
