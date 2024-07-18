@@ -56,28 +56,6 @@ func (s *CommentResponseService) CanCommentResponse(commentId uint, userID uint)
 		return false, errors.New("comment not found")
 	}
 
-	if comment.GetDrop().GetCreatedBy().GetID() != userID {
-		isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, comment.GetDrop().GetCreatedBy().GetID())
-
-		if err != nil {
-			return false, err
-		}
-
-		if !isFollowing {
-			availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(comment.GetDrop().GetID())
-			if err != nil {
-				return false, err
-			}
-			areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
-			if err != nil {
-				return false, err
-			}
-			if !areUserInSameGroups {
-				return false, errors.New("you must follow the drop creator are be in the same group before posting comments")
-			}
-		}
-	}
-
 	return true, nil
 }
 
