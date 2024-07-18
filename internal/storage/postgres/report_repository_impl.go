@@ -178,6 +178,9 @@ func (r *repoReportPrivate) GetAllReports(page int, pageSize int) ([]model.Repor
 	}
 	var result []model.ReportModel
 	for _, report := range reports {
+		if report.ReportedDrop.ID == 0 && report.ReportedComment.ID == 0 && report.ReportedResponse.ID == 0 {
+			continue
+		}
 		result = append(result, &report)
 	}
 	return result, nil
