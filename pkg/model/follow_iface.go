@@ -29,6 +29,7 @@ type FollowRepository interface {
 	CountFollowed(userID uint) int
 	GetUserFollowedBy(followerID uint, followedID uint) (FollowModel, error)
 	GetFollowByID(followID uint) (FollowModel, error)
+	GetPendingFollowByID(followID uint) (FollowModel, error)
 }
 
 type FollowService interface {

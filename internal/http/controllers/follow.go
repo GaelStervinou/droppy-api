@@ -359,7 +359,7 @@ func AcceptRequest(c *gin.Context) {
 // @Failure		422
 // @Failure		401
 // @Failure		500
-// @Router			/follows/refuse/{id} [delete]
+// @Router			/follows/reject/{id} [post]
 func RejectRequest(c *gin.Context) {
 	currentUserId, exists := c.Get("userId")
 
@@ -391,7 +391,7 @@ func RejectRequest(c *gin.Context) {
 
 	followRepo := postgres.NewFollowRepo(sqlDB)
 
-	myFollow, err := followRepo.GetFollowByID(followId)
+	myFollow, err := followRepo.GetPendingFollowByID(followId)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

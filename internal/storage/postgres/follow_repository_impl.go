@@ -235,3 +235,20 @@ func (r *repoFollowPrivate) GetFollowByID(followID uint) (model.FollowModel, err
 
 	return &follow, nil
 }
+
+func (r *repoFollowPrivate) GetPendingFollowByID(followID uint) (model.FollowModel, error) {
+	var follow Follow
+	result := r.db.
+		Preload("Follower").
+		Preload("Followed").
+		Where("id = ? AND status = ?", followID, new(FollowPendingStatus).ToInt()).First(&follow)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if follow.CreatedAt.IsZero() {
+		return nil, nil
+	}
+
+	return &follow, nil
+}

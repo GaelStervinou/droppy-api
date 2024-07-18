@@ -570,6 +570,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/users/search": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Search user by admin user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Search user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "search",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response_models.AdminGetUserResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/admin/users/{id}": {
             "put": {
                 "security": [
@@ -1335,8 +1378,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/follows/refuse/{id}": {
-            "delete": {
+        "/follows/reject/{id}": {
+            "post": {
                 "security": [
                     {
                         "BearerAuth": []
@@ -2927,6 +2970,38 @@ const docTemplate = `{
                 }
             }
         },
+        "response_models.AdminGetUserResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isPrivate": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "response_models.GetCommentResponse": {
             "type": "object",
             "properties": {
@@ -3298,7 +3373,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3000",
+	Host:             "https://droppy.gael-stervinou.fr",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Droppy API",

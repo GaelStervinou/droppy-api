@@ -22,7 +22,7 @@ import (
 
 // @contact.name   Droppy API Support
 // @contact.email  stervinou.g36@gmail.com
-// @host localhost:3000
+// @host https://droppy.gael-stervinou.fr
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header

@@ -447,6 +447,27 @@ definitions:
       verifyToken:
         type: string
     type: object
+  response_models.AdminGetUserResponse:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      isPrivate:
+        type: boolean
+      role:
+        type: string
+      status:
+        type: integer
+      username:
+        type: string
+    type: object
   response_models.GetCommentResponse:
     properties:
       content:
@@ -685,7 +706,7 @@ definitions:
         type: string
       type: array
     type: object
-host: localhost:3000
+host: https://droppy.gael-stervinou.fr
 info:
   contact:
     email: stervinou.g36@gmail.com
@@ -1065,6 +1086,33 @@ paths:
       security:
       - BearerAuth: []
       summary: Get all users count
+      tags:
+      - admin
+  /admin/users/search:
+    get:
+      consumes:
+      - application/json
+      description: Search user by admin user
+      parameters:
+      - description: Search query
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response_models.AdminGetUserResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Search user
       tags:
       - admin
   /auth:
@@ -1554,8 +1602,8 @@ paths:
       summary: Accept request
       tags:
       - follow
-  /follows/refuse/{id}:
-    delete:
+  /follows/reject/{id}:
+    post:
       consumes:
       - application/json
       description: Refuse follow request by its ID
