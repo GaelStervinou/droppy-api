@@ -164,9 +164,15 @@ func (repo *repoUserPrivate) GetById(id uint) (model.UserModel, error) {
 	userObject := User{}
 	userObject.ID = id
 
+	validGroupMembers := repo.db.Model(&GroupMember{}).
+		Select("group_id").
+		Where("member_id = ? AND status = 1 AND deleted_at IS NULL", userObject.ID)
 	result := repo.db.
-		Preload("Groups").
-		Joins("LEFT JOIN group_members ON group_members.member_id = users.id AND group_members.deleted_at IS NULL").
+		Table("users").
+		Where("users.id = ?", userObject.ID).
+		Preload("Groups", func(db *gorm.DB) *gorm.DB {
+			return db.Where("groups.id IN (?)", validGroupMembers)
+		}).
 		Preload("Groups.CreatedBy").
 		Find(&userObject)
 	if userObject.CreatedAt.IsZero() {
