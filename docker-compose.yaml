@@ -34,6 +34,8 @@ services:
       - /etc/letsencrypt/live/droppy.gael-stervinou.fr/privkey.pem:/etc/pki/tls/certs/privkey.pem
     depends_on:
       - app
+    networks:
+      - learning
 
   postgresdb:
     image: postgres:latest
