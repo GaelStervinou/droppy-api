@@ -71,23 +71,25 @@ func (s *CommentService) CanCommentDrop(dropID uint, userID uint) (bool, error) 
 		return false, errors.New("you must drop before posting comments")
 	}
 
-	isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, drop.GetCreatedBy().GetID())
+	if drop.GetCreatedBy().GetID() != userID {
+		isFollowing, err := s.Repo.FollowRepository.IsActiveFollowing(userID, drop.GetCreatedBy().GetID())
 
-	if err != nil {
-		return false, err
-	}
-
-	if !isFollowing {
-		availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(drop.GetID())
 		if err != nil {
 			return false, err
 		}
-		areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
-		if err != nil {
-			return false, err
-		}
-		if !areUserInSameGroups {
-			return false, errors.New("you must follow the drop creator are be in the same group before posting comments")
+
+		if !isFollowing {
+			availableGroups, err := s.Repo.GroupDropRepository.GetGroupIdsByDropId(drop.GetID())
+			if err != nil {
+				return false, err
+			}
+			areUserInSameGroups, err := s.Repo.GroupMemberRepository.IsUserInGroups(availableGroups, userID)
+			if err != nil {
+				return false, err
+			}
+			if !areUserInSameGroups {
+				return false, errors.New("you must follow the drop creator or to be in the same group before posting comments")
+			}
 		}
 	}
 
