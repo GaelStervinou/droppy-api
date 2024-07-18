@@ -148,6 +148,7 @@ func main() {
 		admin := v1.Group("/admin")
 		{
 			admin.GET("/users", middlewares.AdminRequired(), controllers.GetAllUsers)
+			admin.GET("/users/search", middlewares.AdminRequired(), controllers.AdminSearchUser)
 			admin.GET("/users/count", middlewares.AdminRequired(), controllers.GetAllUsersCount)
 			admin.PUT("/users/:id", middlewares.AdminRequired(), controllers.UpdateUser)
 			admin.GET("/groups", middlewares.AdminRequired(), controllers.GetAllGroups)
@@ -159,7 +160,6 @@ func main() {
 			admin.GET("/comments", middlewares.AdminRequired(), controllers.GetAllComments)
 			admin.DELETE("/comments/:id", middlewares.AdminRequired(), controllers.DeleteComment)
 			admin.GET("/reports", middlewares.AdminRequired(), controllers.GetAllReports)
-			//admin.GET("/reports/count", middlewares.AdminRequired(), controllers.GetAllReportsCount)
 			admin.PUT("/reports/:id", middlewares.AdminRequired(), controllers.AdminManageReport)
 			admin.POST("/drops/schedule", middlewares.AdminRequired(), controllers.AdminScheduleDrop)
 			admin.POST("/drops/send-now", middlewares.AdminRequired(), controllers.AdminSendDropNow)

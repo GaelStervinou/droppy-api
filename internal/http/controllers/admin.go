@@ -49,6 +49,39 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, usersResponse)
 }
 
+// AdminSearchUser godoc
+//
+// @Summary		Search user
+// @Description	Search user by admin user
+// @Tags			admin
+// @Accept			json
+// @Produce		json
+// @Security BearerAuth
+// @Param			search query string true "Search query"
+// @Success		200	{object} []response_models.AdminGetUserResponse
+// @Failure		500
+// @Router			/admin/users/search [get]
+func AdminSearchUser(c *gin.Context) {
+	sqlDB := postgres.Connect()
+
+	us := postgres.NewUserRepo(sqlDB)
+
+	search := c.Query("search")
+
+	users, err := us.Search(search)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var usersResponse []response_models.GetUserResponseInterface
+	for _, userModel := range users {
+		usersResponse = append(usersResponse, response_models.FormatAdminGetUserResponse(userModel))
+	}
+
+	c.JSON(http.StatusOK, usersResponse)
+}
+
 // GetAllUsersCount godoc
 //
 // @Summary		Get all users count
