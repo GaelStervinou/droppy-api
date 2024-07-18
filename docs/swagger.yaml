@@ -96,8 +96,9 @@ definitions:
         $ref: '#/definitions/multipart.FileHeader'
     required:
     - content
+    - contentPicturePath
     - contentTitle
-    - description
+    - picture
     type: object
   model.DropPatch:
     properties:
@@ -183,6 +184,13 @@ definitions:
         type: integer
     required:
     - description
+    type: object
+  model.ScheduleDropParam:
+    properties:
+      type:
+        type: string
+    required:
+    - type
     type: object
   model.UserCreationParam:
     properties:
@@ -475,6 +483,15 @@ definitions:
       id:
         type: integer
     type: object
+  response_models.GetDropNotificationResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+    type: object
   response_models.GetDropResponse:
     properties:
       comments:
@@ -726,6 +743,15 @@ paths:
       consumes:
       - application/json
       description: Get all drops by admin user
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -765,11 +791,93 @@ paths:
       summary: Delete drop
       tags:
       - admin
+  /admin/drops/count:
+    get:
+      consumes:
+      - application/json
+      description: Get all drops count by admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get all drops count
+      tags:
+      - admin
+  /admin/drops/schedule:
+    post:
+      consumes:
+      - application/json
+      description: Schedule drop by admin user
+      parameters:
+      - description: Send drop data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/model.ScheduleDropParam'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response_models.GetDropNotificationResponse'
+        "422":
+          description: Invalid drop data
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Schedule drop
+      tags:
+      - admin
+  /admin/drops/send-now:
+    post:
+      consumes:
+      - application/json
+      description: Send drop now by admin user
+      parameters:
+      - description: Send drop data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/model.ScheduleDropParam'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response_models.GetDropNotificationResponse'
+        "422":
+          description: Invalid drop data
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Send drop now
+      tags:
+      - admin
   /admin/groups:
     get:
       consumes:
       - application/json
       description: Get all groups by admin user
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -809,11 +917,37 @@ paths:
       summary: Delete group
       tags:
       - admin
+  /admin/groups/count:
+    get:
+      consumes:
+      - application/json
+      description: Get all groups count by admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get all groups count
+      tags:
+      - admin
   /admin/reports:
     get:
       consumes:
       - application/json
       description: Get all reports by admin user
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -860,6 +994,15 @@ paths:
       consumes:
       - application/json
       description: Get all users by admin user
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -907,17 +1050,11 @@ paths:
       summary: Update user
       tags:
       - admin
-  /admin/users/{id}/ban:
-    put:
+  /admin/users/count:
+    get:
       consumes:
       - application/json
-      description: Ban user by admin user
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
+      description: Get all users count by admin user
       produces:
       - application/json
       responses:
@@ -927,30 +1064,7 @@ paths:
           description: Internal Server Error
       security:
       - BearerAuth: []
-      summary: Ban user
-      tags:
-      - admin
-  /admin/users/{id}/unban:
-    put:
-      consumes:
-      - application/json
-      description: Unban user by admin user
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Unban user
+      summary: Get all users count
       tags:
       - admin
   /auth:
@@ -1782,7 +1896,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/account.TokenInfo'
+            $ref: '#/definitions/response_models.GetUserResponse'
         "422":
           description: Unprocessable Entity
           schema:

@@ -534,7 +534,7 @@ func AdminScheduleDrop(c *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Security BearerAuth
-// @Param			params	body model.SendDropRequest true "Send drop data"
+// @Param			params	body model.ScheduleDropParam true "Send drop data"
 // @Success		201 {object} response_models.GetDropNotificationResponse
 // @Failure		422 "Invalid drop data"
 // @Failure		500
