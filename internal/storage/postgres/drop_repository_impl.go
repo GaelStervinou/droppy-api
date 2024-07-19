@@ -173,6 +173,11 @@ func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 		First(&drop, dropId).Error; err != nil {
 		return nil, err
 	}
+	var totalLikes int64
+	if err := r.db.Model(&Like{}).Where("drop_id = ?", drop.ID).Count(&totalLikes).Error; err != nil {
+		return nil, err
+	}
+	drop.TotalLikes = int(totalLikes)
 	return &drop, nil
 }
 

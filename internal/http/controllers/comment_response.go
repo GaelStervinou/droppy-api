@@ -84,7 +84,12 @@ func RespondToComment(c *gin.Context) {
 		log.Printf("Error getting comment: %v", err)
 	}
 
-	drop := comment.GetDrop()
+	drop, err := cs.Repo.DropRepository.GetDropById(comment.GetDrop().GetID())
+
+	if err != nil {
+		log.Printf("Error getting drop: %v", err)
+		return
+	}
 
 	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
 
