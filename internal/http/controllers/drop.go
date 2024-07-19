@@ -550,7 +550,19 @@ func PatchDrop(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 
-	_ = NewDropAvailable(uintCurrentUserId, updatedDrop)
+	lastDropNotif, err := ds.Repo.DropNotificationRepository.GetCurrentDropNotification()
+
+	if err != nil {
+		return
+	}
+
+	if nil == lastDropNotif {
+		return
+	}
+
+	if lastDropNotif.GetID() == updatedDrop.GetDropNotificationID() {
+		_ = NewDropAvailable(uintCurrentUserId, updatedDrop)
+	}
 }
 
 var hasUserDroppedTodayConnections = make(map[string]*WebSocketConnection)
