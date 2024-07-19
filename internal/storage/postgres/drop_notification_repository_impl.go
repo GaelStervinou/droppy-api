@@ -40,6 +40,6 @@ func (r *repoDropNotifPrivate) GetNotificationByID(notificationId uint) (model.D
 
 func (r *repoDropNotifPrivate) GetCurrentDropNotification() (model.DropNotificationModel, error) {
 	var notification DropNotification
-	r.db.Last(&notification)
+	r.db.Order("id desc").First(&notification)
 	return &notification, nil
 }

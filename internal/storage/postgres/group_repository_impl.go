@@ -122,7 +122,7 @@ func (r repoGroupPrivate) GetById(id uint) (model.GroupModel, error) {
 	result := r.db.
 		Preload("CreatedBy").
 		Preload("GroupMembers", func(db *gorm.DB) *gorm.DB {
-			return db.Where("status = ?", 1).Order("created_at DESC")
+			return db.Where("status = ?", 1).Order("created_at ASC")
 		}).
 		Preload("GroupMembers.Member", "status = 1").
 		Joins("JOIN group_members ON group_members.group_id = groups.id AND group_members.status = ?", 1).
