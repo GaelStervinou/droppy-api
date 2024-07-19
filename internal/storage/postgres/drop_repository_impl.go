@@ -166,9 +166,13 @@ func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 	var drop Drop
 	if err := r.db.
 		Preload("CreatedBy").
-		Preload("Comments").
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.CreatedBy").
-		Preload("Comments.Responses").
+		Preload("Comments.Responses", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.Responses.CreatedBy").
 		First(&drop, dropId).Error; err != nil {
 		return nil, err
@@ -183,7 +187,14 @@ func (r *repoDropPrivate) GetDropById(dropId uint) (model.DropModel, error) {
 
 func (r *repoDropPrivate) GetUserDrops(userId uint) ([]model.DropModel, error) {
 	var drops []Drop
-	if err := r.db.Preload("CreatedBy").Preload("Comments").Where("created_by_id = ?", userId).Find(&drops).Error; err != nil {
+	if err := r.db.Preload("CreatedBy").
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Preload("Comments.Responses", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Where("created_by_id = ?", userId).Find(&drops).Error; err != nil {
 		return nil, err
 	}
 	var result []model.DropModel
@@ -213,9 +224,13 @@ func (r *repoDropPrivate) GetDropsByUserIdsAndDropNotificationId(userIds []uint,
 	var drops []Drop
 	if err := r.db.
 		Preload("CreatedBy").
-		Preload("Comments").
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.CreatedBy").
-		Preload("Comments.Responses").
+		Preload("Comments.Responses", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.Responses.CreatedBy").
 		Where("created_by_id IN ? AND drop_notification_id = ?", userIds, dropNotifId).
 		Order("created_at desc").
@@ -250,9 +265,13 @@ func (r *repoDropPrivate) GetUserPinnedDrops(userId uint) ([]model.DropModel, er
 	var drops []Drop
 	if err := r.db.
 		Preload("CreatedBy").
-		Preload("Comments").
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.CreatedBy").
-		Preload("Comments.Responses").
+		Preload("Comments.Responses", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.Responses.CreatedBy").
 		Where("created_by_id = ? AND is_pinned = ?", userId, true).
 		Order("created_at desc").
@@ -271,8 +290,13 @@ func (r *repoDropPrivate) GetUserLastDrop(userId uint, lastNotifID uint) (model.
 	var drop Drop
 	if err := r.db.
 		Preload("CreatedBy").
-		Preload("Comments").
-		Preload("Comments.Responses").
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Preload("Comments.CreatedBy").
+		Preload("Comments.Responses", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
 		Preload("Comments.Responses.CreatedBy").
 		Where("created_by_id = ? AND drop_notification_id = ?", userId, lastNotifID).
 		Order("created_at desc").
