@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -335,8 +334,6 @@ func GetAllReports(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
-
-	fmt.Printf("page: %d, pageSize: %d\n", page, pageSize)
 
 	reports, err := rr.GetAllReports(page, pageSize)
 	if err != nil {

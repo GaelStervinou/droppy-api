@@ -6,6 +6,7 @@ import (
 	"go-api/internal/services/account"
 	"go-api/pkg/jwt_helper"
 	"go-api/pkg/model"
+	"log"
 	"net/http"
 )
 
@@ -87,6 +88,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid email or password"})
 		return
 	}
+	log.Println("Info: Login success with token " + tokenInfo.JWTToken)
 
 	c.JSON(http.StatusOK, tokenInfo)
 }

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
@@ -99,16 +98,10 @@ func RespondToComment(c *gin.Context) {
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), drop)
-		if err != nil {
-			log.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), drop)
 	}
 
-	err = NewDropAvailable(drop.GetCreatedById(), drop)
-	if err != nil {
-		log.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(drop.GetCreatedById(), drop)
 }
 
 // DeleteCommentResponse godoc
@@ -162,7 +155,6 @@ func DeleteCommentResponse(c *gin.Context) {
 	commentResponse, err := cs.Repo.CommentResponseRepository.GetById(uint(commentResponseIdUint))
 
 	if err != nil {
-		fmt.Printf("Error getting comment response: %v", err)
 		return
 	}
 
@@ -192,14 +184,8 @@ func DeleteCommentResponse(c *gin.Context) {
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), drop)
-		if err != nil {
-			log.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), drop)
 	}
 
-	err = NewDropAvailable(drop.GetCreatedById(), drop)
-	if err != nil {
-		log.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(drop.GetCreatedById(), drop)
 }

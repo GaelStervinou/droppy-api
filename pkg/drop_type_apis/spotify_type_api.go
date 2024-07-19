@@ -1,7 +1,6 @@
 package drop_type_apis
 
 import (
-	"fmt"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/net/context"
@@ -21,15 +20,13 @@ type SpotifyAPI struct {
 func (s *SpotifyAPI) Search(search string) []ApiSearchResponse {
 	result, err := s.Client.Search(context.Background(), search, spotify.SearchTypeTrack)
 	if err != nil {
-		log.Fatalf("Failed to search for track: %v", err)
+		log.Printf("Error: Failed to search for track: %v", err)
 		return nil
 	}
 
 	if len(result.Tracks.Tracks) == 0 {
-		log.Printf("No results found for search query %s\n", search)
 		return nil
 	}
-	fmt.Println(result.Tracks.Tracks[0].Name)
 
 	var results []ApiSearchResponse
 	for _, item := range result.Tracks.Tracks {
@@ -59,7 +56,8 @@ func (s *SpotifyAPI) Init() {
 	// Get a token and create a Spotify client
 	token, err := config.Token(ctx)
 	if err != nil {
-		log.Fatalf("Failed to get token: %v", err)
+		log.Printf("Error: Failed to get token: %v", err)
+		return
 	}
 
 	httpClient := spotifyauth.New().Client(ctx, token)

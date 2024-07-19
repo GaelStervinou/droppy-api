@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/repositories"
 	likeservice "go-api/internal/services/like"
 	pushnotificationservice "go-api/internal/services/push_notification"
 	"go-api/pkg/model"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -71,14 +71,12 @@ func LikeDrop(c *gin.Context) {
 	likedDrop, err := ls.Repo.DropRepository.GetDropById(like.GetDropID())
 
 	if err != nil {
-		fmt.Printf("Error getting drop: %v", err)
 		return
 	}
 
 	user, err := ls.Repo.UserRepository.GetById(likedDrop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting user: %v", err)
 		return
 	}
 
@@ -86,28 +84,21 @@ func LikeDrop(c *gin.Context) {
 		pushNotificationService := &pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
 		err = pushNotificationService.SendNotification("like", []string{user.GetFCMToken()})
 		if err != nil {
-			fmt.Printf("Error sending push notification: %v", err)
+			log.Printf("Error: Error sending push notification: %v", err)
 		}
 	}
 
 	followers, err := ls.Repo.FollowRepository.GetFollowers(likedDrop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting followers: %v", err)
 		return
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), likedDrop)
-		if err != nil {
-			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), likedDrop)
 	}
 
-	err = NewDropAvailable(likedDrop.GetCreatedById(), likedDrop)
-	if err != nil {
-		fmt.Printf("Error sending message to user %d: %v", likedDrop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(likedDrop.GetCreatedById(), likedDrop)
 }
 
 // UnlikeDrop godoc
@@ -170,26 +161,18 @@ func UnlikeDrop(c *gin.Context) {
 	unlikedDrop, err := ls.Repo.DropRepository.GetDropById(uint(uintDropId))
 
 	if err != nil {
-		fmt.Printf("Error getting drop: %v", err)
 		return
 	}
 
 	followers, err := ls.Repo.FollowRepository.GetFollowers(unlikedDrop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting followers: %v", err)
 		return
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), unlikedDrop)
-		if err != nil {
-			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), unlikedDrop)
 	}
 
-	err = NewDropAvailable(unlikedDrop.GetCreatedById(), unlikedDrop)
-	if err != nil {
-		fmt.Printf("Error sending message to user %d: %v", unlikedDrop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(unlikedDrop.GetCreatedById(), unlikedDrop)
 }

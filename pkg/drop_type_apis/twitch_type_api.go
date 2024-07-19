@@ -2,7 +2,6 @@ package drop_type_apis
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -61,7 +60,6 @@ func (t *TwitchTypeApi) Search(search string) []ApiSearchResponse {
 }
 
 func (t *TwitchTypeApi) Init() {
-	fmt.Println("Initializing Twitch API")
 	clientID := os.Getenv("TWITCH_CLIENT_ID")
 	clientSecret := os.Getenv("TWITCH_CLIENT_SECRET")
 
@@ -89,7 +87,6 @@ func (t *TwitchTypeApi) Init() {
 
 	t.ClientID = clientID
 	t.Token = tokenResponse.AccessToken
-	fmt.Println("Twitch API initialized")
 }
 
 type TokenResponse struct {

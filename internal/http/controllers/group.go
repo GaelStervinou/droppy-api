@@ -13,6 +13,7 @@ import (
 	"go-api/pkg/errors2"
 	"go-api/pkg/file"
 	"go-api/pkg/model"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -317,6 +318,7 @@ func JoinGroup(c *gin.Context) {
 
 	groupMemberResponse := response_models.FormatGetGroupMemberResponse(createdGroupMember)
 
+	log.Printf("Info: User %d joined group %d\n", uintCurrentUserId, groupId)
 	c.JSON(http.StatusCreated, groupMemberResponse)
 }
 
@@ -383,6 +385,7 @@ func DeleteGroupMember(c *gin.Context) {
 		return
 	}
 
+	log.Printf("Info: User %d left group %d (action amde by %d)\n", uintCurrentUserId, groupIdUint, uintCurrentUserId)
 	c.JSON(http.StatusNoContent, gin.H{"message": "Group member deleted"})
 }
 
@@ -542,6 +545,7 @@ func AddUserToGroup(c *gin.Context) {
 
 	response := response_models.FormatGetGroupMemberResponse(groupMember)
 
+	log.Printf("Info: User %d added user %d to group %d\n", uintCurrentUserId, userIdUint, groupIdUint)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -751,5 +755,6 @@ func DeleteGroup(c *gin.Context) {
 		return
 	}
 
+	log.Printf("Info: User %d deleted group %d\n", uintCurrentUserId, groupId)
 	c.JSON(http.StatusNoContent, nil)
 }

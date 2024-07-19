@@ -1,8 +1,6 @@
 package validation
 
 import (
-	"errors"
-	"go-api/internal/services/drop_type"
 	"go-api/pkg/errors2"
 	"go-api/pkg/model"
 	"net/mail"
@@ -61,22 +59,6 @@ func ValidateDropCreation(args model.DropCreationParam) errors2.MultiFieldsError
 	}
 
 	return finalErrors
-}
-
-func validateContentByType(content string, dropType string) error {
-	dropTypeFactory := drop_type.NewDropTypeFactory()
-
-	dropTypeInstance := dropTypeFactory.CreateDropType(dropType)
-
-	if dropTypeInstance == nil {
-		return errors.New("invalid drop type")
-	}
-
-	if false == dropTypeInstance.IsValidContent(content) {
-		return errors.New("invalid content")
-	}
-
-	return nil
 }
 
 func ValidateGroupCreation(args model.GroupCreationParam) errors2.MultiFieldsError {

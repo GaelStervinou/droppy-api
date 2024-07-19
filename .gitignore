@@ -13,3 +13,4 @@
 
 config/
 /nginx/
+/app.log

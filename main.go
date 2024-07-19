@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -29,17 +28,22 @@ import (
 // @name Authorization
 
 func main() {
-	err := godotenv.Load()
+	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		fmt.Println("Error loading .env file")
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+	defer file.Close()
+	log.SetOutput(file)
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 		return
 	}
 	if env, ok := os.LookupEnv("ENV"); ok {
 		environment.SetEnv(env)
 	}
 
-	fmt.Println("ENV: " + environment.GetEnv())
-
+	log.Println("Info: ENV is: " + environment.GetEnv())
 	postgres.Init()
 	postgres.AutoMigrate()
 	r := gin.Default()
@@ -163,6 +167,11 @@ func main() {
 			admin.PUT("/reports/:id", middlewares.AdminRequired(), controllers.AdminManageReport)
 			admin.POST("/drops/schedule", middlewares.AdminRequired(), controllers.AdminScheduleDrop)
 			admin.POST("/drops/send-now", middlewares.AdminRequired(), controllers.AdminSendDropNow)
+			admin.GET("/logs", middlewares.AdminRequired(), func(c *gin.Context) {
+				c.Writer.Header().Set("Content-Disposition", "attachment; filename=app.log")
+				c.Writer.Header().Set("Content-Type", "application/octet-stream")
+				c.File("app.log")
+			})
 		}
 	}
 	if environment.IsDev() {

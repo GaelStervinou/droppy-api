@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/internal/http/response_models"
 	"go-api/internal/repositories"
 	commentservice "go-api/internal/services/comment"
 	pushnotificationservice "go-api/internal/services/push_notification"
 	"go-api/pkg/model"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -80,14 +80,12 @@ func CommentDrop(c *gin.Context) {
 	drop, err := cs.Repo.DropRepository.GetDropById(uint(dropIdUint))
 
 	if err != nil {
-		fmt.Printf("Error getting drop: %v", err)
 		return
 	}
 
 	user, err := cs.Repo.UserRepository.GetById(drop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting user: %v", err)
 		return
 	}
 
@@ -95,28 +93,21 @@ func CommentDrop(c *gin.Context) {
 		pushNotificationService := &pushnotificationservice.PushNotificationService{Repo: repositories.Setup()}
 		err = pushNotificationService.SendNotification("like", []string{user.GetFCMToken()})
 		if err != nil {
-			fmt.Printf("Error sending push notification: %v", err)
+			log.Printf("Error: Error sending push notification: %v", err)
 		}
 	}
 
 	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting followers: %v", err)
 		return
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), drop)
-		if err != nil {
-			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), drop)
 	}
 
-	err = NewDropAvailable(drop.GetCreatedById(), drop)
-	if err != nil {
-		fmt.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(drop.GetCreatedById(), drop)
 }
 
 // DeleteComment godoc
@@ -170,7 +161,6 @@ func DeleteComment(c *gin.Context) {
 	comment, err := cs.Repo.CommentRepository.GetById(uint(commentIdUint))
 
 	if err != nil {
-		fmt.Printf("Error getting comment: %v", err)
 		return
 	}
 
@@ -186,26 +176,18 @@ func DeleteComment(c *gin.Context) {
 	drop, err := cs.Repo.DropRepository.GetDropById(comment.GetDrop().GetID())
 
 	if err != nil {
-		fmt.Printf("Error getting drop: %v", err)
 		return
 	}
 
 	followers, err := cs.Repo.FollowRepository.GetFollowers(drop.GetCreatedById())
 
 	if err != nil {
-		fmt.Printf("Error getting followers: %v", err)
 		return
 	}
 
 	for _, follower := range followers {
-		err = NewDropAvailable(follower.GetFollowerID(), drop)
-		if err != nil {
-			fmt.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), drop)
 	}
 
-	err = NewDropAvailable(drop.GetCreatedById(), drop)
-	if err != nil {
-		fmt.Printf("Error sending message to user %d: %v", drop.GetCreatedById(), err)
-	}
+	_ = NewDropAvailable(drop.GetCreatedById(), drop)
 }

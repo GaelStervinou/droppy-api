@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/gorilla/websocket"
@@ -37,7 +36,6 @@ func CreateDrop(c *gin.Context) {
 	var dropCreationParam model.DropCreationParam
 
 	if err := c.MustBindWith(&dropCreationParam, binding.FormMultipart); err != nil {
-		fmt.Printf("Error: %v\n", err)
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
@@ -75,7 +73,7 @@ func CreateDrop(c *gin.Context) {
 	if ok {
 		err := wsConn.conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: true})
 		if err != nil {
-			log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+			log.Printf("Error: Error sending message to user %d: %v", uintCurrentUserId, err)
 		}
 	}
 
@@ -89,23 +87,19 @@ func CreateDrop(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("Sending new drop to followers %v\n", userFollowers)
+	log.Printf("Info: Sending new drop to followers %v\n", userFollowers)
 	for _, follower := range userFollowers {
-		err := NewDropAvailable(follower.GetFollowerID(), createdDrop)
-		if err != nil {
-			log.Printf("Error sending message to user %d: %v", follower.GetFollowerID(), err)
-		}
+		_ = NewDropAvailable(follower.GetFollowerID(), createdDrop)
 	}
 
 	drops, err := ds.GetUserFeed(uintCurrentUserId)
 
 	if err != nil {
-		log.Printf("Error getting user feed: %v", err)
 		return
 	}
 	err = NewDropsAvailable(uintCurrentUserId, drops)
 	if err != nil {
-		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		log.Printf("Error: Error sending message to user %d: %v", uintCurrentUserId, err)
 	}
 }
 
@@ -315,9 +309,9 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 
 	mu.Lock()
 	userFeedConnections[strconv.Itoa(int(uintCurrentUserId))] = wsConn
-	fmt.Printf("Users connected to drop feed: %v\n", userFeedConnections)
 	mu.Unlock()
 
+	log.Printf("Info: New user connected to drop feed: %v\n", uintCurrentUserId)
 	ds := &dropservice.DropService{
 		Repo: repositories.Setup(),
 	}
@@ -332,7 +326,7 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 	availableDrops, err := ds.GetUserFeed(uintCurrentUserId)
 
 	if err != nil {
-		log.Printf("Error getting user feed: %v", err)
+		log.Printf("Error: Error getting user feed: %v", err)
 		return
 	}
 
@@ -344,7 +338,6 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), uintCurrentUserId)
 
 		if err != nil {
-			log.Printf("Error checking if user is liking drop: %v", err)
 			return
 		}
 
@@ -352,21 +345,19 @@ func GetCurrentUserFeedWS(c *gin.Context) {
 		dropResponses = append(dropResponses, dropResponse)
 	}
 
-	fmt.Println("Sending drops to WebSocket connection")
 	err = wsConn.conn.WriteJSON(dropResponses)
 	if err != nil {
-		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		log.Printf("Error: Error sending message to user %d: %v", uintCurrentUserId, err)
 		return
 	}
 
 	defer func() {
-		fmt.Println("Closing WebSocket connection")
 		mu.Lock()
 		delete(userFeedConnections, strconv.Itoa(int(uintCurrentUserId)))
 		mu.Unlock()
 		err := conn.Close()
 		if err != nil {
-			log.Printf("Error closing WebSocket connection: %v", err)
+			log.Printf("Error: Error closing WebSocket connection: %v", err)
 		}
 	}()
 
@@ -392,13 +383,19 @@ func NewDropAvailable(userID uint, newDrop model.DropModel) error {
 
 	isCurrentUserLiking, err := ds.IsCurrentUserLiking(newDrop.GetID(), userID)
 	if err != nil {
-		log.Printf("Error checking if user is liking drop: %v", err)
 		return err
 	}
 
 	dropResponse := response_models.FormatGetDropResponse(newDrop, isCurrentUserLiking)
 
-	return wsConn.conn.WriteJSON(dropResponse)
+	log.Printf("Info: Sending drop to user %d\n", userID)
+	err = wsConn.conn.WriteJSON(dropResponse)
+	if err != nil {
+		log.Printf("Error: Error sending message to user %d: %v", userID, err)
+		return err
+	}
+
+	return nil
 }
 
 func NewDropsAvailable(userID uint, newDrops []model.DropModel) error {
@@ -418,7 +415,6 @@ func NewDropsAvailable(userID uint, newDrops []model.DropModel) error {
 		isCurrentUserLiking, err := ds.IsCurrentUserLiking(drop.GetID(), userID)
 
 		if err != nil {
-			log.Printf("Error checking if user is liking drop: %v", err)
 			return err
 		}
 
@@ -553,6 +549,8 @@ func PatchDrop(c *gin.Context) {
 	response := response_models.FormatGetDropResponse(updatedDrop, false)
 
 	c.JSON(http.StatusOK, response)
+
+	_ = NewDropAvailable(uintCurrentUserId, updatedDrop)
 }
 
 var hasUserDroppedTodayConnections = make(map[string]*WebSocketConnection)
@@ -590,14 +588,13 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 	hasDropped, err := ds.HasUserDroppedToday(uintCurrentUserId)
 
 	if err != nil {
-		log.Printf("Error checking if user has dropped today: %v", err)
 		return
 	}
 
 	err = wsConn.conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: hasDropped})
 
 	if err != nil {
-		log.Printf("Error sending message to user %d: %v", uintCurrentUserId, err)
+		log.Printf("Error: Error sending message to user %d: %v", uintCurrentUserId, err)
 		return
 	}
 
@@ -607,7 +604,7 @@ func HasUserDroppedTodayWS(c *gin.Context) {
 		mu.Unlock()
 		err := conn.Close()
 		if err != nil {
-			log.Printf("Error closing WebSocket connection: %v", err)
+			log.Printf("Error: Error closing WebSocket connection: %v", err)
 		}
 	}()
 
@@ -624,10 +621,10 @@ func RefreshHasUserDroppedToday() {
 	for userId := range hasUserDroppedTodayConnections {
 		err := hasUserDroppedTodayConnections[userId].conn.WriteJSON(response_models.HasUserDroppedTodayResponse{Status: false})
 		if err != nil {
-			log.Printf("Error sending message to user %s: %v", userId, err)
+			log.Printf("Error: Error sending message to user %s: %v", userId, err)
 			err = hasUserDroppedTodayConnections[userId].conn.Close()
 			if err != nil {
-				log.Printf("Error closing WebSocket connection: %v", err)
+				log.Printf("Error: Error closing WebSocket connection: %v", err)
 			}
 			delete(hasUserDroppedTodayConnections, userId)
 			continue

@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -47,5 +46,5 @@ func AutoMigrate() {
 		&Like{},
 		&Report{},
 	)
-	fmt.Println("Migrations done")
+	log.Println("Info: Migrations done")
 }

@@ -3,7 +3,6 @@ package push_notification
 import (
 	"context"
 	"firebase.google.com/go/v4/messaging"
-	"fmt"
 	"go-api/internal/repositories"
 	"go-api/internal/storage/firebase"
 	"go-api/internal/storage/postgres"
@@ -18,19 +17,19 @@ type PushNotificationService struct {
 
 func (s *PushNotificationService) SendDropNotification(fcmTokens []string, dropType string) {
 	if len(fcmTokens) == 0 {
-		log.Println("No FCM tokens to send notifications to")
+		log.Println("Error: No FCM tokens to send notifications to")
 		return
 	}
 
 	firebaseRepo, err := firebase.NewRepo()
 	if err != nil {
-		log.Println("Error getting firebase repo:", err)
+		log.Println("Error: Error getting firebase repo:", err)
 		return
 	}
 
 	client, err := firebaseRepo.App.Messaging(context.Background())
 	if err != nil {
-		log.Println("Error getting messaging client:", err)
+		log.Println("Error: Error getting messaging client:", err)
 		return
 	}
 
@@ -47,9 +46,9 @@ func (s *PushNotificationService) SendDropNotification(fcmTokens []string, dropT
 		})
 
 		if err2 != nil {
-			log.Println("Error sending single message:", err2)
+			log.Println("Error: Error sending single message:", err2)
 		} else {
-			fmt.Println("Single message response:", response2)
+			log.Println("Info: Single message response:", response2)
 		}
 	} else {
 		response, err := client.SendEachForMulticast(ctx, &messaging.MulticastMessage{
@@ -61,13 +60,13 @@ func (s *PushNotificationService) SendDropNotification(fcmTokens []string, dropT
 		})
 
 		if err != nil {
-			log.Println("Error sending multicast message:", err)
+			log.Println("Error: Error sending multicast message:", err)
 		} else {
-			fmt.Println("Multicast response:", response)
+			log.Println("Info: Multicast response:", response)
 		}
 	}
 
-	fmt.Println("FCM tokens used:", fcmTokens)
+	log.Println("Info: FCM tokens used:", fcmTokens)
 }
 
 func (s *PushNotificationService) SendNotificationsToAllUser(dropType string) {
@@ -76,7 +75,7 @@ func (s *PushNotificationService) SendNotificationsToAllUser(dropType string) {
 	userRepo := postgres.NewUserRepo(sqlDB)
 	fcmTokens, err := userRepo.GetAllFCMTokens()
 	if err != nil {
-		log.Println("Error getting FCM tokens:", err)
+		log.Println("Error: Error getting FCM tokens:", err)
 		return
 	}
 
@@ -107,7 +106,7 @@ func (s *PushNotificationService) GenerateRandomNotification(dropType string) {
 	}
 
 	duration := randomTime.Sub(now)
-	fmt.Printf("Notification scheduled for: %v\n", randomTime)
+	log.Printf("Info: Notification scheduled for: %v\n", randomTime)
 
 	// Sleep until the random time and then send the notification
 	time.Sleep(duration)
@@ -117,19 +116,19 @@ func (s *PushNotificationService) GenerateRandomNotification(dropType string) {
 
 func (s *PushNotificationService) SendNotification(notifType string, fcmTokens []string) error {
 	if len(fcmTokens) == 0 {
-		log.Println("No FCM tokens to send notifications to")
+		log.Println("Error: No FCM tokens to send notifications to")
 		return nil
 	}
 
 	firebaseRepo, err := firebase.NewRepo()
 	if err != nil {
-		log.Println("Error getting firebase repo:", err)
+		log.Println("Error: Error getting firebase repo:", err)
 		return err
 	}
 
 	client, err := firebaseRepo.App.Messaging(context.Background())
 	if err != nil {
-		log.Println("Error getting messaging client:", err)
+		log.Println("Error: Error getting messaging client:", err)
 		return err
 	}
 
@@ -143,9 +142,9 @@ func (s *PushNotificationService) SendNotification(notifType string, fcmTokens [
 		})
 
 		if err2 != nil {
-			log.Println("Error sending single message:", err2)
+			log.Println("Error: Error sending single message:", err2)
 		} else {
-			fmt.Println("Single message response:", response2)
+			log.Println("Info: Single message response:", response2)
 		}
 	} else {
 		response, err := client.SendEachForMulticast(ctx, &messaging.MulticastMessage{
@@ -154,9 +153,9 @@ func (s *PushNotificationService) SendNotification(notifType string, fcmTokens [
 		})
 
 		if err != nil {
-			log.Println("Error sending multicast message:", err)
+			log.Println("Error: Error sending multicast message:", err)
 		} else {
-			fmt.Println("Multicast response:", response)
+			log.Println("Info: Multicast response:", response)
 		}
 	}
 

@@ -6,7 +6,6 @@ import (
 )
 
 type Repositories struct {
-	//wg              *sync.WaitGroup
 	UserRepository             model.UserRepository
 	TokenRepository            model.AuthTokenRepository
 	DropRepository             model.DropRepository

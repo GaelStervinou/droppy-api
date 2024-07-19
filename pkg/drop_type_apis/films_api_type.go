@@ -16,26 +16,24 @@ func (f *FilmsAPI) Search(search string) []ApiSearchResponse {
 	apiKey := os.Getenv("TMDB_API_KEY")
 
 	if apiKey == "" {
-		log.Printf("The Movie Database API key not found in environment variable TMDB_API_KEY\n")
+		log.Printf("Error: The Movie Database API key not found in environment variable TMDB_API_KEY\n")
 		return nil
 	}
 	url := fmt.Sprintf("https://api.themoviedb.org/3/search/multi?api_key=%s&query=%s&page=1", apiKey, search)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
+		log.Println("Error: Error trying to get films from tmdb API:", err)
+		return nil
 	}
 	defer resp.Body.Close()
 
 	var result TMDBResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		fmt.Println("Error decoding response:", err)
 		return nil
 	}
 
 	if len(result.Results) == 0 {
-		log.Printf("No results found for search query %s\n", search)
 		return nil
 	}
 

@@ -5,6 +5,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
+	"log"
 	"os"
 )
 
@@ -22,12 +23,10 @@ func (y *YoutubeAPI) Search(search string) []ApiSearchResponse {
 	response, err := call.Do()
 
 	if err != nil {
-		fmt.Printf("Unable to retrieve search results with search query %s : %v\n", search, err)
 		return nil
 	}
 
 	if len(response.Items) == 0 {
-		fmt.Printf("No results found for search query %s\n", search)
 		return nil
 	}
 
@@ -49,12 +48,13 @@ func (y *YoutubeAPI) Init() {
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
 
 	if apiKey == "" {
-		fmt.Printf("YouTube API key not found in environment variable YOUTUBE_API_KEY\n")
+		log.Printf("Error: YouTube API key not found in environment variable YOUTUBE_API_KEY\n")
+		return
 	}
 
 	service, err := youtube.NewService(context.Background(), option.WithAPIKey(apiKey))
 	if err != nil {
-		fmt.Printf("Unable to create YouTube service: %v\n", err)
+		log.Printf("Error: Unable to create YouTube service: %v\n", err)
 	}
 	y.Client = service
 }
